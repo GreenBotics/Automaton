@@ -1,28 +1,79 @@
 /** @jsx hJSX */
-import Cycle from '@cycle/core';
-import {makeDOMDriver, hJSX} from '@cycle/dom';
+import Cycle from '@cycle/core'
+import {Rx} from '@cycle/core'
+import {makeDOMDriver, hJSX} from '@cycle/dom'
 
-function main(drivers) {
-  return {
-    DOM: drivers.DOM.get('.checker', 'click')
-      .map(ev => ev.target.checked)
-      .startWith(false)
-      .map(toggled =>
-        <div>
-          <input type="checkbox" className="checker" checked={toggled}/> Toggle me
-          <p>{toggled ? 'ON' : 'off'}</p>
-          <div>
-            Some other stuff here
-              <input type="checkbox" className="checker2" checked={toggled}/> Toggle me too
-              <p>{toggled ? 'ON' : 'off'}</p>
-          </div>
-        </div>
-      )
-  };
+import {renderLabeledCheckbox} from './relayControl'
+import SocketIO from 'cycle-socket.io'
+
+
+function zop(DOM) {
+  return DOM.get('#checker0', 'click')
+      .map(e => e.target.checked)
+      .map(e => ({name:"relay0",toggled:e})  )
 }
 
+
+function main(drivers) {
+  let DOM      = drivers.DOM
+  let socketIO = drivers.socketIO
+
+
+  function renderRelays(relaysData){
+    return relaysData.map( (relayData,index) =>
+      <div>
+        {relayData.name}
+        { renderLabeledCheckbox("Toggle:", relayData.toggled, "checker"+index, "relayToggler") } 
+      </div>
+    )
+  }
+
+  function view(model$){
+    return model$.map(model =>
+      <div>
+        <div> Relays: </div>
+        {renderRelays(model.relays)}
+      </div>
+    )
+  }
+
+  function model(actions){
+    const defaults = {
+      relays:[
+         {toggled:false,name:"relay0"}
+        ,{toggled:false,name:"relay1"}
+        ,{toggled:true, name:"relay2"}
+      ]
+    }
+
+    return Rx.Observable.just(defaults)
+  }
+
+
+  let stream$ = zop(DOM)//Rx.Observable.just("bla")
+  const incomingMessages$ = socketIO.get('messageType')
+  const outgoingMessages$ = stream$.map( 
+    function(eventData){
+      return {
+        messageType: 'someEvent',
+        message: JSON.stringify(eventData)
+      }
+    })
+
+  return {
+      DOM: view(model())
+    , socketIO: outgoingMessages$
+  }
+}
+
+//////////setup drivers
+let socketIODriver = SocketIO.createSocketIODriver(window.location.origin)
+let domDriver      = makeDOMDriver('#app')
+
 let drivers = {
-  DOM: makeDOMDriver('#app')
-};
+
+   DOM: domDriver
+  ,socketIO: socketIODriver
+}
 
 Cycle.run(main, drivers)
