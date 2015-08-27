@@ -3,6 +3,18 @@ Automaton, home automaton & stuff
 
 
 
+Building
+========
+
+
+client side code (uses webpack, continuous build)
+
+          npm run build2
+
+
+server side code
+
+          npm run build-srv
 
 
 Authors
