@@ -5,10 +5,15 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 import combineTemplate from 'rx.observable.combinetemplate'
 
 
-import {renderLabeledCheckbox} from './relayControl'
+import {renderLabeledCheckbox} from './uiElements'
 import SocketIO from 'cycle-socket.io'
 
 import {modelHelper} from './modelHelper'
+
+
+import Immutable from 'seamless-immutable'
+//import Immutable from 'immutable'
+
 
 
 function intent(DOM){
@@ -38,34 +43,57 @@ function main(drivers) {
   }
 
   function view(model$){
+
     return model$.map(model =>
       <div>
         <div> Relays: </div>
-        {renderRelays(model.relays)}
+          {renderRelays( model.relays.asMutable() )}
       </div>
     )
   }
 
-
   function model(actions){
 
-    const defaults = {
-      relays:[
-         {toggled:false,name:"relay0"}
-        ,{toggled:false,name:"relay1"}
-        ,{toggled:true, name:"relay2"}
-      ]
-    }
+    const defaults = Immutable(
+      {
+        relays:[
+           {toggled:false,name:"relay0"}
+          ,{toggled:false,name:"relay1"}
+          ,{toggled:true, name:"relay2"}
+        ]
+      }
+    )
+
+    //console.log("defaults",defaults)
 
     function modifications(actions){
       let toggleRelayMod$ = actions.toggleRelay$
         .map((toggleInfo) => (currentData) => {
+          /*//normal
           let targetRelay = currentData.relays[toggleInfo.id]
           if(targetRelay){
             targetRelay.toggled = toggleInfo.toggled
           }
-          console.log("targetRelay",targetRelay,toggleInfo.id, toggleInfo)
+          console.log("targetRelay",targetRelay,toggleInfo.id, toggleInfo)*/
           
+          /*//Immutable.js
+          let targetRelay = currentData.get("relays",toggleInfo.id)
+          console.log("targetRelay",targetRelay,toggleInfo.id, toggleInfo)
+
+          if(targetRelay)
+          {
+            targetRelay.set("toggled",toggleInfo.toggled)
+          }*/
+
+          //seamless-immutable
+          let targetRelay = currentData.relays[toggleInfo.id]
+          //console.log("targetRelay",targetRelay,toggleInfo.id, toggleInfo)
+
+          if(targetRelay)
+          {
+            targetRelay.merge({toggled:toggleInfo.toggled})
+          }
+
           return currentData
         })
 
@@ -76,9 +104,6 @@ function main(drivers) {
 
     return modelHelper(defaults,modifications)(actions)
   }
-
-
-
 
 
 

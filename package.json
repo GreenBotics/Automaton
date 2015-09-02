@@ -18,10 +18,12 @@
     "cron": "ncb000gt/node-cron",
     "cycle-socket.io": "^1.0.0",
     "cyclejs": "^0.24.1",
+    "immutable": "^3.7.4",
     "rpi-gpio": "^0.6.0",
     "rx-lite": "^2.5.2",
     "rx-node": "^1.0.1",
     "rx.observable.combinetemplate": "^0.2.6",
+    "seamless-immutable": "^3.0.0",
     "socket.io": "^1.3.6",
     "socket.io-client": "^1.3.5"
   },
