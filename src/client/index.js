@@ -2,15 +2,24 @@
 import Cycle from '@cycle/core'
 import {Rx} from '@cycle/core'
 import {makeDOMDriver, hJSX} from '@cycle/dom'
+import combineTemplate from 'rx.observable.combinetemplate'
+
 
 import {renderLabeledCheckbox} from './relayControl'
 import SocketIO from 'cycle-socket.io'
 
 
-function zop(DOM) {
-  return DOM.get('#checker0', 'click')
-      .map(e => e.target.checked)
-      .map(e => ({name:"relay0",toggled:e})  )
+
+
+function intent(DOM){
+  let toggleRelay$ =  DOM.get('.relayToggler', 'click')
+    .do(e=>console.log("EVENT",e))
+    .map(function(e){
+      let id = parseInt( e.target.id.split("_").pop() )
+      return {id,toggled:e.target.checked}
+    })
+
+  return {toggleRelay$}
 }
 
 
@@ -23,7 +32,7 @@ function main(drivers) {
     return relaysData.map( (relayData,index) =>
       <div>
         {relayData.name}
-        { renderLabeledCheckbox("Toggle:", relayData.toggled, "checker"+index, "relayToggler") } 
+        { renderLabeledCheckbox("Toggle:", relayData.toggled, "checker_"+index, "relayToggler") } 
       </div>
     )
   }
@@ -38,6 +47,7 @@ function main(drivers) {
   }
 
   function model(actions){
+
     const defaults = {
       relays:[
          {toggled:false,name:"relay0"}
@@ -46,11 +56,46 @@ function main(drivers) {
       ]
     }
 
-    return Rx.Observable.just(defaults)
+  
+    function modifications(actions){
+      let toggleRelayMod$ = actions.toggleRelay$
+        .map((toggleInfo) => (currentData) => {
+          let targetRelay = currentData.relays[toggleInfo.id]
+          if(targetRelay){
+            targetRelay.toggled = toggleInfo.toggled
+          }
+          console.log("targetRelay",targetRelay,toggleInfo.id, toggleInfo)
+          
+          return currentData
+        })
+
+      return Rx.Observable.merge(
+        toggleRelayMod$
+        )
+    }
+
+    /*let model$ = combineTemplate(
+    {
+      relays:[
+        actions.
+      ]
+    }*/
+
+    let source$ =  Rx.Observable.just(defaults)
+    let mods$   =  modifications(actions)
+
+    return mods$
+      .merge(source$)
+      .scan((currentData, modFn) => modFn(currentData))//combine existing data with new one
+      //.distinctUntilChanged()
+      .shareReplay(1)
+
+    //return Rx.Observable.just(defaults)
   }
 
+  let model$ = model(intent(DOM))
 
-  let stream$ = zop(DOM)//Rx.Observable.just("bla")
+  let stream$ = model$//zop(DOM)//Rx.Observable.just("bla")
   const incomingMessages$ = socketIO.get('messageType')
   const outgoingMessages$ = stream$.map( 
     function(eventData){
@@ -61,7 +106,7 @@ function main(drivers) {
     })
 
   return {
-      DOM: view(model())
+      DOM: view(model$)
     , socketIO: outgoingMessages$
   }
 }
