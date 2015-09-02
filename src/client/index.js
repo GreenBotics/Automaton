@@ -6,17 +6,16 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 import SocketIO from 'cycle-socket.io'
 
 import {renderRelays} from './uiElements'
-import {modelHelper} from './modelHelper'
 import {model, intent} from './model'
-
-
-import Immutable from 'seamless-immutable'
-//import Immutable from 'immutable'
 
 
 function view(model$){
   return model$.map(model =>
     <div>
+      <div> 
+        <button id="undo"> undo </button>
+        <button id="redo"> redo </button>
+      </div> 
       <div> Relays: </div>
         {renderRelays( model.relays.asMutable() )}
     </div>

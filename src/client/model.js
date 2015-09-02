@@ -5,11 +5,19 @@ import {modelHelper} from './modelHelper'
 
 export function intent(DOM){
   let toggleRelay$ =  DOM.get('.relayToggler', 'click')
-    .do(e=>console.log("EVENT",e))
+    .do(e=>console.log("EVENT relay toggling",e))
     .map(function(e){
       let id = parseInt( e.target.id.split("_").pop() )
       return {id,toggled:e.target.checked}
     })
+
+  let undo$ = DOM.get('#undo','click')
+    .do(e=>console.log("EVENT undo ",e))
+    .map(true)
+
+  let redo$ = DOM.get('#redo','click')
+    .do(e=>console.log("EVENT redo ",e))
+    .map(false)
 
   return {toggleRelay$}
 }
