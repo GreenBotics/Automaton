@@ -21,3 +21,11 @@ export function renderLabeledCheckbox(label, checked, id, className){
     </span>
 }
 
+export function renderRelays(relaysData){
+  return relaysData.map( (relayData,index) =>
+    <div>
+      {relayData.name}
+      { renderLabeledCheckbox("Toggle:", relayData.toggled, "checker_"+index, "relayToggler") } 
+    </div>
+  )
+}
