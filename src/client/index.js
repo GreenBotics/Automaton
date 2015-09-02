@@ -8,7 +8,7 @@ import combineTemplate from 'rx.observable.combinetemplate'
 import {renderLabeledCheckbox} from './relayControl'
 import SocketIO from 'cycle-socket.io'
 
-
+import {modelHelper} from './modelHelper'
 
 
 function intent(DOM){
@@ -46,6 +46,7 @@ function main(drivers) {
     )
   }
 
+
   function model(actions){
 
     const defaults = {
@@ -56,7 +57,6 @@ function main(drivers) {
       ]
     }
 
-  
     function modifications(actions){
       let toggleRelayMod$ = actions.toggleRelay$
         .map((toggleInfo) => (currentData) => {
@@ -74,28 +74,17 @@ function main(drivers) {
         )
     }
 
-    /*let model$ = combineTemplate(
-    {
-      relays:[
-        actions.
-      ]
-    }*/
-
-    let source$ =  Rx.Observable.just(defaults)
-    let mods$   =  modifications(actions)
-
-    return mods$
-      .merge(source$)
-      .scan((currentData, modFn) => modFn(currentData))//combine existing data with new one
-      //.distinctUntilChanged()
-      .shareReplay(1)
-
-    //return Rx.Observable.just(defaults)
+    return modelHelper(defaults,modifications)(actions)
   }
+
+
+
+
+
 
   let model$ = model(intent(DOM))
 
-  let stream$ = model$//zop(DOM)//Rx.Observable.just("bla")
+  let stream$ = model$
   const incomingMessages$ = socketIO.get('messageType')
   const outgoingMessages$ = stream$.map( 
     function(eventData){
