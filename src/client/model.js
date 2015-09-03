@@ -11,15 +11,10 @@ export function intent(DOM){
       return {id,toggled:e.target.checked}
     })
 
-  let undo$ = DOM.get('#undo','click')
-    .do(e=>console.log("EVENT undo ",e))
+  let emergencyShutdown$ = DOM.get('#shutdown', 'click')
     .map(true)
 
-  let redo$ = DOM.get('#redo','click')
-    .do(e=>console.log("EVENT redo ",e))
-    .map(false)
-
-  return {toggleRelay$}
+  return {toggleRelay$, emergencyShutdown$}
 }
 
 
@@ -27,6 +22,8 @@ export function model(actions){
 
     const defaults = Immutable(
       {
+        active:true,
+
         relays:[
            {toggled:false,name:"relay0"}
           ,{toggled:false,name:"relay1"}
@@ -53,22 +50,38 @@ export function model(actions){
           {
             targetRelay.set("toggled",toggleInfo.toggled)
           }*/
+          //console.log("currentData BEFORE",JSON.stringify(currentData))
 
-          //seamless-immutable
-          let targetRelay = currentData.relays[toggleInfo.id]
-          //console.log("targetRelay",targetRelay,toggleInfo.id, toggleInfo)
+          //seamless-immutable 
+          let relays = currentData.relays
+            //.filter((e,index)=>toggleInfo.id===index)
+            .map(function(relay,index){
+              if(index === toggleInfo.id){
+                return {name:relay.name,toggled:toggleInfo.toggled}
+              }
+              return relay
+            })
 
-          if(targetRelay)
-          {
-            targetRelay.merge({toggled:toggleInfo.toggled})
-          }
+          currentData = currentData.merge({relays})
+          //console.log("currentData AFTER",JSON.stringify(currentData))
 
           return currentData
         })
 
+      let emergencyShutdownMod$ = actions.emergencyShutdown$
+        .map((toggleInfo) => (currentData) => {
+
+          let relays = currentData.relays
+            .map( relay => ({ toggled:false, name:relay.name}) )
+          currentData = currentData.merge({active:false})
+      
+          return currentData.merge( {relays} )
+        })
+
       return Rx.Observable.merge(
         toggleRelayMod$
-        )
+        ,emergencyShutdownMod$
+      )
     }
 
     return modelHelper(defaults,modifications)(actions)
