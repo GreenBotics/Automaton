@@ -10,7 +10,6 @@ function renderSlider(label, value, unit, id, min, max) {
 }
 
 export function renderCheckbox(checked, id, className) {
-  console.log("renderCheckbox",checked,id)
   return <input type="checkbox" id={id} checked={checked} className={className}/>
 }
 
