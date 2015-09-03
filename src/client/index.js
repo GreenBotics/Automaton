@@ -48,7 +48,7 @@ function view(model$){
           {renderRelays( model.relays )}
 
         <div> Emergency shutdown </div>
-          <button id="shutdown"> shutdown </button>
+          <button id="shutdown" disabled={!model.active}> shutdown </button>
 
       </div>
   )

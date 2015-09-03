@@ -64,6 +64,7 @@ export function model(actions){
 
           currentData = currentData.merge({relays})
           //console.log("currentData AFTER",JSON.stringify(currentData))
+          currentData = currentData.merge({active:true})
 
           return currentData
         })
