@@ -13,7 +13,10 @@ function historyM(actions){
   let actionsL = []
   for(let key in actions){
     console.log("actions",key)
-    actionsL.push(actions[key])
+
+    let opName = key.replace(/\$/g, "")
+    let action$ = actions[key].map(a=>({op:opName,data:a}))
+    actionsL.push(action$)
   }
 
   return Rx.Observable.merge(actionsL)
@@ -60,8 +63,8 @@ function main(drivers) {
 
   let model$ = model(intent(DOM))
 
-  //let history$ = historyM(intent(DOM))
-  //history$.subscribe(h=>console.log("history item",h))
+  let history$ = historyM(intent(DOM))
+  history$.subscribe(h=>console.log("history item",h))
 
   let stream$ = model$ //anytime our model changes , dispatch it via socket.io
   const incomingMessages$ = socketIO.get('messageType')
