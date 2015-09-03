@@ -5,7 +5,7 @@ import {modelHelper} from './modelHelper'
 
 export function intent(DOM){
   let toggleRelay$ =  DOM.get('.relayToggler', 'click')
-    .do(e=>console.log("EVENT relay toggling",e))
+    //.do(e=>console.log("EVENT relay toggling",e))
     .map(function(e){
       let id = parseInt( e.target.id.split("_").pop() )
       return {id,toggled:e.target.checked}
@@ -16,11 +16,11 @@ export function intent(DOM){
 
 
   let undo$ = DOM.get('#undo','click')
-    .do(e=>console.log("EVENT undo ",e))
+    //.do(e=>console.log("EVENT undo ",e))
     .map(true)
 
   let redo$ = DOM.get('#redo','click')
-    .do(e=>console.log("EVENT redo ",e))
+    //.do(e=>console.log("EVENT redo ",e))
     .map(false)
 
 
@@ -69,8 +69,9 @@ export function model(actions){
           //seamless-immutable 
 
           //history
-          let _past = [currentData].concat(currentData._past)
-          currentData = currentData.merge({_past})
+          let _past   = [currentData].concat(currentData._past)
+          let _future = []
+          currentData = currentData.merge({_past, _future})
 
           let relays = currentData.relays
             //.filter((e,index)=>toggleInfo.id===index)
@@ -93,7 +94,8 @@ export function model(actions){
 
           //history
           let _past = [currentData].concat(currentData._past)
-          currentData = currentData.merge({_past})
+          let _future = []
+          currentData = currentData.merge({_past, _future})
 
           let relays = currentData.relays
             .map( relay => ({ toggled:false, name:relay.name}) )
