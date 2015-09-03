@@ -47,6 +47,14 @@ export function model(actions){
     )
 
     function modifications(actions){
+
+      function logHistory(currentData){ 
+        let _past   = [currentData].concat(currentData._past)
+        let _future = []
+        currentData = currentData.merge({_past, _future})
+        return currentData
+      }
+
       let toggleRelayMod$ = actions.toggleRelay$
         .map((toggleInfo) => (currentData) => {
           /*//normal
@@ -69,9 +77,7 @@ export function model(actions){
           //seamless-immutable 
 
           //history
-          let _past   = [currentData].concat(currentData._past)
-          let _future = []
-          currentData = currentData.merge({_past, _future})
+          currentData = logHistory(currentData)
 
           let relays = currentData.relays
             //.filter((e,index)=>toggleInfo.id===index)
@@ -93,9 +99,7 @@ export function model(actions){
         .map((toggleInfo) => (currentData) => {
 
           //history
-          let _past = [currentData].concat(currentData._past)
-          let _future = []
-          currentData = currentData.merge({_past, _future})
+          currentData = logHistory(currentData)
 
           let relays = currentData.relays
             .map( relay => ({ toggled:false, name:relay.name}) )
