@@ -14,7 +14,17 @@ export function intent(DOM){
   let emergencyShutdown$ = DOM.get('#shutdown', 'click')
     .map(true)
 
-  return {toggleRelay$, emergencyShutdown$}
+
+  let undo$ = DOM.get('#undo','click')
+    .do(e=>console.log("EVENT undo ",e))
+    .map(true)
+
+  let redo$ = DOM.get('#redo','click')
+    .do(e=>console.log("EVENT redo ",e))
+    .map(false)
+
+
+  return {toggleRelay$, emergencyShutdown$, undo$, redo$}
 }
 
 
@@ -29,6 +39,10 @@ export function model(actions){
           ,{toggled:false,name:"relay1"}
           ,{toggled:true, name:"relay2"}
         ]
+
+        //only for undo/redo , experimental
+        ,_past:[]
+        ,_future:[]
       }
     )
 
@@ -53,6 +67,11 @@ export function model(actions){
           //console.log("currentData BEFORE",JSON.stringify(currentData))
 
           //seamless-immutable 
+
+          //history
+          let _past = [currentData].concat(currentData._past)
+          currentData = currentData.merge({_past})
+
           let relays = currentData.relays
             //.filter((e,index)=>toggleInfo.id===index)
             .map(function(relay,index){
@@ -62,9 +81,9 @@ export function model(actions){
               return relay
             })
 
-          currentData = currentData.merge({relays})
           //console.log("currentData AFTER",JSON.stringify(currentData))
-          currentData = currentData.merge({active:true})
+          currentData = currentData.merge([{active:true}, {relays}])
+
 
           return currentData
         })
@@ -72,16 +91,49 @@ export function model(actions){
       let emergencyShutdownMod$ = actions.emergencyShutdown$
         .map((toggleInfo) => (currentData) => {
 
+          //history
+          let _past = [currentData].concat(currentData._past)
+          currentData = currentData.merge({_past})
+
           let relays = currentData.relays
             .map( relay => ({ toggled:false, name:relay.name}) )
-          currentData = currentData.merge({active:false})
-      
-          return currentData.merge( {relays} )
+          currentData = currentData.merge( [{active:false}, {relays}] )
+     
+          return currentData
+        })
+
+      let undoMod$ = actions.undo$
+        .map((toggleInfo) => (currentData) => {
+          console.log("Undoing")
+          //history
+          let cur     = currentData._past[0]//currentData._past.length-1]
+          let _past   = currentData._past.slice(1)
+          let _future = [currentData].concat(currentData._future)
+
+          cur = cur.merge({_past,_future})
+
+          return cur
+        })
+
+      let redoMod$ = actions.redo$
+        .map((toggleInfo) => (currentData) => {
+          console.log("Redoing")
+          //history
+          let cur = currentData._future[0]
+
+          let _past = [currentData].concat(currentData._past) 
+          let _future = currentData._future.slice(1)
+
+          cur = cur.merge({_past,_future})
+
+          return cur
         })
 
       return Rx.Observable.merge(
         toggleRelayMod$
         ,emergencyShutdownMod$
+        ,undoMod$
+        ,redoMod$
       )
     }
 

@@ -39,8 +39,8 @@ function view(model$){
     .map(model =>
       <div>
         <div> 
-          <button id="undo" disabled={true}> undo </button>
-          <button id="redo" disabled={true}> redo </button>
+          <button id="undo" disabled={model._past.length===0}> undo </button>
+          <button id="redo" disabled={model._future.length===0}> redo </button>
         </div> 
 
         <div> System state: {model.active ? 'active' : 'inactive'} </div>
