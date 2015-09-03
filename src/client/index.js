@@ -44,6 +44,8 @@ function view(model$){
         <div> 
           <button id="undo" disabled={model._past.length===0}> undo </button>
           <button id="redo" disabled={model._future.length===0}> redo </button>
+
+          <div> Undos : {model._past.length} Redos: {model._future.length} </div>
         </div> 
 
         <div> System state: {model.active ? 'active' : 'inactive'} </div>

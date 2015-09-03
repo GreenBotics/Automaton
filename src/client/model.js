@@ -48,39 +48,30 @@ export function model(actions){
 
     function modifications(actions){
 
+      //merge the current data with any number of input data
+      function mergeData(currentData,inputs){
+        if("merge" in currentData){
+          return currentData.merge(inputs)
+        }
+        return Object.assign(currentData,inputs)
+      }
+
       function logHistory(currentData){ 
         let _past   = [currentData].concat(currentData._past)
         let _future = []
-        currentData = currentData.merge({_past, _future})
+
+        console.log("currentData",_past)
+        currentData = mergeData(currentData, {_past, _future})
         return currentData
       }
 
       let toggleRelayMod$ = actions.toggleRelay$
         .map((toggleInfo) => (currentData) => {
-          /*//normal
-          let targetRelay = currentData.relays[toggleInfo.id]
-          if(targetRelay){
-            targetRelay.toggled = toggleInfo.toggled
-          }
-          console.log("targetRelay",targetRelay,toggleInfo.id, toggleInfo)*/
-          
-          /*//Immutable.js
-          let targetRelay = currentData.get("relays",toggleInfo.id)
-          console.log("targetRelay",targetRelay,toggleInfo.id, toggleInfo)
-
-          if(targetRelay)
-          {
-            targetRelay.set("toggled",toggleInfo.toggled)
-          }*/
-          //console.log("currentData BEFORE",JSON.stringify(currentData))
-
           //seamless-immutable 
-
-          //history
+          //history (undo redo)
           currentData = logHistory(currentData)
 
           let relays = currentData.relays
-            //.filter((e,index)=>toggleInfo.id===index)
             .map(function(relay,index){
               if(index === toggleInfo.id){
                 return {name:relay.name,toggled:toggleInfo.toggled}
@@ -89,8 +80,7 @@ export function model(actions){
             })
 
           //console.log("currentData AFTER",JSON.stringify(currentData))
-          currentData = currentData.merge([{active:true}, {relays}])
-
+          currentData = mergeData( currentData, [{active:true}, {relays}] )
 
           return currentData
         })
@@ -102,8 +92,8 @@ export function model(actions){
           currentData = logHistory(currentData)
 
           let relays = currentData.relays
-            .map( relay => ({ toggled:false, name:relay.name}) )
-          currentData = currentData.merge( [{active:false}, {relays}] )
+            .map( relay => ({ name:relay.name, toggled:false}) )
+          currentData = mergeData( currentData, [{active:false}, {relays}] )
      
           return currentData
         })
@@ -111,12 +101,12 @@ export function model(actions){
       let undoMod$ = actions.undo$
         .map((toggleInfo) => (currentData) => {
           console.log("Undoing")
-          //history
-          let cur     = currentData._past[0]//currentData._past.length-1]
+
+          let cur     = currentData._past[0]
           let _past   = currentData._past.slice(1)
           let _future = [currentData].concat(currentData._future)
 
-          cur = cur.merge({_past,_future})
+          cur = mergeData(cur, {_past,_future})
 
           return cur
         })
@@ -124,13 +114,12 @@ export function model(actions){
       let redoMod$ = actions.redo$
         .map((toggleInfo) => (currentData) => {
           console.log("Redoing")
-          //history
-          let cur = currentData._future[0]
 
+          let cur = currentData._future[0]
           let _past = [currentData].concat(currentData._past) 
           let _future = currentData._future.slice(1)
 
-          cur = cur.merge({_past,_future})
+          cur = mergeData(cur, {_past,_future})
 
           return cur
         })
