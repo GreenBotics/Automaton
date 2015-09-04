@@ -34,31 +34,33 @@ export function model(actions){
 
     const defaults = Immutable(
       {
-        active:true,
+        
+        state:{
+          active:true,
 
-        relays:[
-           {toggled:false,name:"relay0"}
-          ,{toggled:false,name:"relay1"}
-          ,{toggled:true, name:"relay2"}
-        ]
+          relays:[
+             {toggled:false,name:"relay0"}
+            ,{toggled:false,name:"relay1"}
+            ,{toggled:true, name:"relay2"}
+          ]
+        }
 
         //only for undo/redo , experimental
-        ,_past:[]
-        ,_future:[]
+        ,history:{
+          _past:[]
+          ,_future:[]
+        }
+     
       }
     )
 
-    const history = Immutable({
-      _past:[]
-      ,_future:[]
-    })
+  
 
     function modifications(actions){
 
       
 
-      function logHistory(currentData){ 
-        let history = currentData
+      function logHistory(currentData, history){ 
         let _past   = [currentData].concat(history._past)
         let _future = []
 
@@ -72,14 +74,12 @@ export function model(actions){
         /*.withLatestFrom(intent.settings$,function(data,settings){
           return {nentities:data,settings}
         })*/
-        .map((toggleInfo) => (currentData) => {
-
-          //console.log("history",history)
+        .map((toggleInfo) => ({state,history}) => {
           //seamless-immutable 
           //history (undo redo)
-          currentData = logHistory(currentData)
+          history = logHistory(state,history)
 
-          let relays = currentData.relays
+          let relays = state.relays
             .map(function(relay,index){
               if(index === toggleInfo.id){
                 return {name:relay.name,toggled:toggleInfo.toggled}
@@ -87,50 +87,49 @@ export function model(actions){
               return relay
             })
 
-          //console.log("currentData AFTER",JSON.stringify(currentData))
-          currentData = mergeData( currentData, [{active:true}, {relays}] )
+          //console.log("state AFTER",JSON.stringify(state))
+          state = mergeData( state, [{active:true}, {relays}] )
 
-          return currentData
+          return Immutable({state,history})
         })
 
       let emergencyShutdownMod$ = actions.emergencyShutdown$
-        .map((payload) => (currentData) => {
+        .map((payload) => ({state,history}) => {
 
-          //history
-          currentData = logHistory(currentData)
+          history = logHistory(state, history)
 
-          let relays = currentData.relays
+          let relays = state.relays
             .map( relay => ({ name:relay.name, toggled:payload}) )
 
-          currentData = mergeData( currentData, [{active:payload}, {relays}] )
+          state = mergeData( state, [{active:payload}, {relays}] )
 
-          return currentData
+          return Immutable({state,history})
         })
 
       let undoMod$ = actions.undo$
-        .map((toggleInfo) => (currentData) => {
+        .map((toggleInfo) => ({state,history}) => {
           console.log("Undoing")
 
-          let cur     = currentData._past[0]
-          let _past   = currentData._past.slice(1)
-          let _future = [currentData].concat(currentData._future)
+          let nState     = history._past[0]
+          let _past   = history._past.slice(1)
+          let _future = [state].concat(history._future)
 
-          cur = mergeData(cur, {_past,_future})
+          history = mergeData(history,{_past,_future})
 
-          return cur
+          return Immutable({state:nState,history})
         })
 
       let redoMod$ = actions.redo$
-        .map((toggleInfo) => (currentData) => {
+        .map((toggleInfo) => ({state,history}) => {
           console.log("Redoing")
 
-          let cur = currentData._future[0]
-          let _past = [currentData].concat(currentData._past) 
-          let _future = currentData._future.slice(1)
+          let nState = history._future[0]
+          let _past = [state].concat(history._past) 
+          let _future = history._future.slice(1)
 
-          cur = mergeData(cur, {_past,_future})
+          history = mergeData(history,{_past,_future})
 
-          return cur
+          return Immutable({state:nState,history})
         })
 
       return Rx.Observable.merge(

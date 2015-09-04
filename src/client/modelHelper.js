@@ -1,8 +1,6 @@
 import {Rx} from '@cycle/core'
 
-
 export function modelHelper(defaults,modFunction){
-
 
   return function model(actions){
     let source$ =  Rx.Observable.just(defaults)
@@ -14,9 +12,9 @@ export function modelHelper(defaults,modFunction){
       //.distinctUntilChanged()
       .shareReplay(1)
   }
-  
 
 }
+
 
 
   /*let model$ = combineTemplate(

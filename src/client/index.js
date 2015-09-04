@@ -28,25 +28,29 @@ function historyM(actions){
 
 
 function view(model$){
-  model$.subscribe(m=>console.log("model",m))
+  //model$.subscribe(m=>console.log("model",m))
 
   return model$
-    .map(m=>m.asMutable({deep: true}))//for seamless immutable
+    //.map(m=>m.asMutable({deep: true}))//for seamless immutable
+    .map(function(m){
+      console.log("model",m)
+      return m.asMutable({deep: true})
+    })
     .map(model =>
       <div>
         <div> 
-          <button id="undo" disabled={model._past.length===0}> undo </button>
-          <button id="redo" disabled={model._future.length===0}> redo </button>
+          <button id="undo" disabled={model.history._past.length===0}> undo </button>
+          <button id="redo" disabled={model.history._future.length===0}> redo </button>
 
-          <div> Undos : {model._past.length} Redos: {model._future.length} </div>
+          <div> Undos : {model.history._past.length} Redos: {model.history._future.length} </div>
         </div> 
 
-        <div> System state: {model.active ? 'active' : 'inactive'} </div>
+        <div> System state: {model.state.active ? 'active' : 'inactive'} </div>
         <div> Relays: </div>
-          {renderRelays( model.relays )}
+          {renderRelays( model.state.relays )}
 
         <div> Emergency shutdown </div>
-          <button id="shutdown" disabled={!model.active}> shutdown </button>
+          <button id="shutdown" disabled={!model.state.active}> shutdown </button>
 
       </div>
   )
