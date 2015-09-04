@@ -1,2 +1,13 @@
 #undosList ul{max-height: 40px; width:18%;}
 #undosList ul{overflow:hidden; overflow-y:auto;}
+
+section{
+  padding: 10px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+section h1{
+  font-size: 1em;
+}
+

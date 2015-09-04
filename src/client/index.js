@@ -37,21 +37,28 @@ function view(model$){
     .map(model =>
       <div>
         <div> 
-          <button id="undo" disabled={model.history._past.length===0}> undo </button>
-          <button id="redo" disabled={model.history._future.length===0}> redo </button>
+          <button id="undo" disabled={model.history.past.length===0}> undo </button>
+          <button id="redo" disabled={model.history.future.length===0}> redo </button>
 
-          <div> Undos : {model.history._past.length} Redos: {model.history._future.length} </div>
+          <div> Undos : {model.history.past.length} Redos: {model.history.future.length} </div>
           <div id="undosList">
-            {renderHistory(model.history._past)}
+            {renderHistory(model.history.past)}
           </div>
         </div> 
 
-        <div> System state: {model.state.active ? 'active' : 'inactive'} </div>
-        <div> Relays: </div>
+        <section id="overview"> 
+          <h1> System state: {model.state.active ? 'active' : 'inactive'} </h1>
+        </section>
+        
+        <section id="relays"> 
+          <h1>Relays: </h1>
           {renderRelays( model.state.relays )}
+        </section>
 
-        <div> Emergency shutdown </div>
+        <section id="emergency">
+          <h1> Emergency shutdown </h1>
           <button id="shutdown" disabled={!model.state.active}> shutdown </button>
+        </section>
 
       </div>
   )
