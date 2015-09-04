@@ -13,20 +13,28 @@ export function intent(DOM){
       return {id,toggled:e.target.checked}
     })
 
+  let setCoolerPower$ = DOM.get('.coolerSlider','input')//input vs change events
+    .debounce(30)
+    .map(e=>parseFloat(e.target.value))
+
+
   let emergencyShutdown$ = DOM.get('#shutdown', 'click')
     .map(false)
 
 
   let undo$ = DOM.get('#undo','click')
-    //.do(e=>console.log("EVENT undo ",e))
     .map(true)
 
   let redo$ = DOM.get('#redo','click')
-    //.do(e=>console.log("EVENT redo ",e))
     .map(false)
 
 
-  return {toggleRelay$, emergencyShutdown$, undo$, redo$}
+  return {
+    toggleRelay$
+    ,emergencyShutdown$
+    ,setCoolerPower$
+    , undo$
+    , redo$}
 }
 
 
@@ -62,6 +70,14 @@ function emergencyShutdown(state, input){
   return state
 }
 
+function setCoolerPower(state, input){
+  let coolers = state.coolers
+    .map( cooler => ( mergeData(cooler, {power:input} ) ) )//Object.assign({}, cooler,{value:input}) ) )
+
+  state = mergeData( state, [{active:input}, {coolers}] )
+  return state
+}
+
 export function model(actions){
 
     const defaults = Immutable(
@@ -73,6 +89,10 @@ export function model(actions){
              {toggled:false,name:"relay0"}
             ,{toggled:false,name:"relay1"}
             ,{toggled:true, name:"relay2"}
+          ]
+          ,
+          coolers:[
+            {toggled:true,power:10,name:"cooler0"}
           ]
         }
         //only for undo/redo , experimental
@@ -103,11 +123,18 @@ export function model(actions){
 
           history = logHistory(state, history)
           state   = emergencyShutdown(state, payload)
-         
-
+      
           return Immutable({state,history})
         })
 
+      let setCoolerPowerMod$ = actions.setCoolerPower$
+        .map((input) => ({state,history}) => {
+
+          history = logHistory(state, history)
+          state   = setCoolerPower(state, input)
+      
+          return Immutable({state,history})
+        })
 
 
       //we need to seperate this somehow?
@@ -140,6 +167,9 @@ export function model(actions){
       return Rx.Observable.merge(
         toggleRelayMod$
         ,emergencyShutdownMod$
+        ,setCoolerPowerMod$
+
+
         ,undoMod$
         ,redoMod$
       )

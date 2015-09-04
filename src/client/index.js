@@ -5,7 +5,7 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 
 import SocketIO from 'cycle-socket.io'
 
-import {renderRelays} from './uiElements'
+import {renderRelays, renderCoolers} from './uiElements'
 import {model, intent} from './model'
 
 import {history, historyIntent} from './history'
@@ -28,6 +28,7 @@ function renderHistory(items){
   let list = items.map(item=> <li></li>)
   return <ul> {list}</ul>
 }
+
 
 function view(model$){
   //model$.subscribe(m=>console.log("model",m))
@@ -53,6 +54,12 @@ function view(model$){
         <section id="relays"> 
           <h1>Relays: </h1>
           {renderRelays( model.state.relays )}
+        </section>
+
+        <section id="cooling">
+          <h1>Cooling </h1>
+          {renderCoolers("power",model.state.coolers)}
+
         </section>
 
         <section id="emergency">

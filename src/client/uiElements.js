@@ -28,3 +28,19 @@ export function renderRelays(relaysData){
     </div>
   )
 }
+
+export function renderLabeledSlider(label="", id, className, value=0, min=0, max=100){
+  return <div> {label} {value}
+    <input id={id} className={className} type="range" min="{min}" max="{max}" step="1" value={value}/> 
+  </div>
+}
+
+export function renderCoolers(label, data){
+  return data.map( (item,index) => 
+    <div> 
+      {renderLabeledSlider(label, "cooler_"+index, "coolerSlider", item.power)}
+    </div>
+  )
+
+}
+
