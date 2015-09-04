@@ -30,11 +30,42 @@ export function intent(DOM){
 }
 
 
+
+function logHistory(currentData, history){ 
+  let past   = [currentData].concat(history.past)
+  let future = []
+
+  console.log("currentData",past)
+  history = mergeData(history, {past, future})
+  return history
+}
+
+//these all are actual api methods , right? 
+function toggleRelays(state, input){
+  let relays = state.relays
+    .map(function(relay,index){
+      if(index === input.id){
+        return {name:relay.name,toggled:input.toggled}
+      }
+      return relay
+    })
+
+  state = mergeData( state, {active:true, relays})//toggleRelays(state,toggleInfo) )
+  return state
+}
+
+function emergencyShutdown(state, input){
+  let relays = state.relays
+    .map( relay => ({ name:relay.name, toggled:input}) )
+
+  state = mergeData( state, [{active:input}, {relays}] )
+  return state
+}
+
 export function model(actions){
 
     const defaults = Immutable(
-      {
-        
+      { 
         state:{
           active:true,
 
@@ -44,53 +75,18 @@ export function model(actions){
             ,{toggled:true, name:"relay2"}
           ]
         }
-
         //only for undo/redo , experimental
         ,history:{
-          _past:[]
-          ,_future:[]
+          past:[]
+          ,future:[]
         }
-     
       }
     )
 
-  
-
     function modifications(actions){
 
-      //these all are actual api methods , right? 
-      function logHistory(currentData, history){ 
-        let _past   = [currentData].concat(history._past)
-        let _future = []
-
-        console.log("currentData",_past)
-        history = mergeData(history, {_past, _future})
-        return history
-      }
-
-      function toggleRelays(state, input){
-        let relays = state.relays
-          .map(function(relay,index){
-            if(index === input.id){
-              return {name:relay.name,toggled:input.toggled}
-            }
-            return relay
-          })
-
-        state = mergeData( state, {active:true, relays})//toggleRelays(state,toggleInfo) )
-        return state
-      }
-
-      function emergencyShutdown(state, input){
-        let relays = state.relays
-          .map( relay => ({ name:relay.name, toggled:input}) )
-
-        state = mergeData( state, [{active:input}, {relays}] )
-        return state
-      }
-
       let toggleRelayMod$ = actions.toggleRelay$
-        //splice in history
+        //splice in history? or settings?
         /*.withLatestFrom(intent.settings$,function(data,settings){
           return {nentities:data,settings}
         })*/
@@ -112,15 +108,18 @@ export function model(actions){
           return Immutable({state,history})
         })
 
+
+
+      //we need to seperate this somehow?
       let undoMod$ = actions.undo$
         .map((toggleInfo) => ({state,history}) => {
           console.log("Undoing")
 
-          let nState     = history._past[0]
-          let _past   = history._past.slice(1)
-          let _future = [state].concat(history._future)
+          let nState     = history.past[0]
+          let past   = history.past.slice(1)
+          let future = [state].concat(history.future)
 
-          history = mergeData(history,{_past,_future})
+          history = mergeData(history,{past,future})
 
           return Immutable({state:nState,history})
         })
@@ -129,11 +128,11 @@ export function model(actions){
         .map((toggleInfo) => ({state,history}) => {
           console.log("Redoing")
 
-          let nState = history._future[0]
-          let _past = [state].concat(history._past) 
-          let _future = history._future.slice(1)
+          let nState = history.future[0]
+          let past = [state].concat(history.past) 
+          let future = history.future.slice(1)
 
-          history = mergeData(history,{_past,_future})
+          history = mergeData(history,{past,future})
 
           return Immutable({state:nState,history})
         })

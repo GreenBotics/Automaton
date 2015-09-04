@@ -20,8 +20,8 @@ export function historyIntent(DOM){
 export function history(actions, observedModel$){
 
   const defaults = Immutable({
-    _past:[]
-    ,_future:[]
+    past:[]
+    ,future:[]
   })
 
   observedModel$.subscribe(e=>console.log("observedModel",e))
@@ -31,11 +31,11 @@ export function history(actions, observedModel$){
       .map((toggleInfo) => (currentData) => {
         console.log("Undoing")
 
-        /*let cur     = currentData._past[0]
-        let _past   = currentData._past.slice(1)
-        let _future = [currentData].concat(currentData._future)
+        /*let cur     = currentData.past[0]
+        let past   = currentData.past.slice(1)
+        let future = [currentData].concat(currentData.future)
 
-        cur = mergeData(cur, {_past,_future})
+        cur = mergeData(cur, {past,future})
         return cur
         */
 
@@ -46,11 +46,11 @@ export function history(actions, observedModel$){
         .map((toggleInfo) => (currentData) => {
           console.log("Redoing")
 
-          /*let cur = currentData._future[0]
-          let _past = [currentData].concat(currentData._past) 
-          let _future = currentData._future.slice(1)
+          /*let cur = currentData.future[0]
+          let past = [currentData].concat(currentData.past) 
+          let future = currentData.future.slice(1)
 
-          cur = mergeData(cur, {_past,_future})
+          cur = mergeData(cur, {past,future})
 
           return cur*/
           return currentData
