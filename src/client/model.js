@@ -1,7 +1,9 @@
 import Immutable from 'seamless-immutable'
+import {Rx} from '@cycle/core'
+
 //import Immutable from 'immutable'
 import {modelHelper} from './modelHelper'
-
+import {mergeData} from './utils'
 
 export function intent(DOM){
   let toggleRelay$ =  DOM.get('.relayToggler', 'click')
@@ -12,7 +14,7 @@ export function intent(DOM){
     })
 
   let emergencyShutdown$ = DOM.get('#shutdown', 'click')
-    .map(true)
+    .map(false)
 
 
   let undo$ = DOM.get('#undo','click')
@@ -46,27 +48,33 @@ export function model(actions){
       }
     )
 
+    const history = Immutable({
+      _past:[]
+      ,_future:[]
+    })
+
     function modifications(actions){
 
-      //merge the current data with any number of input data
-      function mergeData(currentData,inputs){
-        if("merge" in currentData){
-          return currentData.merge(inputs)
-        }
-        return Object.assign(currentData,inputs)
-      }
+      
 
       function logHistory(currentData){ 
-        let _past   = [currentData].concat(currentData._past)
+        let history = currentData
+        let _past   = [currentData].concat(history._past)
         let _future = []
 
         console.log("currentData",_past)
-        currentData = mergeData(currentData, {_past, _future})
-        return currentData
+        history = mergeData(history, {_past, _future})
+        return history
       }
 
       let toggleRelayMod$ = actions.toggleRelay$
+        //splice in history
+        /*.withLatestFrom(intent.settings$,function(data,settings){
+          return {nentities:data,settings}
+        })*/
         .map((toggleInfo) => (currentData) => {
+
+          //console.log("history",history)
           //seamless-immutable 
           //history (undo redo)
           currentData = logHistory(currentData)
@@ -86,15 +94,16 @@ export function model(actions){
         })
 
       let emergencyShutdownMod$ = actions.emergencyShutdown$
-        .map((toggleInfo) => (currentData) => {
+        .map((payload) => (currentData) => {
 
           //history
           currentData = logHistory(currentData)
 
           let relays = currentData.relays
-            .map( relay => ({ name:relay.name, toggled:false}) )
-          currentData = mergeData( currentData, [{active:false}, {relays}] )
-     
+            .map( relay => ({ name:relay.name, toggled:payload}) )
+
+          currentData = mergeData( currentData, [{active:payload}, {relays}] )
+
           return currentData
         })
 
