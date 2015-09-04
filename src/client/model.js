@@ -58,8 +58,7 @@ export function model(actions){
 
     function modifications(actions){
 
-      
-
+      //these all are actual api methods , right? 
       function logHistory(currentData, history){ 
         let _past   = [currentData].concat(history._past)
         let _future = []
@@ -69,26 +68,36 @@ export function model(actions){
         return history
       }
 
+      function toggleRelays(state, input){
+        let relays = state.relays
+          .map(function(relay,index){
+            if(index === input.id){
+              return {name:relay.name,toggled:input.toggled}
+            }
+            return relay
+          })
+
+        state = mergeData( state, {active:true, relays})//toggleRelays(state,toggleInfo) )
+        return state
+      }
+
+      function emergencyShutdown(state, input){
+        let relays = state.relays
+          .map( relay => ({ name:relay.name, toggled:input}) )
+
+        state = mergeData( state, [{active:input}, {relays}] )
+        return state
+      }
+
       let toggleRelayMod$ = actions.toggleRelay$
         //splice in history
         /*.withLatestFrom(intent.settings$,function(data,settings){
           return {nentities:data,settings}
         })*/
         .map((toggleInfo) => ({state,history}) => {
-          //seamless-immutable 
           //history (undo redo)
           history = logHistory(state,history)
-
-          let relays = state.relays
-            .map(function(relay,index){
-              if(index === toggleInfo.id){
-                return {name:relay.name,toggled:toggleInfo.toggled}
-              }
-              return relay
-            })
-
-          //console.log("state AFTER",JSON.stringify(state))
-          state = mergeData( state, [{active:true}, {relays}] )
+          state   = toggleRelays(state,toggleInfo)
 
           return Immutable({state,history})
         })
@@ -97,11 +106,8 @@ export function model(actions){
         .map((payload) => ({state,history}) => {
 
           history = logHistory(state, history)
-
-          let relays = state.relays
-            .map( relay => ({ name:relay.name, toggled:payload}) )
-
-          state = mergeData( state, [{active:payload}, {relays}] )
+          state   = emergencyShutdown(state, payload)
+         
 
           return Immutable({state,history})
         })

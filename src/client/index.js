@@ -18,7 +18,7 @@ function historyM(actions){
     console.log("actions",key)
 
     let opName = key.replace(/\$/g, "")
-    let action$ = actions[key].map(a=>({op:opName,data:a}))
+    let action$ = actions[key].map(a=>({type:opName,data:a}))
     actionsL.push(action$)
   }
 
@@ -65,7 +65,7 @@ function main(drivers) {
   //let history$ = history(historyIntent(DOM),model$) 
 
   let opHistory$ = historyM(intent(DOM))
-  opHistory$.subscribe(h=>console.log("history item",h))
+  opHistory$.subscribe(h=>console.log("Operation/action/command",h))
 
   let stream$ = model$ //anytime our model changes , dispatch it via socket.io
   const incomingMessages$ = socketIO.get('messageType')
