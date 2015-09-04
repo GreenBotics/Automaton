@@ -1,0 +1,2 @@
+#undosList ul{max-height: 40px; width:18%;}
+#undosList ul{overflow:hidden; overflow-y:auto;}

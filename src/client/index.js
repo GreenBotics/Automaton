@@ -11,7 +11,6 @@ import {model, intent} from './model'
 import {history, historyIntent} from './history'
 
 
-
 function historyM(actions){
   let actionsL = []
   for(let key in actions){
@@ -25,17 +24,16 @@ function historyM(actions){
   return Rx.Observable.merge(actionsL)
 }
 
-
+function renderHistory(items){
+  let list = items.map(item=> <li></li>)
+  return <ul> {list}</ul>
+}
 
 function view(model$){
   //model$.subscribe(m=>console.log("model",m))
 
   return model$
-    //.map(m=>m.asMutable({deep: true}))//for seamless immutable
-    .map(function(m){
-      console.log("model",m)
-      return m.asMutable({deep: true})
-    })
+    .map(m=>m.asMutable({deep: true}))//for seamless immutable
     .map(model =>
       <div>
         <div> 
@@ -43,6 +41,9 @@ function view(model$){
           <button id="redo" disabled={model.history._future.length===0}> redo </button>
 
           <div> Undos : {model.history._past.length} Redos: {model.history._future.length} </div>
+          <div id="undosList">
+            {renderHistory(model.history._past)}
+          </div>
         </div> 
 
         <div> System state: {model.state.active ? 'active' : 'inactive'} </div>
