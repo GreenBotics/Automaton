@@ -8,6 +8,9 @@ import SocketIO from 'cycle-socket.io'
 import {renderRelays} from './uiElements'
 import {model, intent} from './model'
 
+import {history, historyIntent} from './history'
+
+
 
 function historyM(actions){
   let actionsL = []
@@ -22,21 +25,11 @@ function historyM(actions){
   return Rx.Observable.merge(actionsL)
 }
 
-function historyIntent(DOM){
-  let undo$ = DOM.get('#undo','click')
-    .do(e=>console.log("EVENT undo ",e))
-    .map(true)
-
-  let redo$ = DOM.get('#redo','click')
-    .do(e=>console.log("EVENT redo ",e))
-    .map(false)
-
-  return {undo$, redo$}
-}
-
 
 
 function view(model$){
+  model$.subscribe(m=>console.log("model",m))
+
   return model$
     .map(m=>m.asMutable({deep: true}))//for seamless immutable
     .map(model =>
@@ -65,8 +58,10 @@ function main(drivers) {
 
   let model$ = model(intent(DOM))
 
-  let history$ = historyM(intent(DOM))
-  history$.subscribe(h=>console.log("history item",h))
+  //let history$ = history(historyIntent(DOM),model$) 
+
+  let opHistory$ = historyM(intent(DOM))
+  opHistory$.subscribe(h=>console.log("history item",h))
 
   let stream$ = model$ //anytime our model changes , dispatch it via socket.io
   const incomingMessages$ = socketIO.get('messageType')
