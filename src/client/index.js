@@ -14,7 +14,7 @@ import {history, historyIntent} from './history'
 function historyM(actions){
   let actionsL = []
   for(let key in actions){
-    console.log("actions",key)
+    //console.log("actions",key)
 
     let opName = key.replace(/\$/g, "")
     let action$ = actions[key].map(a=>({type:opName,data:a}))

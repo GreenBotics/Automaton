@@ -2,7 +2,7 @@ import Immutable from 'seamless-immutable'
 import {Rx} from '@cycle/core'
 
 //import Immutable from 'immutable'
-import {modelHelper} from './modelHelper'
+import {modelHelper, makeModifications} from './modelHelper'
 import {mergeData} from './utils'
 
 export function intent(DOM){
@@ -55,7 +55,7 @@ function logHistory(currentData, history){
 }
 
 //these all are actual api methods , right? 
-function toggleRelays(state, input){
+function toggleRelay(state, input){
   let relays = state.relays
     .map(function(relay,index){
       if(index === input.id){
@@ -115,17 +115,30 @@ export function model(actions){
       }
     )
 
-    function modifications(actions){
+    //list of "update functions", to be called based on mapping 
+    //between action names & update functions
+    let updateFns = {setCoolerPower,emergencyShutdown,toggleRelay}
+    let mods$ =  makeModifications(actions,updateFns)
+
+    let source$ =  Rx.Observable.just(defaults)
+
+    return mods$
+      .merge(source$)
+      .scan((currentData, modFn) => modFn(currentData))//combine existing data with new one
+      //.distinctUntilChanged()
+      .shareReplay(1)
+  
+    /*function modifications(actions){
 
       let toggleRelayMod$ = actions.toggleRelay$
         //splice in history? or settings?
-        /*.withLatestFrom(intent.settings$,function(data,settings){
-          return {nentities:data,settings}
-        })*/
+        //.withLatestFrom(intent.settings$,function(data,settings){
+        //  return {nentities:data,settings}
+        //})
         .map((input) => ({state,history}) => {
 
           history = logHistory(state,history)
-          state   = toggleRelays(state,input)
+          state   = toggleRelay(state,input)
 
           return Immutable({state,history})
         })
@@ -187,5 +200,5 @@ export function model(actions){
       )
     }
 
-    return modelHelper(defaults,modifications)(actions)
+    return modelHelper(defaults,modifications)(actions)*/
   }
