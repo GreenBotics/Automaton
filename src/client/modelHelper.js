@@ -90,7 +90,7 @@ export function makeModifications(actions, updateFns){
 
       /*
       //handle undo & redo seperatly, they are alway the same
-      //we need to seperate this somehow?
+      //we need to separate this somehow?
       //why does this not work ??
       let undoMod$ = actions.undo$
         .map((toggleInfo) => ({state,history}) => {

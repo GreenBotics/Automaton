@@ -162,7 +162,7 @@ export function model(actions){
         })
 
 
-      //we need to seperate this somehow?
+      //we need to separate this somehow?
       let undoMod$ = actions.undo$
         .map((toggleInfo) => ({state,history}) => {
           console.log("Undoing")
