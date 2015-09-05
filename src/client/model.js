@@ -14,12 +14,15 @@ export function intent(DOM){
     })
 
   let setCoolerPower$ = DOM.get('.coolerSlider','input')//input vs change events
+    .merge( DOM.get('.coolerSlider_number','change') )
+    //DOM.get('.coolerSlider_number','change')
     .debounce(30)
     .map(function(e){
       let id = parseInt( e.target.id.split("_").pop() )
       let value = parseFloat(e.target.value)
       return {id,value}
     })
+  
 
   let emergencyShutdown$ = DOM.get('#shutdown', 'click')
     .map(false)
@@ -119,19 +122,19 @@ export function model(actions){
         /*.withLatestFrom(intent.settings$,function(data,settings){
           return {nentities:data,settings}
         })*/
-        .map((toggleInfo) => ({state,history}) => {
-          //history (undo redo)
+        .map((input) => ({state,history}) => {
+
           history = logHistory(state,history)
-          state   = toggleRelays(state,toggleInfo)
+          state   = toggleRelays(state,input)
 
           return Immutable({state,history})
         })
 
       let emergencyShutdownMod$ = actions.emergencyShutdown$
-        .map((payload) => ({state,history}) => {
+        .map((input) => ({state,history}) => {
 
           history = logHistory(state, history)
-          state   = emergencyShutdown(state, payload)
+          state   = emergencyShutdown(state, input)
       
           return Immutable({state,history})
         })

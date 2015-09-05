@@ -2,13 +2,6 @@
 import {hJSX} from '@cycle/dom'
 
 
-function renderSlider(label, value, unit, id, min, max) {
-  /*return h('div', [
-    '' + label + ' ' + value + unit,
-    h('input#' + id, {type: 'range', min, max, value})
-  ]);*/
-}
-
 export function renderCheckbox(checked, id, className) {
   return <input type="checkbox" id={id} checked={checked} className={className}/>
 }
@@ -16,9 +9,20 @@ export function renderCheckbox(checked, id, className) {
 export function renderLabeledCheckbox(label, checked, id, className){
   return <span>
       {renderCheckbox(checked,id,className)}
-      <label htmlFor="showGrid"> {label} </label>
+      <label htmlFor={id}> {label} </label>
     </span>
 }
+
+export function renderLabeledSlider(label="", idx, className, value=0, min=0, max=100){
+  return <div className="labeledSlider"> 
+    <label htmlFor={idx}> {label} </label>
+    <input type="range"  id={label+"_"+idx} className={className} min="{min}" max="{max}" step="1" value={value}/> 
+    <input type="number" id={label+'number_'+idx} value={value} className={className+'_number'}/>
+  </div>
+}
+
+////////
+
 
 export function renderRelays(relaysData){
   return relaysData.map( (relayData,index) =>
@@ -29,16 +33,10 @@ export function renderRelays(relaysData){
   )
 }
 
-export function renderLabeledSlider(label="", id, className, value=0, min=0, max=100){
-  return <div> {label} {value}
-    <input id={id} className={className} type="range" min="{min}" max="{max}" step="1" value={value}/> 
-  </div>
-}
-
 export function renderCoolers(data){
   return data.map( (item,index) => 
     <div> 
-      {renderLabeledSlider(item.name, "cooler_"+index, "coolerSlider", item.power)}
+      {renderLabeledSlider(item.name, index, "coolerSlider", item.power)}
     </div>
   )
 
