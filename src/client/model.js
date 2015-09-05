@@ -15,8 +15,11 @@ export function intent(DOM){
 
   let setCoolerPower$ = DOM.get('.coolerSlider','input')//input vs change events
     .debounce(30)
-    .map(e=>parseFloat(e.target.value))
-
+    .map(function(e){
+      let id = parseInt( e.target.id.split("_").pop() )
+      let value = parseFloat(e.target.value)
+      return {id,value}
+    })
 
   let emergencyShutdown$ = DOM.get('#shutdown', 'click')
     .map(false)
@@ -72,9 +75,14 @@ function emergencyShutdown(state, input){
 
 function setCoolerPower(state, input){
   let coolers = state.coolers
-    .map( cooler => ( mergeData(cooler, {power:input} ) ) )//Object.assign({}, cooler,{value:input}) ) )
+    .map(function(cooler,index){
+      if(index === input.id){
+        return mergeData(cooler, {power:input.value})
+      }
+      return cooler
+    })
 
-  state = mergeData( state, [{active:input}, {coolers}] )
+  state = mergeData( state, [{active:input!==undefined}, {coolers}] )
   return state
 }
 
@@ -93,6 +101,7 @@ export function model(actions){
           ,
           coolers:[
             {toggled:true,power:10,name:"cooler0"}
+            ,{toggled:true,power:72.6,name:"cooler1"}
           ]
         }
         //only for undo/redo , experimental

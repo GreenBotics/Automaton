@@ -58,7 +58,7 @@ function view(model$){
 
         <section id="cooling">
           <h1>Cooling </h1>
-          {renderCoolers("power",model.state.coolers)}
+          {renderCoolers( model.state.coolers )}
 
         </section>
 

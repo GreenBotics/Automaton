@@ -35,10 +35,10 @@ export function renderLabeledSlider(label="", id, className, value=0, min=0, max
   </div>
 }
 
-export function renderCoolers(label, data){
+export function renderCoolers(data){
   return data.map( (item,index) => 
     <div> 
-      {renderLabeledSlider(label, "cooler_"+index, "coolerSlider", item.power)}
+      {renderLabeledSlider(item.name, "cooler_"+index, "coolerSlider", item.power)}
     </div>
   )
 
