@@ -60,7 +60,7 @@ function toggleRelay(state, input){
   let relays = state.relays
     .map(function(relay,index){
       if(index === input.id){
-        return {name:relay.name,toggled:input.toggled}
+        return mergeData(relay, {toggled:input.toggled})
       }
       return relay
     })
@@ -92,13 +92,11 @@ function setCoolerPower(state, input){
 
 function toggleSensor(state, input){
   let sensors = state.sensors
-    .map(function(relay,index){
+    .map(function(sensor,index){
       if(index === input.id){
-
-        let output = mergeData(relay, {toggled:input.toggled})
-        return output //Immutable(output) //{name:relay.name,toggled:input.toggled}
+        return mergeData(sensor, {toggled:input.toggled})
       }
-      return relay
+      return sensor
     })
 
   state = mergeData( state, {active:true, sensors})//toggleRelays(state,toggleInfo) )
@@ -146,6 +144,16 @@ export function model(actions){
     ie doFoo$ ---> function doFoo(state,input){}
     */
     let updateFns = {setCoolerPower,emergencyShutdown,toggleRelay,toggleSensor}
+
+    let sensor1Data$ = Rx.Observable
+      .interval(500 /* ms */)
+      .timeInterval()
+      .map(Math.random())
+
+    let sensor2Data$ = Rx.Observable
+      .interval(10 /* ms */)
+      .timeInterval()
+      .map(Math.random())
 
     return makeModel(updateFns, actions, defaults)
    

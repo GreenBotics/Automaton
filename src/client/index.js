@@ -29,13 +29,17 @@ function renderHistory(items){
   return <ul> {list}</ul>
 }
 
+function renderSensorData(data){
+  return <div> {data} </div>
+}
 
-function view(model$){
-  //model$.subscribe(m=>console.log("model",m))
+
+function view(model$, rtm$, rtm2$){
 
   return model$
     .map(m=>m.asMutable({deep: true}))//for seamless immutable
-    .map(model =>
+    .combineLatest(rtm$, rtm2$, function(model,rtm,rtm2){return {model,rtm,rtm2}  })
+    .map(({model,rtm, rtm2}) =>
       <div>
         <div> 
           <button id="undo" disabled={model.history.past.length===0}> undo </button>
@@ -64,6 +68,10 @@ function view(model$){
         <section id="sensors">
           <h1> Sensors </h1>
           {renderSensors( model.state )}
+
+          {renderSensorData(rtm)}
+
+          {renderSensorData(rtm2)}
         </section>
 
         <section id="emergency">
@@ -75,6 +83,8 @@ function view(model$){
   )
 }
 
+
+
 function main(drivers) {
   let DOM      = drivers.DOM
   let socketIO = drivers.socketIO
@@ -82,6 +92,23 @@ function main(drivers) {
   let model$ = model(intent(DOM))
 
   //let history$ = history(historyIntent(DOM),model$) 
+
+  let sensor1Data$ = Rx.Observable
+      .interval(10 /* ms */)
+      .timeInterval()
+      //.do((e)=>console.log(e))
+      .map(e=> Math.random())
+
+  let sensor2Data$ = Rx.Observable
+      .interval(500 /* ms */)
+      .timeInterval()
+      //.do((e)=>console.log(e))
+      .map(e=> Math.random())
+
+  let fakeModel$ = Rx.Observable.just({name:"fooobar", value:42})
+  //sensor1Data$ = Rx.Observable.just("bfdsdf")
+  sensor2Data$ = Rx.Observable.just("sdf")
+
 
   let opHistory$ = historyM(intent(DOM))
   opHistory$.subscribe(h=>console.log("Operation/action/command",h))
@@ -96,8 +123,11 @@ function main(drivers) {
       }
     })
 
+
   return {
-      DOM: view(model$)
+      DOM: //minView2(DOM, fakeModel$,sensor1Data$, sensor2Data$)
+      //minView(fakeModel$,sensor1Data$, sensor2Data$) 
+      view(model$, sensor1Data$, sensor2Data$)
     , socketIO: outgoingMessages$
   }
 }
