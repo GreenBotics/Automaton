@@ -15,6 +15,15 @@ section h1{
   padding: 5px;
 }
 
+#sensorData{
+  position: absolute;
+  right:200px;
+  top:200px;
+  width: 300px;
+  height: 300px;
+
+}
+
 /*from http://codereview.stackexchange.com/questions/62338/stylish-underline-when-input-is-focused-modern-browsers-only*/
 input[type=text] {
   height:17px;

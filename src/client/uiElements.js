@@ -35,6 +35,7 @@ export function renderRelays(relaysData){
 }
 
 export function renderCoolers(data){
+  //console.log("renderCoolers")
   return data.map( (item,index) => 
     <div> 
       {renderLabeledSlider(item.name, index, "coolerSlider", item.power)}
@@ -49,6 +50,9 @@ export function renderSensors(data){
       {sensor.name}
       { renderLabeledCheckbox("foo", sensor.toggled, "sensor_"+index, "sensorToggler") }
       
+      <div id="sensorData">
+
+      </div>
     </div>
   )
 }
