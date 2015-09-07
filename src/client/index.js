@@ -5,7 +5,7 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 
 import SocketIO from 'cycle-socket.io'
 
-import {renderRelays, renderCoolers} from './uiElements'
+import {renderRelays, renderCoolers, renderSensors} from './uiElements'
 import {model, intent} from './model'
 
 import {history, historyIntent} from './history'
@@ -59,7 +59,11 @@ function view(model$){
         <section id="cooling">
           <h1>Cooling </h1>
           {renderCoolers( model.state.coolers )}
+        </section>
 
+        <section id="sensors">
+          <h1> Sensors </h1>
+          {renderSensors( model.state )}
         </section>
 
         <section id="emergency">

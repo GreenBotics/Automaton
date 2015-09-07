@@ -21,6 +21,7 @@ export function renderLabeledSlider(label="", idx, className, value=0, min=0, ma
   </div>
 }
 
+
 ////////
 
 
@@ -42,3 +43,14 @@ export function renderCoolers(data){
 
 }
 
+export function renderSensors(data){
+   return data.sensors.map( (sensor,index) => 
+    <div> 
+      {sensor.name}
+      { renderLabeledCheckbox("foo", sensor.toggled, "sensor_"+index, "sensorToggler") }
+      
+    </div>
+  )
+}
+
+//data.sensors.map(d => <div> Sensor: {d.name} </div> )

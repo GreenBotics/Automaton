@@ -1,3 +1,4 @@
+import "babel-core/polyfill"//needed for object.assign
 
 //merge the current data with any number of input data
 export function mergeData(currentData,inputs){
