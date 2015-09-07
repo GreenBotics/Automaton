@@ -20,7 +20,6 @@ export function modelHelper(defaults,modFunction){
 }
 
 
-
 function logHistory(currentData, history){ 
   let past   = [currentData].concat(history.past)
   let future = []

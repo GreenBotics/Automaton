@@ -45,16 +45,8 @@ export function intent(DOM){
 
 
 
-function logHistory(currentData, history){ 
-  let past   = [currentData].concat(history.past)
-  let future = []
 
-  console.log("currentData",past)
-  history = mergeData(history, {past, future})
-  return history
-}
-
-//these all are actual api methods , right? 
+//these all are actual "api functions"  
 function toggleRelay(state, input){
   let relays = state.relays
     .map(function(relay,index){
@@ -115,8 +107,11 @@ export function model(actions){
       }
     )
 
-    //list of "update functions", to be called based on mapping 
-    //between action names & update functions
+    /*list of "update functions", to be called based on mapping 
+    between action names & update functions
+    ie if you have an "action" called doFoo$, you should specify an function called doFoo(state,input)
+    ie doFoo$ ---> function doFoo(state,input){}
+    */
     let updateFns = {setCoolerPower,emergencyShutdown,toggleRelay}
     let mods$ =  makeModifications(actions,updateFns)
 
@@ -128,77 +123,5 @@ export function model(actions){
       //.distinctUntilChanged()
       .shareReplay(1)
   
-    /*function modifications(actions){
 
-      let toggleRelayMod$ = actions.toggleRelay$
-        //splice in history? or settings?
-        //.withLatestFrom(intent.settings$,function(data,settings){
-        //  return {nentities:data,settings}
-        //})
-        .map((input) => ({state,history}) => {
-
-          history = logHistory(state,history)
-          state   = toggleRelay(state,input)
-
-          return Immutable({state,history})
-        })
-
-      let emergencyShutdownMod$ = actions.emergencyShutdown$
-        .map((input) => ({state,history}) => {
-
-          history = logHistory(state, history)
-          state   = emergencyShutdown(state, input)
-      
-          return Immutable({state,history})
-        })
-
-      let setCoolerPowerMod$ = actions.setCoolerPower$
-        .map((input) => ({state,history}) => {
-
-          history = logHistory(state, history)
-          state   = setCoolerPower(state, input)
-      
-          return Immutable({state,history})
-        })
-
-
-      //we need to seperate this somehow?
-      let undoMod$ = actions.undo$
-        .map((toggleInfo) => ({state,history}) => {
-          console.log("Undoing")
-
-          let nState     = history.past[0]
-          let past   = history.past.slice(1)
-          let future = [state].concat(history.future)
-
-          history = mergeData(history,{past,future})
-
-          return Immutable({state:nState,history})
-        })
-
-      let redoMod$ = actions.redo$
-        .map((toggleInfo) => ({state,history}) => {
-          console.log("Redoing")
-
-          let nState = history.future[0]
-          let past = [state].concat(history.past) 
-          let future = history.future.slice(1)
-
-          history = mergeData(history,{past,future})
-
-          return Immutable({state:nState,history})
-        })
-
-      return Rx.Observable.merge(
-        toggleRelayMod$
-        ,emergencyShutdownMod$
-        ,setCoolerPowerMod$
-
-
-        ,undoMod$
-        ,redoMod$
-      )
-    }
-
-    return modelHelper(defaults,modifications)(actions)*/
   }
