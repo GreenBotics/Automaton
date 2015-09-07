@@ -2,7 +2,7 @@ import Immutable from 'seamless-immutable'
 import {Rx} from '@cycle/core'
 
 //import Immutable from 'immutable'
-import {modelHelper, makeModifications} from './modelHelper'
+import {makeModel, makeModifications} from './modelHelper'
 import {mergeData} from './utils'
 
 export function intent(DOM){
@@ -44,8 +44,6 @@ export function intent(DOM){
 }
 
 
-
-
 //these all are actual "api functions"  
 function toggleRelay(state, input){
   let relays = state.relays
@@ -83,45 +81,35 @@ function setCoolerPower(state, input){
 
 export function model(actions){
 
-    const defaults = Immutable(
-      { 
-        state:{
-          active:true,
+    const defaults = { 
+      state:{
+        active:true,
 
-          relays:[
-             {toggled:false,name:"relay0"}
-            ,{toggled:false,name:"relay1"}
-            ,{toggled:true, name:"relay2"}
-          ]
-          ,
-          coolers:[
-            {toggled:true,power:10,name:"cooler0"}
-            ,{toggled:true,power:72.6,name:"cooler1"}
-          ]
-        }
-        //only for undo/redo , experimental
-        ,history:{
-          past:[]
-          ,future:[]
-        }
+        relays:[
+           {toggled:false,name:"relay0"}
+          ,{toggled:false,name:"relay1"}
+          ,{toggled:true, name:"relay2"}
+        ]
+        ,
+        coolers:[
+          {toggled:true,power:10,name:"cooler0"}
+          ,{toggled:true,power:72.6,name:"cooler1"}
+        ]
       }
-    )
-
+      //only for undo/redo , experimental
+      ,history:{
+        past:[]
+        ,future:[]
+      }
+    }
+    
     /*list of "update functions", to be called based on mapping 
     between action names & update functions
     ie if you have an "action" called doFoo$, you should specify an function called doFoo(state,input)
     ie doFoo$ ---> function doFoo(state,input){}
     */
     let updateFns = {setCoolerPower,emergencyShutdown,toggleRelay}
-    let mods$ =  makeModifications(actions,updateFns)
 
-    let source$ =  Rx.Observable.just(defaults)
-
-    return mods$
-      .merge(source$)
-      .scan((currentData, modFn) => modFn(currentData))//combine existing data with new one
-      //.distinctUntilChanged()
-      .shareReplay(1)
-  
-
+    return makeModel(updateFns, actions, defaults)
+   
   }

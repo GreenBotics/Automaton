@@ -19,6 +19,19 @@ export function modelHelper(defaults,modFunction){
 
 }
 
+export function makeModel(updateFns,actions,defaults){
+  let mods$ =  makeModifications(actions,updateFns)
+
+  let source$ =  Rx.Observable.just( Immutable(defaults) )
+
+  return mods$
+    .merge(source$)
+    .scan((currentData, modFn) => modFn(currentData))//combine existing data with new one
+    //.distinctUntilChanged()
+    .shareReplay(1)
+  
+}
+
 
 function logHistory(currentData, history){ 
   let past   = [currentData].concat(history.past)
