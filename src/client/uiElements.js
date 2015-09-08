@@ -22,7 +22,7 @@ export function renderLabeledSlider(label="", idx, className, value=0, min=0, ma
   </div>
 }
 
-function labeledInputSlider({DOM, props$}, name = '') {
+export function labeledInputSlider({DOM, props$}, name = '') {
   let initialValue$ = props$.map(props => props.initial).first()
   let newValue$ = DOM.select(`.labeled-input-slider${name} .slider`).events('input')
     .merge( DOM.select(`.labeled-input--slider${name} .number`).events('change') )
@@ -94,7 +94,24 @@ export function renderSensors(data){
 }
 
 
-export function coolers({DOM, props$}, name = ''){
+export function coolers({DOM, props$}){
+  //console.log("data",data)
+  /*vtree$ = data.map( (item,index) => 
+    <div> 
+      <labeledInputSlider />
+    </div>
+  )*/
+
+  let vtree$ = Rx.Observable.just( <div> 
+      <labeled-slider> </labeled-slider>
+    </div>)
+
+  return {
+    DOM: vtree$
+  } 
+}
+
+export function coolers_({DOM, props$}, name = ''){
   let data$ = props$
     .filter(data=>data!==undefined)
     .map(props => props.data)
@@ -104,16 +121,19 @@ export function coolers({DOM, props$}, name = ''){
         let props$ = Rx.Observable.just({label: item.name, unit: '', min: 0, 
           initial: item.power , max: 100, id:"cooler"+index})
         let slider = labeledInputSlider({DOM, props$}, "-cooler")//item.name+"_"+index)
-        let value$ = slider.value$
-        return slider.DOM
+        return slider
       })
   }
 
-  /*let sliders = data$
-    .map(data => makeSliders(data))*/
-
-  let vtree$ = data$
+  let sliders$ = data$
     .map(data => makeSliders(data))
+
+  //sliders$.subscribe(e=>  console.log("sliders",e)  )
+  
+  let vtree$ = Rx.Observable.just(<div> </div>)
+
+  /*let vtree$ = data$
+    .map(data => makeSliders(data))*/
 
   return {
     DOM: vtree$

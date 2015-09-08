@@ -5,7 +5,7 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 
 import SocketIO from 'cycle-socket.io'
 
-import {renderRelays, renderCoolers, renderSensors, coolers} from './uiElements'
+import {renderRelays, renderCoolers, renderSensors, coolers, labeledInputSlider} from './uiElements'
 import {model, intent} from './model'
 
 import {history, historyIntent} from './history'
@@ -92,7 +92,6 @@ function minView3(DOM, model$, rtm$, rtm2$){
 
   let _coolers = coolers({DOM,props$})
 
-
   return Rx.Observable.combineLatest(rtm$, _coolers.DOM, function(rtm,coolers){
 
     return <div>
@@ -100,6 +99,25 @@ function minView3(DOM, model$, rtm$, rtm2$){
       {renderSensorData(rtm)}
     </div>
   })
+}
+
+function minView4(model$, rtm$, rtm2$){
+
+  model$ = model$
+    .map(m=>m.asMutable({deep: true}))//for seamless immutable
+
+  //let props$   = model$.map(e=>{return{data:e.state.coolers}})
+
+  //let _coolers = coolers({DOM,props$})
+
+  return Rx.Observable.combineLatest(model$, rtm$, function(model, rtm){
+
+    return <div>
+      {renderSensorData(rtm)}
+      <coolers> </coolers>
+    </div>
+  })
+ 
 }
 
 
@@ -132,7 +150,6 @@ function main(drivers) {
   //sensor1Data$ = Rx.Observable.just("bfdsdf")
   sensor2Data$ = Rx.Observable.just("sdf")
 
-
   let opHistory$ = historyM(intent(DOM))
   opHistory$.subscribe(h=>console.log("Operation/action/command",h))
 
@@ -150,8 +167,8 @@ function main(drivers) {
   return {
       DOM: //minView2(DOM, fakeModel$,sensor1Data$, sensor2Data$)
       //minView(fakeModel$,sensor1Data$, sensor2Data$) 
-
-      minView3(DOM, model$,sensor1Data$, sensor2Data$)
+      minView4(model$,sensor1Data$)
+      //minView3(DOM, model$,sensor1Data$, sensor2Data$)
       //view(model$, sensor1Data$, sensor2Data$)
     , socketIO: outgoingMessages$
   }
@@ -161,7 +178,10 @@ function main(drivers) {
 
 //////////setup drivers
 let socketIODriver = SocketIO.createSocketIODriver(window.location.origin)
-let domDriver      = makeDOMDriver('#app')
+let domDriver      = makeDOMDriver('#app',{
+    'labeled-slider': labeledInputSlider
+    ,'coolers':coolers
+  })
 
 let drivers = {
    DOM: domDriver
