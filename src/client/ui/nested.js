@@ -2,6 +2,9 @@
 import {hJSX} from '@cycle/dom'
 import {Rx} from '@cycle/core'
 
+import {renderSensorData} from './uiElements'
+
+
 export function labeledInputSlider({DOM, props$}, name = '') {
   let initialValue$ = props$.map(props => props.initial).first()
   let newValue$ = DOM.select(`.labeled-input-slider${name} .slider`).events('input')
@@ -20,13 +23,10 @@ export function labeledInputSlider({DOM, props$}, name = '') {
 
       <input className="slider" type="range" min={props.min} max={props.max} value={props.value}>
       </input>
-
     </div>
   )
 
   console.log("making labeledInputSlider")
-  //value$.subscribe(e=>console.log("value"))
-
   return {
     DOM: vtree$
     ,events:{ //nope, cannot do this
@@ -46,7 +46,7 @@ export function coolers({DOM, props$}, name = ''){
   function makeSliders(data){
     return data.map((item,index) => {
         let props$ = Rx.Observable.just({label: item.name, unit: '', min: 0, 
-          initial: item.power , max: 100, id:"cooler"+index})
+          initial: item.power , max: 100, id:"cooler_"+index})
         let slider = labeledInputSlider({DOM, props$}, "-cooler")//item.name+"_"+index)
         return slider
       })
@@ -58,7 +58,7 @@ export function coolers({DOM, props$}, name = ''){
   let vtree$ = sliders$
     .map(s=>s.map(se=>se.DOM))
 
-  let data$ = sliders$
+  //let data$ = sliders$
 
   return {
     DOM: vtree$
@@ -68,20 +68,21 @@ export function coolers({DOM, props$}, name = ''){
 
 //this one is the "root/main" view
 //rtm1 & 2 : stand ins for observables for real time data (just for experimenting)
-function mainView(DOM, model$, rtm$, rtm2$){
+export function mainView(DOM, model$, rtm$, rtm2$){
 
   model$ = model$
     .map(m=>m.asMutable({deep: true}))//for seamless immutable
-
   let props$   = model$.map(e=>{return{data:e.state.coolers}})
 
   let _coolers = coolers({DOM,props$})
 
-  return Rx.Observable.combineLatest(rtm$, _coolers.DOM, function(rtm,coolers){
+  return Rx.Observable.combineLatest(rtm$, rtm2$, _coolers.DOM, function(rtm, rtm2, coolers){
 
     return <div>
-      {coolers}
       {renderSensorData(rtm)}
+      {renderSensorData(rtm2)}
+      {coolers}
+      
     </div>
   })
 

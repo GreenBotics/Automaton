@@ -4,11 +4,14 @@ import {Rx} from '@cycle/core'
 
 import {renderSensorData} from './uiElements'
 
-export function labeledInputSlider(responses) {
+export function labeledInputSlider(responses, name = '') {
   let initialValue$ = responses.props.get('initial').first()
   let newValue$ = responses.DOM.select('.slider').events('input')
-    .merge( responses.DOM.select(`.labeled-input--slider${name} .number`).events('change') )
+    .merge( responses.DOM.select(`.labeled-input-slider${name} .number`).events('change') )
     .map(ev => ev.target.value)
+
+  //console.log(`.labeled-input-slider${name} .number`)
+  //newValue$.subscribe(e=>console.log("newValue",e))
 
   let value$ = initialValue$.concat(newValue$)
   let props$ = responses.props.get('*')
@@ -18,11 +21,11 @@ export function labeledInputSlider(responses) {
 
         <span className="label">
           {props.label+ ' '}
-          <input className="number" type="number" value={value} > </input> 
+          <input className="number" type="number" min={props.min} max={props.max} value={value} > </input> 
           {props.unit}
         </span>
 
-        <input className="slider" type="range" min={props.min} max={props.max} value={props.value}>
+        <input className="slider" type="range" min={props.min} max={props.max} value={value}>
         </input>
 
       </div>

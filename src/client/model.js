@@ -39,7 +39,6 @@ export function intent(DOM){
   let emergencyShutdown$ = DOM.select('#shutdown').events('click')
     .map(false)
 
-
   let toggleSensor$ = DOM.select('.sensorToggler').events('click')
     .map(idAndChecked)
 
