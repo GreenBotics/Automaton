@@ -5,7 +5,7 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 
 import SocketIO from 'cycle-socket.io'
 
-import {renderRelays, renderCoolers, renderSensors} from './uiElements'
+import {renderRelays, renderCoolers, renderSensors, coolers} from './uiElements'
 import {model, intent} from './model'
 
 import {history, historyIntent} from './history'
@@ -34,7 +34,7 @@ function renderSensorData(data){
 }
 
 
-function view(model$, rtm$, rtm2$){
+function view(dom, model$, rtm$, rtm2$){
 
   return model$
     .map(m=>m.asMutable({deep: true}))//for seamless immutable
@@ -83,6 +83,24 @@ function view(model$, rtm$, rtm2$){
   )
 }
 
+function minView3(DOM, model$, rtm$, rtm2$){
+
+  model$ = model$
+    .map(m=>m.asMutable({deep: true}))//for seamless immutable
+
+  let props$   = model$.map(e=>{return{data:e.state.coolers}})
+
+  let _coolers = coolers({DOM,props$})
+
+
+  return Rx.Observable.combineLatest(rtm$, _coolers.DOM, function(rtm,coolers){
+
+    return <div>
+      {coolers}
+      {renderSensorData(rtm)}
+    </div>
+  })
+}
 
 
 function main(drivers) {
@@ -105,7 +123,12 @@ function main(drivers) {
       //.do((e)=>console.log(e))
       .map(e=> Math.random())
 
-  let fakeModel$ = Rx.Observable.just({name:"fooobar", value:42})
+  //let fakeModel$ = Rx.Observable.just({name:"fooobar", value:42, power:43})
+
+  let fakeModel$ = Rx.Observable.just([
+    {name:"fooobar", power:43}
+    ,{name:"sdfds",  power:2.34}
+    ])
   //sensor1Data$ = Rx.Observable.just("bfdsdf")
   sensor2Data$ = Rx.Observable.just("sdf")
 
@@ -127,7 +150,9 @@ function main(drivers) {
   return {
       DOM: //minView2(DOM, fakeModel$,sensor1Data$, sensor2Data$)
       //minView(fakeModel$,sensor1Data$, sensor2Data$) 
-      view(model$, sensor1Data$, sensor2Data$)
+
+      minView3(DOM, model$,sensor1Data$, sensor2Data$)
+      //view(model$, sensor1Data$, sensor2Data$)
     , socketIO: outgoingMessages$
   }
 }

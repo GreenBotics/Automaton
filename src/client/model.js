@@ -18,29 +18,32 @@ function idAndValue(e){
 }
 
 export function intent(DOM){
-  let toggleRelay$ =  DOM.get('.relayToggler', 'click')
+  let toggleRelay$ =  DOM.select('.relayToggler').events('click')
     .map(idAndChecked)
 
 
-  let setCoolerPower$ = DOM.get('.coolerSlider','input')//input vs change events
-    .merge( DOM.get('.coolerSlider_number','change') )
-    //DOM.get('.coolerSlider_number','change')
+  let setCoolerPower$ = DOM.select('.coolerSlider').events('input')//input vs change events
+    //.merge( DOM.select('.coolerSlider_number'.events('change') )
+    .merge( DOM.select('.labeled-input-slider-cooler').events('change') )
+    //DOM.select('.coolerSlider_number','change')
     .debounce(30)
     .map(idAndValue)
+    .do(e=>console.log("value",e))
 
+  DOM.select('.labeled-input-slider-cooler').events('newValue').subscribe(e=>console.log("AI AI cooler change",e))
 
-  let emergencyShutdown$ = DOM.get('#shutdown', 'click')
+  let emergencyShutdown$ = DOM.select('#shutdown').events('click')
     .map(false)
 
 
-  let toggleSensor$ = DOM.get('.sensorToggler', 'click')
+  let toggleSensor$ = DOM.select('.sensorToggler').events('click')
     .map(idAndChecked)
 
 
-  let undo$ = DOM.get('#undo','click')
+  let undo$ = DOM.select('#undo').events('click')
     .map(true)
 
-  let redo$ = DOM.get('#redo','click')
+  let redo$ = DOM.select('#redo').events('click')
     .map(false)
 
 
