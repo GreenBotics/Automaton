@@ -13,7 +13,8 @@ function idAndChecked(e){
 
 function idAndValue(e){
   let id = parseInt( e.target.id.split("_").pop() )
-  let value = parseFloat(e.target.value)
+  //let value = parseFloat(e.target.value)// for basic use case
+  let value = parseFloat(e.detail)//for custom element etc
   return {id,value}
 }
 
@@ -21,16 +22,19 @@ export function intent(DOM){
   let toggleRelay$ =  DOM.select('.relayToggler').events('click')
     .map(idAndChecked)
 
-
-  let setCoolerPower$ = DOM.select('.coolerSlider').events('input')//input vs change events
-    //.merge( DOM.select('.coolerSlider_number'.events('change') )
-    .merge( DOM.select('.labeled-input-slider-cooler').events('change') )
+  /*//for renderXXX version : leaking implementation
+    let setCoolerPower$ = DOM.select('.coolerSlider').events('input')
+      .merge( DOM.select('.coolerSlider_number'.events('change') )
     //DOM.select('.coolerSlider_number','change')
+  */
+
+  let setCoolerPower$ = DOM.select('.labeled-input-slider-cooler').events('newValue') 
     .debounce(30)
     .map(idAndValue)
     .do(e=>console.log("value",e))
 
-  DOM.select('.labeled-input-slider-cooler').events('newValue').subscribe(e=>console.log("AI AI cooler change",e))
+  DOM.select('.labeled-input-slider-cooler').events('newValue')
+    .subscribe(e=>console.log("saw cooler slider change",e))
 
   let emergencyShutdown$ = DOM.select('#shutdown').events('click')
     .map(false)

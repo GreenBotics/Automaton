@@ -5,7 +5,11 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 
 import SocketIO from 'cycle-socket.io'
 
-import {renderRelays, renderCoolers, renderSensors, coolers, labeledInputSlider} from './uiElements'
+import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from './ui/uiElements'
+//import {coolers, labeledInputSlider, mainView} from './ui/nested'
+import {coolers, labeledInputSlider, mainView} from './ui/custom'
+
+
 import {model, intent} from './model'
 
 import {history, historyIntent} from './history'
@@ -22,15 +26,6 @@ function historyM(actions){
   }
 
   return Rx.Observable.merge(actionsL)
-}
-
-function renderHistory(items){
-  let list = items.map(item=> <li></li>)
-  return <ul> {list}</ul>
-}
-
-function renderSensorData(data){
-  return <div> {data} </div>
 }
 
 
@@ -83,42 +78,7 @@ function view(dom, model$, rtm$, rtm2$){
   )
 }
 
-function minView3(DOM, model$, rtm$, rtm2$){
 
-  model$ = model$
-    .map(m=>m.asMutable({deep: true}))//for seamless immutable
-
-  let props$   = model$.map(e=>{return{data:e.state.coolers}})
-
-  let _coolers = coolers({DOM,props$})
-
-  return Rx.Observable.combineLatest(rtm$, _coolers.DOM, function(rtm,coolers){
-
-    return <div>
-      {coolers}
-      {renderSensorData(rtm)}
-    </div>
-  })
-}
-
-function minView4(model$, rtm$, rtm2$){
-
-  model$ = model$
-    .map(m=>m.asMutable({deep: true}))//for seamless immutable
-
-  //let props$   = model$.map(e=>{return{data:e.state.coolers}})
-
-  //let _coolers = coolers({DOM,props$})
-
-  return Rx.Observable.combineLatest(model$, rtm$, function(model, rtm){
-
-    return <div>
-      {renderSensorData(rtm)}
-      <coolers> </coolers>
-    </div>
-  })
- 
-}
 
 
 function main(drivers) {
@@ -127,8 +87,7 @@ function main(drivers) {
 
   let model$ = model(intent(DOM))
 
-  //let history$ = history(historyIntent(DOM),model$) 
-
+  //fake data, to simulate "real time" streams of data
   let sensor1Data$ = Rx.Observable
       .interval(10 /* ms */)
       .timeInterval()
@@ -147,9 +106,9 @@ function main(drivers) {
     {name:"fooobar", power:43}
     ,{name:"sdfds",  power:2.34}
     ])
-  //sensor1Data$ = Rx.Observable.just("bfdsdf")
-  sensor2Data$ = Rx.Observable.just("sdf")
 
+
+  //let history$ = history(historyIntent(DOM),model$) 
   let opHistory$ = historyM(intent(DOM))
   opHistory$.subscribe(h=>console.log("Operation/action/command",h))
 
@@ -165,10 +124,10 @@ function main(drivers) {
 
 
   return {
-      DOM: //minView2(DOM, fakeModel$,sensor1Data$, sensor2Data$)
-      //minView(fakeModel$,sensor1Data$, sensor2Data$) 
-      minView4(model$,sensor1Data$)
-      //minView3(DOM, model$,sensor1Data$, sensor2Data$)
+      DOM: 
+      mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
+      //mainView(DOM, model$, sensor1Data$, sensor2Data$)//for nested version
+      
       //view(model$, sensor1Data$, sensor2Data$)
     , socketIO: outgoingMessages$
   }
@@ -179,9 +138,10 @@ function main(drivers) {
 //////////setup drivers
 let socketIODriver = SocketIO.createSocketIODriver(window.location.origin)
 let domDriver      = makeDOMDriver('#app',{
-    'labeled-slider': labeledInputSlider
-    ,'coolers':coolers
-  })
+    'coolers':coolers
+    ,'labeled-slider': labeledInputSlider
+    
+})
 
 let drivers = {
    DOM: domDriver
