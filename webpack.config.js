@@ -21,7 +21,9 @@ module.exports = {
         }
       },
       loaders: ['babel-loader']
-    }]
+    },
+    { test: /\.css$/, loader: "style-loader!css-loader" }
+    ]
   },
 
   resolve: {
