@@ -32,7 +32,8 @@ function attributeSetFloats(gl, prog, attr_name, rsize, arr) {
   gl.enableVertexAttribArray(attr);
   gl.vertexAttribPointer(attr, rsize, gl.FLOAT, false, 0, 0);
 }
-  function draw(elem) {
+
+function getContext(elem){
     try {
       var gl = elem
         .getContext("experimental-webgl");
@@ -40,8 +41,16 @@ function attributeSetFloats(gl, prog, attr_name, rsize, arr) {
     } catch (err) {
       throw new Error("Your web browser does not support WebGL!")
     }
-    gl.clearColor(1.0, 0.0, 0.0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    return gl
+}
+
+  function draw(gl, data=[[0]]) {
+
+    let input = data[0][0]
+
+    gl.clearColor(1.0, 1.0, input, 1)
+    gl.clear(gl.COLOR_BUFFER_BIT)
 
     var prog = shaderProgram(gl,
       "attribute vec3 pos;"+
@@ -51,44 +60,37 @@ function attributeSetFloats(gl, prog, attr_name, rsize, arr) {
       "void main() {"+
       " gl_FragColor = vec4(0., 0., 1.0, 1.0);"+
       "}"
-    );
-    gl.useProgram(prog);
+    )
+    gl.useProgram(prog)
 
     attributeSetFloats(gl, prog, "pos", 3, [
       -1, 0, 0,
       0, 1, 0,
       0, -1, 0,
       1, 0, 0
-    ]);
+    ])
     
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
   }
 
-function init(elem) {
-  try {
-    draw(elem);
-  } catch (e) {
-    alert("Error: "+e);
-  }
-}
 
-//setTimeout(init, 100);
-    
+////////////Actual widget
 function GlWidget(data) {
     this.type = 'Widget'
+    this.data = data
 }
-
 
 GlWidget.prototype.init = function () {
   console.log("GlWidget init")
   let elem = document.createElement('canvas')
-  init(elem)
+  this.gl = getContext(elem)
   return elem
 }
 
 GlWidget.prototype.update = function (prev, elem) {
   this.gl = this.gl || prev.gl
-  //this.gl = ""
+  let {gl,data} = this
+  draw(gl,data)
 }
 
 
