@@ -6,8 +6,8 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 import SocketIO from 'cycle-socket.io'
 
 import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from './ui/uiElements'
-//import {coolers, labeledInputSlider, mainView} from './ui/nested'
-import {coolers, labeledInputSlider, mainView} from './ui/custom'
+import {coolers, labeledInputSlider, mainView} from './ui/nested'
+//import {coolers, labeledInputSlider, mainView} from './ui/custom'
 
 
 import {model, intent} from './model'
@@ -74,8 +74,8 @@ function main(drivers) {
 
   return {
       DOM: 
-      mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
-      //mainView(DOM, model$, sensor1Data$, sensor2Data$)//for nested version
+      //mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
+      mainView(DOM, model$, sensor1Data$, sensor2Data$)//for nested version
       
       //view(model$, sensor1Data$, sensor2Data$)
     , socketIO: outgoingMessages$
