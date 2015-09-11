@@ -9,7 +9,7 @@ import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorD
 //import {coolers, labeledInputSlider, mainView} from './ui/nested'
 import {coolers, labeledInputSlider, mainView} from './ui/custom'
 
-import {foo} from './ui/glWidget'
+import {foo,GlWidget} from './ui/glWidget'
 
 
 import {model, intent} from './model'
@@ -77,7 +77,10 @@ function main(drivers) {
     return sensor1Data$
       .bufferWithCount(20,19)
       .combineLatest( sensor2Data$.bufferWithCount(20,19),function(sensor1Data,sensor2Data){
-        return foo([sensor1Data,sensor2Data])
+        return <div>
+          {new GlWidget([sensor1Data,sensor2Data])}
+        </div>
+        //foo([sensor1Data,sensor2Data])
       })
     //return sensor1Data$.map(foo)
   }

@@ -93,8 +93,6 @@ GlWidget.prototype.update = function (prev, elem) {
   draw(gl,data)
 }
 
-
-
 function foo(data){
    return h('div', [
       h('label', 'Name:'),
