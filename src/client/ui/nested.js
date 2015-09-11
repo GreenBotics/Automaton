@@ -3,7 +3,7 @@ import {hJSX} from '@cycle/dom'
 import {Rx} from '@cycle/core'
 
 import {renderSensorData} from './uiElements'
-import GraphWidget from './graphWidget'
+import {GraphWidget} from './graphWidget'
 
 
 export function labeledInputSlider({DOM, props$}, name = '') {

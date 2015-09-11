@@ -9,7 +9,7 @@ import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorD
 //import {coolers, labeledInputSlider, mainView} from './ui/nested'
 import {coolers, labeledInputSlider, mainView} from './ui/custom'
 
-import GraphWidget from './ui/graphWidget'
+import {foo} from './ui/graphWidget'
 
 
 import {model, intent} from './model'
@@ -72,10 +72,13 @@ function main(drivers) {
       }
     })
 
+  function testView(model$){
+    return model$.map(foo)
+  }
 
   return {
-      DOM: 
-      mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
+      DOM: testView(model$)
+      //mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
       //mainView(DOM, model$, sensor1Data$, sensor2Data$)//for nested version
       
       //view(model$, sensor1Data$, sensor2Data$)
