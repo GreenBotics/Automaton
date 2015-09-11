@@ -39,7 +39,7 @@ function main(drivers) {
 
   //fake data, to simulate "real time" streams of data
   let sensor1Data$ = Rx.Observable
-      .interval(10 /* ms */)
+      .interval(50 /* ms */)
       .timeInterval()
       //.do((e)=>console.log(e))
       .map(e=> Math.random())
@@ -72,12 +72,12 @@ function main(drivers) {
       }
     })
 
-  function testView(model$){
-    return model$.map(foo)
+  function testView(model$,sensor1Data$, sensor2Data$){
+    return sensor1Data$.bufferWithCount(20,19).map(foo)
   }
 
   return {
-      DOM: testView(model$)
+      DOM: testView(model$,sensor1Data$)
       //mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
       //mainView(DOM, model$, sensor1Data$, sensor2Data$)//for nested version
       

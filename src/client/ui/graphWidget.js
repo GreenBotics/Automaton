@@ -273,61 +273,46 @@ let ufoSightings =
 ]
 
 
-function GraphWidget(vnode) {
+function GraphWidget(data) {
     this.type = 'Widget'
+    
+    data = data.map((e,index)=>({time: index+'',temperature:Math.abs(e*15) } ) )
+    this.data = data //MG.convert.date(data, 'time','%S')
+    console.log(JSON.stringify(this.data))
 }
 
 GraphWidget.prototype.init = function () {
-  console.log("initializing Widget")
-  var elem = document.createElement('div')
-  
-  /*this.graph = MG.data_graphic({
-    title: "Downloads",
-    description: "This graphic shows a time-series of downloads.",
-    data: [{'date':new Date('2014-11-01'),'value':12},
-           {'date':new Date('2014-11-02'),'value':18}],
-    width: 600,
-    height: 250,
-    target: elem,//'#downloads',
-    x_accessor: 'date',
-    y_accessor: 'value',
-    show_tooltips:false//no jquery please
-  })*/
-
-  
-
-  let data =  MG.convert.date(ufoSightings, 'year','%Y')
-  console.log("data",data)
-  this.graph = MG.data_graphic({
-        title: "UFO Sightings",
-        description: "Yearly UFO sightings from the year 1945 to 2010.",
-        data: data,
-        width: 650,
-        height: 150,
-        target: elem,
-        x_accessor: 'year',
-        y_accessor: 'sightings',
-        markers: [{'year': 1964, 'label': '"The Creeping Terror" released'}],
-        show_tooltips:false//no jquery please
-    })
-
-  return elem
+  console.log("initializing Widget")  
+  return document.createElement('div')
 }
 
 GraphWidget.prototype.update = function (prev, elem) {
-  this.graph = this.graph || prev.graph
+
+  //this.graph = this.graph || prev.graph
+  this.graph = MG.data_graphic({
+        title: "Temperatures",
+        description: "Temperature curves for env#0",
+        data: this.data,
+        width: 650,
+        height: 150,
+        target: elem,
+        x_accessor: 'time',
+        y_accessor: 'temperature',
+        //markers: [{'year': 1964, 'label': '"The Creeping Terror" released'}],
+        show_tooltips:false//no jquery please
+    })
 }
 
 
 
 
-function foo(){
+function foo(data){
    return h('div', [
       h('label', 'Name:'),
       h('input.field', {attributes: {type: 'text'}}),
       h('h1', 'Hello '),
       h('div', [
-        new GraphWidget()
+        new GraphWidget(data)
       ])
     ])
 }
