@@ -3,6 +3,7 @@ import {hJSX} from '@cycle/dom'
 import {Rx} from '@cycle/core'
 
 import {renderSensorData} from './uiElements'
+import GraphWidget from './graphWidget'
 
 
 export function labeledInputSlider({DOM, props$}, name = '') {
@@ -59,8 +60,6 @@ export function coolers({DOM, props$}, name = ''){
   let vtree$ = sliders$
     .map(s=>s.map(se=>se.DOM))
 
-  //let data$ = sliders$
-
   return {
     DOM: vtree$
   } 
@@ -83,6 +82,8 @@ export function mainView(DOM, model$, rtm$, rtm2$){
       {renderSensorData(rtm)}
       {renderSensorData(rtm2)}
       {coolers}
+
+      <GraphWidget> </GraphWidget> 
       
     </div>
   })

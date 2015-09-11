@@ -6,8 +6,10 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 import SocketIO from 'cycle-socket.io'
 
 import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from './ui/uiElements'
-import {coolers, labeledInputSlider, mainView} from './ui/nested'
-//import {coolers, labeledInputSlider, mainView} from './ui/custom'
+//import {coolers, labeledInputSlider, mainView} from './ui/nested'
+import {coolers, labeledInputSlider, mainView} from './ui/custom'
+
+import GraphWidget from './ui/graphWidget'
 
 
 import {model, intent} from './model'
@@ -27,7 +29,6 @@ function historyM(actions){
 
   return Rx.Observable.merge(actionsL)
 }
-
 
 
 function main(drivers) {
@@ -74,8 +75,8 @@ function main(drivers) {
 
   return {
       DOM: 
-      //mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
-      mainView(DOM, model$, sensor1Data$, sensor2Data$)//for nested version
+      mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
+      //mainView(DOM, model$, sensor1Data$, sensor2Data$)//for nested version
       
       //view(model$, sensor1Data$, sensor2Data$)
     , socketIO: outgoingMessages$
@@ -89,6 +90,7 @@ let socketIODriver = SocketIO.createSocketIODriver(window.location.origin)
 let domDriver      = makeDOMDriver('#app',{
     'coolers':coolers
     ,'labeled-slider': labeledInputSlider
+    //,'GraphWidget':GraphWidget
     
 })
 

@@ -3,6 +3,8 @@ import {hJSX} from '@cycle/dom'
 import {Rx} from '@cycle/core'
 
 import {renderSensorData} from './uiElements'
+import GraphWidget from './graphWidget'
+
 
 export function labeledInputSlider(responses, name = '') {
   let initialValue$ = responses.props.get('initial').first()
@@ -81,6 +83,8 @@ export function mainView(model$, rtm$, rtm2$){
       {renderSensorData(rtm)}
       {renderSensorData(rtm2)}
       <coolers data={model.state.coolers}> </coolers>
+
+      <GraphWidget> </GraphWidget> 
     </div>
   })
 }

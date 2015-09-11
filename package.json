@@ -19,6 +19,7 @@
     "cycle-socket.io": "^1.0.0",
     "cyclejs": "^0.24.1",
     "immutable": "^3.7.4",
+    "metrics-graphics": "^2.6.0",
     "rpi-gpio": "^0.6.0",
     "rx": "^3.1.2",
     "rx-lite": "^2.5.2",
