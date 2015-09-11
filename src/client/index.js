@@ -9,7 +9,7 @@ import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorD
 //import {coolers, labeledInputSlider, mainView} from './ui/nested'
 import {coolers, labeledInputSlider, mainView} from './ui/custom'
 
-import {foo} from './ui/graphWidget'
+import {foo} from './ui/glWidget'
 
 
 import {model, intent} from './model'
