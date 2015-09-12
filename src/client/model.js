@@ -17,6 +17,23 @@ function idAndValue(e){
   return {id,value}
 }
 
+
+function makeActions(names=[]){
+  function reducer( total, name ){
+    total[ name+"$" ] = new Rx.Subject()
+    return total
+  }
+  return names.reduce( reducer, {} )
+}
+
+const relayActions  = makeActions(["toggleRelay","emergencyShutdown"])
+const sensorActions = makeActions(["toggleSensor","emergencyShutdown"])
+const coolerActions = makeActions(["setCoolerPower","emergencyShutdown"])
+
+console.log("actions",relayActions, sensorActions, coolerActions)
+
+
+
 export function intent(DOM){
   let toggleRelay$ =  DOM.select('.relayToggler').events('click')
     .map(idAndChecked)
