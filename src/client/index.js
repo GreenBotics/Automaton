@@ -9,7 +9,8 @@ import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorD
 //import {coolers, labeledInputSlider, mainView} from './ui/nested'
 import {coolers, labeledInputSlider, mainView} from './ui/custom'
 
-import {foo,GlWidget} from './ui/glWidget'
+import {GlWidget} from './ui/glWidget'
+import {GraphWidget} from './ui/graphWidget'
 
 
 import {model, intent} from './model'
@@ -39,13 +40,13 @@ function main(drivers) {
 
   //fake data, to simulate "real time" streams of data
   let sensor1Data$ = Rx.Observable
-      .interval(1 /* ms */)
+      .interval(100 /* ms */)
       .timeInterval()
       //.do((e)=>console.log(e))
       .map(e=> Math.random())
 
   let sensor2Data$ = Rx.Observable
-      .interval(50 /* ms */)
+      .interval(500 /* ms */)
       .timeInterval()
       //.do((e)=>console.log(e))
       .map(e=> Math.random())
@@ -78,7 +79,9 @@ function main(drivers) {
       .bufferWithCount(20,19)
       .combineLatest( sensor2Data$.bufferWithCount(20,19),function(sensor1Data,sensor2Data){
         return <div>
+          <div> Some stuff here </div>
           {new GlWidget([sensor1Data,sensor2Data])}
+          {new GraphWidget([sensor1Data,sensor2Data])}
         </div>
         //foo([sensor1Data,sensor2Data])
       })

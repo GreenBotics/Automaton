@@ -43,24 +43,10 @@ GraphWidget.prototype.update = function (prev, elem) {
         legend:["t°0", "t°1"],
         interpolate: 'linear',
         missing_is_zero: true,
-        transition_on_update:false,//disable for very high frequency data updates (no time for transition)
+        //transition_on_update:false,//disable for very high frequency data updates (no time for transition)
         show_tooltips:false//no jquery please
 
     })
 }
 
-
-
-
-function foo(data){
-   return h('div', [
-      h('label', 'Name:'),
-      h('input.field', {attributes: {type: 'text'}}),
-      h('h1', 'Hello '),
-      h('div', [
-        new GraphWidget(data)
-      ])
-    ])
-}
-
-export {GraphWidget,foo}
+export {GraphWidget}
