@@ -17,7 +17,7 @@ function idAndValue(e){
   return {id,value}
 }
 
-
+// this is to allow a level of inderection between intents & actions
 function makeActions(names=[]){
   function reducer( total, name ){
     total[ name+"$" ] = new Rx.Subject()
@@ -32,12 +32,11 @@ const coolerActions = makeActions(["setCoolerPower","emergencyShutdown"])
 
 console.log("actions",relayActions, sensorActions, coolerActions)
 
+const actions = {relayActions,sensorActions,coolerActions}
 
-
-export function intent(DOM){
+export function intent(DOM, actions){
   let toggleRelay$ =  DOM.select('.relayToggler').events('click')
     .map(idAndChecked)
-
 
   let setCoolerPower$ = DOM.select('.coolerSlider').events('input')//input vs change events
     //.merge( DOM.select('.coolerSlider_number'.events('change') )
@@ -56,7 +55,9 @@ export function intent(DOM){
   let toggleSensor$ = DOM.select('.sensorToggler').events('click')
     .map(idAndChecked)
 
+  toggleRelay$.subscribe(actions..remove$.asObserver())
 
+  //////////
   let undo$ = DOM.select('#undo').events('click')
     .map(true)
 
