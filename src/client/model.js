@@ -149,6 +149,11 @@ export function model(actions){
     */
     let updateFns = {setCoolerPower,emergencyShutdown,toggleRelay,toggleSensor}
 
+    //other helper: specifies model "paths", these are mapped to the state output
+    let paths = {relays:"relays", coolers:"coolers", sensors:"sensors"}
+
+
+    //for testing
     let sensor1Data$ = Rx.Observable
       .interval(500 /* ms */)
       .timeInterval()

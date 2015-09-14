@@ -19,19 +19,6 @@ export function modelHelper(defaults,modFunction){
 
 }
 
-export function makeModel(updateFns,actions,defaults){
-  let mods$ =  makeModifications(actions,updateFns)
-
-  let source$ =  Rx.Observable.just( Immutable(defaults) )
-
-  return mods$
-    .merge(source$)
-    .scan((currentData, modFn) => modFn(currentData))//combine existing data with new one
-    //.distinctUntilChanged()
-    .shareReplay(1)
-  
-}
-
 
 function logHistory(currentData, history){ 
   let past   = [currentData].concat(history.past)
@@ -66,7 +53,9 @@ export function makeModifications(actions, updateFns){
           return mod$ 
         }
 
-        //how to make this better? 
+
+        //after this point, only undo/redo management
+        //TODO : how to make this better? 
         if(opName==="undo"){
           return actions.undo$
             .map((toggleInfo) => ({state,history}) => {
@@ -136,9 +125,17 @@ export function makeModifications(actions, updateFns){
     }
 
 
-  /*let model$ = combineTemplate(
-    {
-      relays:[
-        actions.
-      ]
-    }*/
+
+export function makeModel(updateFns,actions,defaults){
+  let mods$ =  makeModifications(actions,updateFns)
+
+  let source$ =  Rx.Observable.just( Immutable(defaults) )
+
+  return mods$
+    .merge(source$)
+    .scan((currentData, modFn) => modFn(currentData))//combine existing data with new one
+    //.distinctUntilChanged()
+    .shareReplay(1)
+  
+}
+

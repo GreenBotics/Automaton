@@ -15,6 +15,7 @@
   "dependencies": {
     "@cycle/core": "^3.1.0",
     "@cycle/dom": "^5.1.2",
+    "addressbar": "^0.2.0",
     "cron": "ncb000gt/node-cron",
     "cycle-socket.io": "^1.0.0",
     "cyclejs": "^0.24.1",

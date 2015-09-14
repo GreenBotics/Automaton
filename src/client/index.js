@@ -11,6 +11,8 @@ import {model, intent} from './model'
 import {history, historyIntent} from './history'
 
 
+var foo = require("./model/entitiesStream")
+
 function historyM(actions){
   let actionsL = []
   for(let key in actions){
@@ -32,6 +34,25 @@ function renderHistory(items){
 function renderSensorData(data){
   return <div> {data} </div>
 }
+
+import addressbar from 'addressbar'
+
+
+/*addressbar.addEventListener('change', function (event) {
+  event.preventDefault()
+  event.target.value // The value of the addressbar
+})
+
+
+console.log("addressbar",addressbar.value)
+*/
+//addressbar.value = "http://localhost:3001/index.html?foo=42"
+let address$ = Rx.Observable.fromEvent(addressbar,"change")
+  .startWith(addressbar.value)
+
+address$.subscribe(e=>console.log("address",e))
+
+
 
 
 function view(model$, rtm$, rtm2$){
