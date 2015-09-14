@@ -17,24 +17,7 @@ function idAndValue(e){
   return {id,value}
 }
 
-// this is to allow a level of inderection between intents & actions
-function makeActions(names=[]){
-  function reducer( total, name ){
-    total[ name+"$" ] = new Rx.Subject()
-    return total
-  }
-  return names.reduce( reducer, {} )
-}
-
-const relayActions  = makeActions(["toggleRelay","emergencyShutdown"])
-const sensorActions = makeActions(["toggleSensor","emergencyShutdown"])
-const coolerActions = makeActions(["setCoolerPower","emergencyShutdown"])
-
-console.log("actions",relayActions, sensorActions, coolerActions)
-
-const actions = {relayActions,sensorActions,coolerActions}
-
-export function intent(DOM, actions){
+export function intent(DOM){
   let toggleRelay$ =  DOM.select('.relayToggler').events('click')
     .map(idAndChecked)
 
@@ -51,12 +34,10 @@ export function intent(DOM, actions){
   let emergencyShutdown$ = DOM.select('#shutdown').events('click')
     .map(false)
 
-
   let toggleSensor$ = DOM.select('.sensorToggler').events('click')
     .map(idAndChecked)
 
-  toggleRelay$.subscribe(actions..remove$.asObserver())
-
+  
   //////////
   let undo$ = DOM.select('#undo').events('click')
     .map(true)
@@ -75,6 +56,8 @@ export function intent(DOM, actions){
     , redo$}
 }
 
+
+//////////////////////////////////////
 
 //these all are actual "api functions"  
 function toggleRelay(state, input){
@@ -178,5 +161,4 @@ export function model(actions){
 
     return makeModel(updateFns, actions, defaults)
    
-  
 }
