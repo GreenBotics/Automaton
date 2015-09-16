@@ -27,16 +27,23 @@ function main(drivers) {
   let actions$ = intent(DOM, preActions)
   let model$   = model(actions$)
 
-  //fake data, to simulate "real time" streams of data
-  let sensor1Data$ = Rx.Observable
-      .interval(100 /* ms */)
-      .timeInterval()
-      .map(e=> Math.random())
 
-  let sensor2Data$ = Rx.Observable
-      .interval(500 /* ms */)
-      .timeInterval()
-      .map(e=> Math.random())
+  let sensor1Rate = 100
+  let sensor2Rate = 500
+
+  function makeFakeSensorStream(rate$){
+    return rate$
+      .flatMap(function(rate){
+        return Rx.Observable
+          .interval(rate /* ms */)
+          .timeInterval()
+          .map(e=> Math.random())
+      })
+  }
+
+  //fake data, to simulate "real time" streams of data
+  let sensor1Data$ = makeFakeSensorStream( Rx.Observable.just(sensor1Rate) )
+  let sensor2Data$ = makeFakeSensorStream( Rx.Observable.just(sensor2Rate) )
 
   //
   let vModel$ = model$
@@ -49,15 +56,15 @@ function main(drivers) {
   let vtree$  = _wrapper.DOM
   let subValues$ = _wrapper.coolersValues$
   
-  subValues$.subscribe( function(subValues$){
+  /*subValues$.subscribe( function(subValues1$){
 
-    subValues$.map(function(subVal$,index){
+    subValues1$.map(function(subVal$,index){
       subVal$.subscribe(function(value){
         preActions.setCoolerPower$.onNext({id:index,value})  
       })
     })
 
-  })  
+  })  */
 
   //socket io stream of model state
   let stream$ = model$ //anytime our model changes , dispatch it via socket.io

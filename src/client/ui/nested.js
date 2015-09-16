@@ -5,6 +5,7 @@ import {Rx} from '@cycle/core'
 import {renderSensorData} from './uiElements'
 import {GraphWidget} from './graphWidget'
 
+import {slidingAccumulator} from '../utils'
 /*
 base template: 
 function Parent(drivers) {
@@ -53,26 +54,38 @@ export function coolers({DOM, props$}, name = ''){
   let data$ = props$
     .distinctUntilChanged()
     .map(props=>props.data)
-    .filter(data=>data!==undefined)
+    .filter(data=>data!==undefined)//data is an array like so [{name:"foo",power:10},{name:"bar",power:76}]
 
   function makeSliders(data){
     return data.map((item,index) => {
       let props$ = Rx.Observable.just({label: item.name, unit: ''
-        , min: 0, initial: item.power , value:item.power, max: 100, 
-        id:"cooler_"+index, className:"labeled-input-slider"})
-      let slider = labeledInputSlider({DOM, props$}, "-cooler"+index)//item.name+"_"+index)
+        , min: 0, initial: item.power , value:item.power, max: 100
+        , id:"cooler_"+index, className:"labeled-input-slider"})
+      let slider = labeledInputSlider({DOM, props$}, "-cooler"+index)
       return slider
     })
   }
 
   let sliders$ = data$
     .map(data => makeSliders(data))
+
+  //sliders$.subscribe(e=>console.log("sliders",e))
   
   let vtree$ = sliders$
+    //.do(e=>console.log("foo",e))
     .map(s=>s.map(se=>se.DOM))
 
   let values$ = sliders$
     .map(s=>s.map(se=>se.value$))
+
+  //Rx.Observable.merge(sliders$).subscribe(e=>console.log("foo",e))
+  //console.log("sliders",sliders$, data$)
+
+  //[
+  //  {name:"foo",power:10} => labeledInputSlider()
+  //  {name:"bar",power:76} => labeledInputSlider()
+  //]
+
 
   return {
     DOM: vtree$
@@ -87,18 +100,54 @@ export function wrapper({DOM, props$}){
 
   let _coolers = coolers({DOM, props$:props$.pluck("model") })
 
+  function formatEntry(entry){
+    return entry.map( (e,index)=>({time: index+'',temperature:Math.abs(e*30)}) ) 
+  }
+
+  let bufferedRtm$ = slidingAccumulator( props$.map(p=>p.rtm), 20 ).map(formatEntry)
+  let bufferedRtm2$ = slidingAccumulator( props$.map(p=>p.rtm2), 20).map(formatEntry)
+
+  let graphSettings1 = {
+    title: "Temperatures",
+    description:"Temperature curves for env#0",
+    width:650,
+    height:150,
+    x_accessor: 'time',
+    y_accessor: 'temperature',
+    legend:["T0","T1"],
+
+    baselines: [{value:12, label:'critical temperature stuff'}],
+  }
+
+  let graphSettings2 = {
+    title: "Temperature (sensor1) ",
+    description:"Temperature curves for env#1",
+    width:650,
+    height:150,
+    x_accessor: 'time',
+    y_accessor: 'temperature',
+    legend:["T0"],
+
+    baselines: [{value:18, label:'critical temperature'}],
+  }
+
+
+
   function view(state$,coolers){
-    return Rx.Observable.combineLatest( state$, _coolers.DOM,function(state, coolers){ 
+    return Rx.Observable.combineLatest( state$, _coolers.DOM, bufferedRtm$,bufferedRtm2$ ,function(state, coolers, bufferedRtm, bufferedRtm2){ 
       return <div>
+        {coolers}
         {renderSensorData(state.rtm)}
         {renderSensorData(state.rtm2)}
-        {coolers}
+        
+        {new GraphWidget([bufferedRtm,bufferedRtm2],graphSettings1)}
+
+        {new GraphWidget(bufferedRtm,graphSettings2)}
       </div> 
     })
   }
 
   let vtree$ = view(props$,coolers)
-    
 
   return {
     DOM:vtree$
