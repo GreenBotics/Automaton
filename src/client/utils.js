@@ -28,3 +28,20 @@ export function combineLatestObj(obj) {
     return combination;
   })
 }
+
+
+export function slidingAccumulator(data$, maxItems=10){
+
+  let foo$ = new Rx.Subject()
+  let acc = []
+  data$
+    .subscribe(function(e){
+      acc.push(e)
+      if(acc.length >= maxItems){
+        acc.shift()
+      }
+      foo$.onNext(acc)
+    })
+
+  return foo$
+}
