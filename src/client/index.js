@@ -17,36 +17,6 @@ import {history, historyIntent} from './history'
 
 import {combineLatestObj} from './utils'
 
-function historyM(actions){
-  let actionsL = []
-  for(let key in actions){
-    //console.log("actions",key)
-
-    let opName = key.replace(/\$/g, "")
-    let action$ = actions[key].map(a=>({type:opName,data:a}))
-    actionsL.push(action$)
-  }
-
-  return Rx.Observable.merge(actionsL)
-}
-
-function testView(model$,sensor1Data$, sensor2Data$){
-
-    return sensor1Data$
-      .bufferWithCount(20,19)
-      .combineLatest( sensor2Data$.bufferWithCount(20,19),function(sensor1Data,sensor2Data){
-        return <div>
-          <div> Some stuff here </div>
-          {new GlWidget([sensor1Data,sensor2Data])}
-          {new GraphWidget([sensor1Data,sensor2Data])}
-        </div>
-        //foo([sensor1Data,sensor2Data])
-      })
-    //return sensor1Data$.map(foo)
-  }
-
-// let opHistory$ = historyM(intent(DOM))
-//opHistory$.subscribe(h=>console.log("Operation/action/command",h))
 
 function main(drivers) {
   let DOM      = drivers.DOM
@@ -102,9 +72,6 @@ function main(drivers) {
 
   return {
       DOM: vtree$
-      //testView(model$,sensor1Data$, sensor2Data$)
-      //mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
-      //view(model$, sensor1Data$, sensor2Data$)
     , socketIO: outgoingMessages$
   }
 }
@@ -114,10 +81,9 @@ function main(drivers) {
 //////////setup drivers
 let socketIODriver = SocketIO.createSocketIODriver(window.location.origin)
 let domDriver      = makeDOMDriver('#app',{
-    'coolers':coolers
-    ,'labeled-slider': labeledInputSlider
+    //'coolers':coolers
+    //,'labeled-slider': labeledInputSlider
     //,'GraphWidget':GraphWidget
-    
 })
 
 let drivers = {
