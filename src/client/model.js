@@ -18,7 +18,7 @@ function idAndValue(e){
   return {id,value}
 }
 
-export function intent(DOM){
+export function intent(DOM, other){
   let toggleRelay$ =  DOM.select('.relayToggler').events('click')
     .map(idAndChecked)
 
@@ -28,10 +28,12 @@ export function intent(DOM){
     //DOM.select('.coolerSlider_number','change')
   */
 
-  let setCoolerPower$ = DOM.select('.labeled-input-slider-cooler').events('newValue') 
+  /*let setCoolerPower$ = DOM.select('.labeled-input-slider-cooler').events('newValue') 
     .debounce(30)
     .map(idAndValue)
-    .do(e=>console.log("value",e))
+    .do(e=>console.log("value",e))*/
+
+  let setCoolerPower$ = other.setCoolerPower$//.debounce(30)
 
   DOM.select('.labeled-input-slider-cooler').events('newValue')
     .subscribe(e=>console.log("saw cooler slider change",e))
@@ -151,15 +153,16 @@ export function model(actions){
     */
     let updateFns = {setCoolerPower,emergencyShutdown,toggleRelay,toggleSensor}
 
+    //fake data, to simulate "real time" streams of data
     let sensor1Data$ = Rx.Observable
-      .interval(500 /* ms */)
+      .interval(100 /* ms */)
       .timeInterval()
-      .map(Math.random())
+      .map(e=> Math.random())
 
     let sensor2Data$ = Rx.Observable
-      .interval(10 /* ms */)
+      .interval(500 /* ms */)
       .timeInterval()
-      .map(Math.random())
+      .map(e=> Math.random())
 
     return makeModel(updateFns, actions, defaults)
    

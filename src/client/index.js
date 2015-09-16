@@ -6,17 +6,16 @@ import {makeDOMDriver, hJSX} from '@cycle/dom'
 import SocketIO from 'cycle-socket.io'
 
 import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from './ui/uiElements'
-//import {coolers, labeledInputSlider, mainView} from './ui/nested'
-import {coolers, labeledInputSlider, mainView} from './ui/custom'
+import {coolers, labeledInputSlider, wrapper} from './ui/nested'
+//import {coolers, labeledInputSlider, mainView} from './ui/custom'
 
-import {GlWidget} from './ui/glWidget'
-import {GraphWidget} from './ui/graphWidget'
-
+//import {GlWidget} from './ui/glWidget'
+//import {GraphWidget} from './ui/graphWidget'
 
 import {model, intent} from './model'
-
 import {history, historyIntent} from './history'
 
+import {combineLatestObj} from './utils'
 
 function historyM(actions){
   let actionsL = []
@@ -31,49 +30,7 @@ function historyM(actions){
   return Rx.Observable.merge(actionsL)
 }
 
-
-function main(drivers) {
-  let DOM      = drivers.DOM
-  let socketIO = drivers.socketIO
-
-  let model$ = model(intent(DOM))
-
-  //fake data, to simulate "real time" streams of data
-  let sensor1Data$ = Rx.Observable
-      .interval(100 /* ms */)
-      .timeInterval()
-      //.do((e)=>console.log(e))
-      .map(e=> Math.random())
-
-  let sensor2Data$ = Rx.Observable
-      .interval(500 /* ms */)
-      .timeInterval()
-      //.do((e)=>console.log(e))
-      .map(e=> Math.random())
-
-  //let fakeModel$ = Rx.Observable.just({name:"fooobar", value:42, power:43})
-
-  let fakeModel$ = Rx.Observable.just([
-    {name:"fooobar", power:43}
-    ,{name:"sdfds",  power:2.34}
-    ])
-
-
-  //let history$ = history(historyIntent(DOM),model$) 
-  let opHistory$ = historyM(intent(DOM))
-  opHistory$.subscribe(h=>console.log("Operation/action/command",h))
-
-  let stream$ = model$ //anytime our model changes , dispatch it via socket.io
-  const incomingMessages$ = socketIO.get('messageType')
-  const outgoingMessages$ = stream$.map( 
-    function(eventData){
-      return {
-        messageType: 'someEvent',
-        message: JSON.stringify(eventData)
-      }
-    })
-
-  function testView(model$,sensor1Data$, sensor2Data$){
+function testView(model$,sensor1Data$, sensor2Data$){
 
     return sensor1Data$
       .bufferWithCount(20,19)
@@ -88,11 +45,65 @@ function main(drivers) {
     //return sensor1Data$.map(foo)
   }
 
+// let opHistory$ = historyM(intent(DOM))
+//opHistory$.subscribe(h=>console.log("Operation/action/command",h))
+
+function main(drivers) {
+  let DOM      = drivers.DOM
+  let socketIO = drivers.socketIO
+
+  let preActions = {setCoolerPower$:new Rx.Subject()}
+
+  let actions$ = intent(DOM, preActions)
+  let model$   = model(actions$)
+
+  //fake data, to simulate "real time" streams of data
+  let sensor1Data$ = Rx.Observable
+      .interval(100 /* ms */)
+      .timeInterval()
+      .map(e=> Math.random())
+
+  let sensor2Data$ = Rx.Observable
+      .interval(500 /* ms */)
+      .timeInterval()
+      .map(e=> Math.random())
+
+  //
+  let vModel$ = model$
+    .map(m=>m.asMutable({deep:true}))
+    .map(e=>{return{data:e.state.coolers}})
+
+  let props$ = combineLatestObj({model$:vModel$, rtm:sensor1Data$, rtm2:sensor2Data$})
+
+  let _wrapper = wrapper({DOM, props$})
+  let vtree$  = _wrapper.DOM
+  let subValues$ = _wrapper.coolersValues$
+  
+  subValues$.subscribe( function(subValues$){
+
+    subValues$.map(function(subVal$,index){
+      subVal$.subscribe(function(value){
+        preActions.setCoolerPower$.onNext({id:index,value})  
+      })
+    })
+
+  })  
+
+  //socket io stream of model state
+  let stream$ = model$ //anytime our model changes , dispatch it via socket.io
+  const incomingMessages$ = socketIO.get('messageType')
+  const outgoingMessages$ = stream$.map( 
+    function(eventData){
+      return {
+        messageType: 'someEvent',
+        message: JSON.stringify(eventData)
+      }
+    })
+
   return {
-      DOM: testView(model$,sensor1Data$, sensor2Data$)
+      DOM: vtree$
+      //testView(model$,sensor1Data$, sensor2Data$)
       //mainView(model$, sensor1Data$,sensor2Data$)//for custom element version
-      //mainView(DOM, model$, sensor1Data$, sensor2Data$)//for nested version
-      
       //view(model$, sensor1Data$, sensor2Data$)
     , socketIO: outgoingMessages$
   }
