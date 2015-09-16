@@ -45,7 +45,6 @@ function main(drivers) {
   let sensor1Data$ = makeFakeSensorStream( Rx.Observable.just(sensor1Rate) )
   let sensor2Data$ = makeFakeSensorStream( Rx.Observable.just(sensor2Rate) )
 
-  //
   let vModel$ = model$
     .map(m=>m.asMutable({deep:true}))
     .map(e=>{return{data:e.state.coolers}})

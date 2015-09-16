@@ -104,14 +104,16 @@ export function wrapper({DOM, props$}){
     return entry.map( (e,index)=>({time: index+'',temperature:Math.abs(e*30)}) ) 
   }
 
-  let bufferedRtm$ = slidingAccumulator( props$.map(p=>p.rtm), 20 ).map(formatEntry)
-  let bufferedRtm2$ = slidingAccumulator( props$.map(p=>p.rtm2), 20).map(formatEntry)
+  let dataPoints = 20
+  let bufferedRtm$ = slidingAccumulator( props$.map(p=>p.rtm), dataPoints ).map(formatEntry)
+  let bufferedRtm2$ = slidingAccumulator( props$.map(p=>p.rtm2), dataPoints).map(formatEntry)
 
   let graphSettings1 = {
     title: "Temperatures",
     description:"Temperature curves for env#0",
     width:650,
     height:150,
+    max_x:dataPoints,
     x_accessor: 'time',
     y_accessor: 'temperature',
     legend:["T0","T1"],
@@ -124,13 +126,13 @@ export function wrapper({DOM, props$}){
     description:"Temperature curves for env#1",
     width:650,
     height:150,
+    max_x:dataPoints,
     x_accessor: 'time',
     y_accessor: 'temperature',
     legend:["T0"],
 
     baselines: [{value:18, label:'critical temperature'}],
   }
-
 
 
   function view(state$,coolers){
