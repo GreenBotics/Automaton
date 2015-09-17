@@ -66,7 +66,7 @@ export function renderHistory(items){
 }
 
 //main view
-function view(dom, model$, rtm$, rtm2$){
+function view(model$, rtm$, rtm2$){
 
   return model$
     .map(m=>m.asMutable({deep: true}))//for seamless immutable
@@ -114,4 +114,6 @@ function view(dom, model$, rtm$, rtm2$){
       </div>
   )
 }
+
+
 
