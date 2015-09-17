@@ -4,6 +4,8 @@ import {Rx} from '@cycle/core'
 
 import {renderSensorData} from './uiElements'
 import {GraphWidget} from './graphWidget'
+import {GLWidget} from './glWidget'
+
 
 import {slidingAccumulator} from '../utils'
 /*
@@ -145,6 +147,8 @@ export function wrapper({DOM, props$}){
         {new GraphWidget([bufferedRtm,bufferedRtm2],graphSettings1)}
 
         {new GraphWidget(bufferedRtm,graphSettings2)}
+
+        {new GLWidget(state.rtm)}
       </div> 
     })
   }

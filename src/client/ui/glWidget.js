@@ -45,9 +45,9 @@ function getContext(elem){
     return gl
 }
 
-  function draw(gl, data=[[0]]) {
+  function draw(gl, data) {
 
-    let input = data[0][0]
+    let input = data
 
     gl.clearColor(1.0, 1.0, input, 1)
     gl.clear(gl.COLOR_BUFFER_BIT)
@@ -75,33 +75,22 @@ function getContext(elem){
 
 
 ////////////Actual widget
-function GlWidget(data) {
+function GLWidget(data) {
     this.type = 'Widget'
     this.data = data
 }
 
-GlWidget.prototype.init = function () {
-  console.log("GlWidget init")
+GLWidget.prototype.init = function () {
+  console.log("GLWidget init")
   let elem = document.createElement('canvas')
   this.gl = getContext(elem)
   return elem
 }
 
-GlWidget.prototype.update = function (prev, elem) {
+GLWidget.prototype.update = function (prev, elem) {
   this.gl = this.gl || prev.gl
   let {gl,data} = this
   draw(gl,data)
 }
 
-function foo(data){
-   return h('div', [
-      h('label', 'Name:'),
-      h('input.field', {attributes: {type: 'text'}}),
-      h('h1', 'Hello '),
-      h('div', [
-        new GlWidget(data)
-      ])
-    ])
-}
-
-export {GlWidget,foo}
+export {GLWidget}
