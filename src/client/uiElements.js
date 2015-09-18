@@ -66,6 +66,8 @@ export function renderRelays(relaysData){
     <div>
       {relayData.name}
       { renderLabeledCheckbox("Toggle:", relayData.toggled, "checker_"+index, "relayToggler") } 
+
+      <button className="removeRelay" id={"removeRelay_"+index}> Remove </button>
     </div>
   )
 }

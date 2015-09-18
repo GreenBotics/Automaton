@@ -78,6 +78,7 @@ function view(model$, rtm$, rtm2$){
         
         <section id="relays"> 
           <h1>Relays: </h1>
+          <div><button id="removeAllRelays"> Remove All </button></div>
           {renderRelays( model.state.relays )}
         </section>
 

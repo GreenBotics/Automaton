@@ -6,6 +6,11 @@ import "babel-core/polyfill"
 import {makeModel, makeModifications} from './modelHelper'
 import {mergeData} from './utils'
 
+function getId(e){
+  let id = parseInt( e.target.id.split("_").pop() )
+  return {id}
+}
+
 function idAndChecked(e){
   let id = parseInt( e.target.id.split("_").pop() )
   return {id,toggled:e.target.checked}
@@ -20,6 +25,12 @@ function idAndValue(e){
 export function intent(DOM){
   let toggleRelay$ =  DOM.select('.relayToggler').events('click')
     .map(idAndChecked)
+
+  let removeRelay$ = DOM.select('.removeRelay').events('click')
+    .map(getId)
+
+  let removeAllRelays$ = DOM.select('#removeAllRelays').events('click')
+    .map(true)
 
   let setCoolerPower$ = DOM.select('.coolerSlider').events('input')//input vs change events
     //.merge( DOM.select('.coolerSlider_number'.events('change') )
@@ -48,7 +59,11 @@ export function intent(DOM){
 
   return {
     toggleRelay$
+    ,removeRelay$
+    ,removeAllRelays$
+
     ,emergencyShutdown$
+    
     ,setCoolerPower$
     ,toggleSensor$
 
@@ -70,6 +85,25 @@ function toggleRelay(state, input){
     })
 
   state = mergeData( state, {active:true, relays})//toggleRelays(state,toggleInfo) )
+  return state
+}
+
+function removeRelay(state, input){
+  let relays = state.relays
+    .map(function(relay,index){
+      if(index !== input.id){
+        return relay
+      }
+    })
+    .filter(r=>r!==undefined)
+    //.filter(r=>input.id)=> if all items had ids this would be simpler
+
+  state = mergeData( state, {active:true, relays})
+  return state
+}
+
+function removeAllRelays(state, input){
+  state = mergeData( state, {relays:[]})
   return state
 }
 
@@ -147,7 +181,13 @@ export function model(actions){
     ie if you have an "action" called doFoo$, you should specify an function called doFoo(state,input)
     ie doFoo$ ---> function doFoo(state,input){}
     */
-    let updateFns = {setCoolerPower,emergencyShutdown,toggleRelay,toggleSensor}
+    let updateFns = {
+      setCoolerPower,
+      emergencyShutdown,
+      toggleRelay,
+      removeRelay,
+      removeAllRelays,
+      toggleSensor}
 
     //other helper: specifies model "paths", these are mapped to the state output
     let paths = {relays:"relays", coolers:"coolers", sensors:"sensors"}
