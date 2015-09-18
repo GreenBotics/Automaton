@@ -3,7 +3,7 @@ import {Rx} from '@cycle/core'
 //import Immutable from 'immutable'
 import "babel-core/polyfill"
 
-import {makeModel, makeModifications} from './modelHelper'
+import {makeModel, makeModifications} from './model/modelHelper'
 import {mergeData} from './utils'
 
 function getId(e){
@@ -63,7 +63,7 @@ export function intent(DOM){
     ,removeAllRelays$
 
     ,emergencyShutdown$
-    
+
     ,setCoolerPower$
     ,toggleSensor$
 

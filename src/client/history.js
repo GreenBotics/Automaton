@@ -1,7 +1,7 @@
 import Immutable from 'seamless-immutable'
 import {Rx} from '@cycle/core'
 
-import {modelHelper} from './modelHelper'
+import {modelHelper} from './model/modelHelper'
 
 
 export function historyIntent(DOM){
