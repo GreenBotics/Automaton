@@ -137,7 +137,7 @@ function makeEntity(id){
 
   let components  = {core$, transforms$, bounds$, mesh$}
   let entity$ = combineLatestObj(components)
-  //entity$.subscribe(e=>console.log("entity",e))
+  entity$.subscribe(e=>console.log("entity",e))
 
   //transforms$.subscribe(t=>console.log("transforms",t))
 
@@ -158,10 +158,11 @@ function makeEntities(count){
   for(let i=0;i<count;i++){
     entities.push( makeEntity(i) )
   }
+
 }
 
 
-makeEntities(100)
+makeEntities(3)
 
 
   

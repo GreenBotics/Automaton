@@ -174,7 +174,6 @@ export function makeModelNoHistory(defaults, updateFns, actions){
   let mods$ =  makeModificationsNoHistory(actions,updateFns)
 
   let source$ =  Rx.Observable.just( Immutable(defaults) )
-  source$.subscribe(e=>console.log("source",e))
 
   return mods$
     .merge(source$)
