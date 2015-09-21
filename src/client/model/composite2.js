@@ -43,7 +43,7 @@ let partInstance = {
 let just = Rx.Observable.just
 
 ////Core//////
-function makeCoreComponent(name, typeUid){
+function makeCoreSystem(name, typeUid){
   const defaults ={
     name: name,
     iuid: generateUUID(),
@@ -65,22 +65,35 @@ function makeCoreComponent(name, typeUid){
 }
 ////Transforms//////
 
-function makeTransformComponent(){
-  const defaults ={
+function makeTransformsSystem(){
+  const defaults = {}
+
+  const transformDefaults ={
     pos: [ 0, 0, 0 ],
     rot: [ 0, 0, 0 ],
     sca: [ 1, 1, 1 ]
   }
 
   function updatePosition(state, input){
-    let pos = input  || [0,0,Math.random()]
-    state = mergeData( state, {pos})
+    console.log("updatePosition")
+    let id  = input.id
+    let pos = input.value  || [0,0,Math.random()]
+    let orig = state[id] || transformDefaults
+
+    state = mergeData({},state)
+    //FIXME big hack, using mutability
+    state[id] = mergeData(orig,{pos})
     return state
   }
 
   function updateRotation(state, input){
-    let rot = input || [0,0,Math.random()]
-    state = mergeData( state, {rot})
+    let id = input.id
+    let rot = input.value || [0,0,Math.random()]
+    let orig = state[id] || transformDefaults
+
+    state = mergeData({},state)
+    //FIXME big hack, using mutability
+    state[id] = mergeData(orig,{rot})
     return state
   }
 
@@ -94,10 +107,11 @@ function makeTransformComponent(){
   return {transforms$,transformActions:actions}
 }
 
-
 ////BoundingBox//////
-function makeBoundingComponent(){
-  const  defaults ={
+function makeBoundingSystem(){
+  const defaults = {}
+
+  const  boundsDefaults ={
     min:[0,0,0],
     max:[0,0,0]
   }
@@ -110,7 +124,7 @@ function makeBoundingComponent(){
 }
 
 ////Mesh//////
-function makeMeshComponent(xParam){
+function makeMeshSystem(xParam){
   const defaults ={
     points: [
       [0,0,1]
@@ -128,43 +142,34 @@ function makeMeshComponent(xParam){
 }
 
 
+let {core$,coreActions}            = makeCoreSystem("apart_"+0, 0)
+let {transforms$,transformActions} = makeTransformsSystem()
+let {mesh$,meshActions}            = makeMeshSystem()
+let {bounds$ ,boundActions}        = makeBoundingSystem()
 
-function makeEntity(id){
-  let {core$,coreActions}            = makeCoreComponent("xzor_"+id, id)
-  let {transforms$,transformActions} = makeTransformComponent()
-  let {mesh$,meshActions}            = makeMeshComponent()
-  let {bounds$ ,boundActions}        = makeBoundingComponent()
+let components  = {core$, transforms$, bounds$, mesh$}
 
-  let components  = {core$, transforms$, bounds$, mesh$}
-  let entity$ = combineLatestObj(components)
-  entity$.subscribe(e=>console.log("entity",e))
+let systems$ = combineLatestObj(components)
+  systems$.subscribe(e=>console.log("systems",e))
 
-  //transforms$.subscribe(t=>console.log("transforms",t))
 
-  //problem, all actions are entity specific almost like instance methods in oop
-
-  setTimeout(function() {
-    transformActions.updatePosition$.onNext([-10,2,4])
+ setTimeout(function() {
+    transformActions.updatePosition$.onNext({id:0,value:[-10,2,4]})
+    transformActions.updateRotation$.onNext({id:1,value:[0.56,2.19,0]})
     }, 200)
 
-  setTimeout(function() {
-    coreActions.setColor$.onNext('#FF00F7')
-    }, 700)
 
-  return entity$
-}
+ setTimeout(function() {
+    transformActions.updatePosition$.onNext({id:1,value:[0,0,9.987]})
+    }, 200)
 
-function makeEntities(count){
-
-  let entities = []
-  for(let i=0;i<count;i++){
-    entities.push( makeEntity(i) )
-  }
-
-}
+systems$.subscribe(function(e){
+  
+})
 
 
-makeEntities(3)
+
+
 
 
   
