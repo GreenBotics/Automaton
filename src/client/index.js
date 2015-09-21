@@ -12,7 +12,8 @@ import {history, historyIntent} from './history'
 
 
 var foo = require("./model/entitiesStream")
-var bar = require("./model/composite")
+//var bar = require("./model/composite")
+var baz = require("./model/composite2")
 
 
 function historyM(actions){
