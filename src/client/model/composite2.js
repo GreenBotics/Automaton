@@ -201,16 +201,44 @@ function makeMetaDataSystem(){
   return {meta$,metaActions:actions}
 }
 
+function makeBomSystem(){
+  const defaults = []
+
+
+  function addBomEntry(state,input){
+
+    state = mergeData(state,input)
+    return state
+  }
+
+  function removeBomEntry(state,input){
+
+    return state
+  }
+
+  let actions = {removeComponent$: new Rx.Subject()
+    , addBomEntry$:new Rx.Subject()
+    , removeBomEntry$: new Rx.Subject()}
+
+  let updateFns = {removeComponent, addBomEntry, removeBomEntry}
+  let meta$ = makeModelNoHistory(defaults, updateFns, actions)
+
+  return {bom$,bomActions:actions}
+}
+
 
 let {core$,coreActions}            = makeCoreSystem("apart_"+0, 0)
 let {transforms$,transformActions} = makeTransformsSystem()
 let {mesh$,meshActions}            = makeMeshSystem()
 let {bounds$ ,boundActions}        = makeBoundingSystem()
 let {meta$ ,metaActions}           = makeMetaDataSystem()
+let {bom$ ,bomActions}             = makeBomSystem()
 
 
 let components  = {core$, transforms$, bounds$, mesh$, meta$}
 let actions  = [coreActions,transformActions,meshActions,boundActions,metaActions]
+
+//bomActions.removeBomEntry$.subscribe(e=>)
 
 let systems$ = combineLatestObj(components)
   systems$.subscribe(e=>console.log("systems",e))
@@ -226,10 +254,15 @@ let systems$ = combineLatestObj(components)
     transformActions.updatePosition$.onNext({id:1,value:[0,0,9.987]})
     }, 200)
 
- setTimeout(function(){
+ /*setTimeout(function(){
     transformActions.removeComponent$.onNext({id:0})
  },400)
 
+  setTimeout(function(){
+    deleteEntity(1)
+ },800)*/
+
+/////////
 function addEntity(inputs){
 
 }
@@ -247,15 +280,15 @@ function duplicateEntity(id){
 }
 
 
- setTimeout(function(){
-    deleteEntity(1)
- },800)
 
-/*systems$.subscribe(function(e){
-  
-})*/
-
-
+function render(data){
+  console.log("data in render",data)
+  let {transforms,bounds,mesh} = data
+  //here we could do stuff with meshes, transforms etc
+}
+combineLatestObj({transforms$, bounds$, mesh$})
+  .distinctUntilChanged()
+  .subscribe(render)
 
 
 
