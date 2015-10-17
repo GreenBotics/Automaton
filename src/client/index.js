@@ -1,7 +1,7 @@
 /** @jsx hJSX */
 import Cycle from '@cycle/core'
 import {Rx} from '@cycle/core'
-import {makeDOMDriver, hJSX} from '@cycle/dom'
+import {makeDOMDriver, hJSX, svg} from '@cycle/dom'
 
 import SocketIO from 'cycle-socket.io'
 
@@ -59,6 +59,11 @@ address$.subscribe(e=>console.log("address",e))
 
 
 function view(model$, rtm$, rtm2$){
+  const togglerIconSvg = `<svg height="100" width="100" style={{width:100,height:100}}>
+            <circle cx="50" cy="50" r="40" stroke="black" fill="red" />
+            <circle attributes={ {cx:100,cy:100,r:40,stroke:'black',fill:'red'}}/>
+              Sorry, your browser does not support inline SVG.  
+          </svg>`
 
   return model$
     .map(m=>m.asMutable({deep: true}))//for seamless immutable
@@ -103,6 +108,10 @@ function view(model$, rtm$, rtm2$){
           <h1> Emergency shutdown </h1>
           <button id="shutdown" disabled={!model.state.active}> shutdown </button>
         </section>
+
+        <button id="toggler" className="toggler" >
+            <span innerHTML={togglerIconSvg}> </span>
+        </button>
 
       </div>
   )
