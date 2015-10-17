@@ -18,6 +18,10 @@ export default function main(drivers) {
   /*let opHistory$ = historyM(intent(DOM))
   opHistory$.subscribe(h=>console.log("Operation/action/command",h))*/
 
+  /*const actions = intent(DOM)
+  const state$ = model(props$, actions)
+  const vtree$ = view(state$)*/
+
   let model$ = just("foo")
   const vtree$ = just(<div> test </div>)
 
