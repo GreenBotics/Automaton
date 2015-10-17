@@ -14,7 +14,13 @@ client side code (uses webpack, continuous build)
 
 server side code
 
+  build:
+
           npm run build-srv
+
+  run:
+
+          node dist/server/index.js
 
 
 Authors
