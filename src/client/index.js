@@ -1,13 +1,18 @@
 /** @jsx hJSX */
 import Cycle from '@cycle/core'
 import {Rx} from '@cycle/core'
-import {makeDOMDriver, hJSX, svg} from '@cycle/dom'
+import {makeDOMDriver, hJSX} from '@cycle/dom'
 
 import SocketIO from 'cycle-socket.io'
 
-import {renderRelays, renderCoolers, renderSensors, coolers, labeledInputSlider} from './uiElements'
-import {model, intent} from './model'
+import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from './ui/uiElements'
+import {coolers, labeledInputSlider, wrapper} from './ui/nested'
+//import {coolers, labeledInputSlider, mainView} from './ui/custom'
 
+//import {GlWidget} from './ui/glWidget'
+//import {GraphWidget} from './ui/graphWidget'
+
+import {model, intent} from './model'
 import {history, historyIntent} from './history'
 
 
@@ -38,32 +43,8 @@ function renderSensorData(data){
   return <div> {data} </div>
 }
 
-import addressbar from 'addressbar'
 
-
-/*addressbar.addEventListener('change', function (event) {
-  event.preventDefault()
-  event.target.value // The value of the addressbar
-})
-
-
-console.log("addressbar",addressbar.value)
-*/
-//addressbar.value = "http://localhost:3001/index.html?foo=42"
-let address$ = Rx.Observable.fromEvent(addressbar,"change")
-  .startWith(addressbar.value)
-
-address$.subscribe(e=>console.log("address",e))
-
-
-
-
-function view(model$, rtm$, rtm2$){
-  const togglerIconSvg = `<svg height="100" width="100" style={{width:100,height:100}}>
-            <circle cx="50" cy="50" r="40" stroke="black" fill="red" />
-            <circle attributes={ {cx:100,cy:100,r:40,stroke:'black',fill:'red'}}/>
-              Sorry, your browser does not support inline SVG.  
-          </svg>`
+function view(dom, model$, rtm$, rtm2$){
 
   return model$
     .map(m=>m.asMutable({deep: true}))//for seamless immutable
@@ -86,7 +67,6 @@ function view(model$, rtm$, rtm2$){
         
         <section id="relays"> 
           <h1>Relays: </h1>
-          <div><button id="removeAllRelays"> Remove All </button></div>
           {renderRelays( model.state.relays )}
         </section>
 
@@ -109,14 +89,46 @@ function view(model$, rtm$, rtm2$){
           <button id="shutdown" disabled={!model.state.active}> shutdown </button>
         </section>
 
-        <button id="toggler" className="toggler" >
-            <span innerHTML={togglerIconSvg}> </span>
-        </button>
-
       </div>
   )
 }
 
+function minView3(DOM, model$, rtm$, rtm2$){
+
+  model$ = model$
+    .map(m=>m.asMutable({deep: true}))//for seamless immutable
+
+  let props$   = model$.map(e=>{return{data:e.state.coolers}})
+
+  let _coolers = coolers({DOM,props$})
+
+  return Rx.Observable.combineLatest(rtm$, _coolers.DOM, function(rtm,coolers){
+
+    return <div>
+      {coolers}
+      {renderSensorData(rtm)}
+    </div>
+  })
+}
+
+function minView4(model$, rtm$, rtm2$){
+
+  model$ = model$
+    .map(m=>m.asMutable({deep: true}))//for seamless immutable
+
+  //let props$   = model$.map(e=>{return{data:e.state.coolers}})
+
+  //let _coolers = coolers({DOM,props$})
+
+  return Rx.Observable.combineLatest(model$, rtm$, function(model, rtm){
+
+    return <div>
+      {renderSensorData(rtm)}
+      <coolers> </coolers>
+    </div>
+  })
+ 
+}
 
 
 function main(drivers) {
@@ -139,6 +151,14 @@ function main(drivers) {
       //.do((e)=>console.log(e))
       .map(e=> Math.random())
 
+  //let fakeModel$ = Rx.Observable.just({name:"fooobar", value:42, power:43})
+
+  let fakeModel$ = Rx.Observable.just([
+    {name:"fooobar", power:43}
+    ,{name:"sdfds",  power:2.34}
+    ])
+  //sensor1Data$ = Rx.Observable.just("bfdsdf")
+  sensor2Data$ = Rx.Observable.just("sdf")
 
   let opHistory$ = historyM(intent(DOM))
   opHistory$.subscribe(h=>console.log("Operation/action/command",h))
@@ -155,7 +175,11 @@ function main(drivers) {
 
 
   return {
-      DOM: view(model$, sensor1Data$, sensor2Data$)
+      DOM: //minView2(DOM, fakeModel$,sensor1Data$, sensor2Data$)
+      //minView(fakeModel$,sensor1Data$, sensor2Data$) 
+      minView4(model$,sensor1Data$)
+      //minView3(DOM, model$,sensor1Data$, sensor2Data$)
+      //view(model$, sensor1Data$, sensor2Data$)
     , socketIO: outgoingMessages$
   }
 }

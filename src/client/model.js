@@ -18,11 +18,12 @@ function idAndChecked(e){
 
 function idAndValue(e){
   let id = parseInt( e.target.id.split("_").pop() )
-  let value = parseFloat(e.target.value)
+  //let value = parseFloat(e.target.value)// for basic use case
+  let value = parseFloat(e.detail)//for custom element etc
   return {id,value}
 }
 
-export function intent(DOM){
+export function intent(DOM, other){
   let toggleRelay$ =  DOM.select('.relayToggler').events('click')
     .map(idAndChecked)
 
@@ -38,9 +39,12 @@ export function intent(DOM){
     //DOM.select('.coolerSlider_number','change')
     .debounce(30)
     .map(idAndValue)
-    .do(e=>console.log("value",e))
+    .do(e=>console.log("value",e))*/
 
-  DOM.select('.labeled-input-slider-cooler').events('newValue').subscribe(e=>console.log("AI AI cooler change",e))
+  let setCoolerPower$ = other.setCoolerPower$//.debounce(30)
+
+  DOM.select('.labeled-input-slider-cooler').events('newValue')
+    .subscribe(e=>console.log("saw cooler slider change",e))
 
   let emergencyShutdown$ = DOM.select('#shutdown').events('click')
     .map(false)
@@ -195,14 +199,14 @@ export function model(actions){
 
     //for testing
     let sensor1Data$ = Rx.Observable
-      .interval(500 /* ms */)
+      .interval(100 /* ms */)
       .timeInterval()
-      .map(Math.random())
+      .map(e=> Math.random())
 
     let sensor2Data$ = Rx.Observable
-      .interval(10 /* ms */)
+      .interval(500 /* ms */)
       .timeInterval()
-      .map(Math.random())
+      .map(e=> Math.random())
 
     return makeModel(updateFns, actions, defaults)
    
