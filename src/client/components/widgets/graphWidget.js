@@ -5,6 +5,8 @@ require("metrics-graphics/dist/metricsgraphics.css")
 
 
 function GraphWidget(data, settings) {
+    console.log("CREATING GraphWidget")
+
     this.type = 'Widget'
 
     const defaults = {
@@ -36,6 +38,8 @@ GraphWidget.prototype.init = function () {
 }
 
 GraphWidget.prototype.update = function (prev, elem) {
+    console.log("UPDATING GraphWidget")
+
   //this.graph = this.graph || prev.graph
   let settings = Object.assign(this.settings,{target:elem})
 

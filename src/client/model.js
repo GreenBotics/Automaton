@@ -3,7 +3,7 @@ import {Rx} from '@cycle/core'
 import "babel-core/polyfill"
 
 import {makeModel, makeModifications} from './model/modelHelper'
-import {mergeData} from './utils'
+import {mergeData,combineLatestObj} from './utils'
 
 //these all are actual "api functions"  
 function toggleRelay(state, input){
@@ -123,17 +123,26 @@ export default function model(actions){
     //other helper: specifies model "paths", these are mapped to the state output
     let paths = {relays:"relays", coolers:"coolers", sensors:"sensors"}
 
-
     //for testing
     let sensor1Data$ = Rx.Observable
       .interval(100 )//ms
       .timeInterval()
       .map(e=> Math.random())
+      //.map(e=>Immutable(e))
+
 
     let sensor2Data$ = Rx.Observable
       .interval(500 )//ms
       .timeInterval()
       .map(e=> Math.random())
+      //.map(e=>Immutable(e))
 
-    return makeModel(updateFns, actions, defaults)
+    const model$ = makeModel(updateFns, actions, defaults)
+    return combineLatestObj({
+      model$
+      ,sensor1Data$
+      ,sensor2Data$
+    })
+    .map(e=>Immutable(e))
+
 }

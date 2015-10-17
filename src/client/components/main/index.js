@@ -26,7 +26,7 @@ export default function main(drivers) {
   opHistory$.subscribe(h=>console.log("Operation/action/command",h))*/
 
   const actions = intent(drivers)
-  const state$  = model(actions)
+  const state$  = model(actions).pluck("model")
   const vtree$  = view(state$)
 
   state$.subscribe(e=>console.log("state",e))

@@ -47,6 +47,82 @@ function renderSensorData(data){
   {renderSensorData(rtm2)}
 </section>
 </div>
+
+
+import {renderSensorData} from './uiElements'
+import {GraphWidget} from './graphWidget'
+import {GLWidget} from './glWidget'
+import {slidingAccumulator} from '../utils'
+
+
+
+//this one is the "root/main" dialogue
+//(just for experimenting)
+export function wrapper({DOM, props$}){
+
+  let _coolers = coolers({DOM, props$:props$.pluck("model") })
+
+  function formatEntry(entry){
+    return entry.map( (e,index)=>({time: index+'',temperature:Math.abs(e*30)}) ) 
+  }
+
+  let dataPoints = 20
+  let bufferedRtm$ = slidingAccumulator( props$.map(p=>p.rtm), dataPoints ).map(formatEntry)
+  let bufferedRtm2$ = slidingAccumulator( props$.map(p=>p.rtm2), dataPoints).map(formatEntry)
+
+  let graphSettings1 = {
+    title: "Temperatures",
+    description:"Temperature curves for env#0",
+    width:650,
+    height:150,
+    max_x:dataPoints,
+    x_accessor: 'time',
+    y_accessor: 'temperature',
+    legend:["T0","T1"],
+
+    baselines: [{value:12, label:'critical temperature stuff'}],
+  }
+
+  let graphSettings2 = {
+    title: "Temperature (sensor1) ",
+    description:"Temperature curves for env#1",
+    width:650,
+    height:150,
+    max_x:dataPoints,
+    x_accessor: 'time',
+    y_accessor: 'temperature',
+    legend:["T0"],
+
+    baselines: [{value:18, label:'critical temperature'}],
+  }
+
+
+  function view(state$,coolers){
+    return Rx.Observable.combineLatest( state$, _coolers.DOM, bufferedRtm$,bufferedRtm2$ ,function(state, coolers, bufferedRtm, bufferedRtm2){ 
+      return <div>
+        {coolers}
+        {renderSensorData(state.rtm)}
+        {renderSensorData(state.rtm2)}
+        
+        {new GraphWidget([bufferedRtm,bufferedRtm2],graphSettings1)}
+
+        {new GraphWidget(bufferedRtm,graphSettings2)}
+
+        {new GLWidget(state.rtm)}
+      </div> 
+    })
+  }
+
+  let vtree$ = view(props$,coolers)
+
+  return {
+    DOM:vtree$
+    ,coolersValues$:_coolers.values$
+  }
+ 
+}
+
+
 */
 
 export default function view(state$){
