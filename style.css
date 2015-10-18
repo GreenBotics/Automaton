@@ -1,6 +1,52 @@
+/* open-sans-condensed-300 - latin */
+@font-face {
+  font-family: 'Open Sans Condensed';
+  font-style: normal;
+  font-weight: 300;
+  src: url('../fonts/open-sans-condensed-v10-latin-300.eot'); /* IE9 Compat Modes */
+  src: local('Open Sans Cond Light'), local('OpenSans-CondensedLight'),
+       url('../fonts/open-sans-condensed-v10-latin-300.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/open-sans-condensed-v10-latin-300.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/open-sans-condensed-v10-latin-300.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/open-sans-condensed-v10-latin-300.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/open-sans-condensed-v10-latin-300.svg#OpenSansCondensed') format('svg'); /* Legacy iOS */
+}
+/* open-sans-condensed-700 - latin */
+@font-face {
+  font-family: 'Open Sans Condensed';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/open-sans-condensed-v10-latin-700.eot'); /* IE9 Compat Modes */
+  src: local('Open Sans Condensed Bold'), local('OpenSans-CondensedBold'),
+       url('../fonts/open-sans-condensed-v10-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/open-sans-condensed-v10-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/open-sans-condensed-v10-latin-700.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/open-sans-condensed-v10-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/open-sans-condensed-v10-latin-700.svg#OpenSansCondensed') format('svg'); /* Legacy iOS */
+}
+
+
 #undosList ul{max-height: 40px; width:18%;}
 #undosList ul{overflow:hidden; overflow-y:auto;}
 
+#app{
+  background-color: #383838;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+
+  font-family: 'Open Sans Condensed';
+}
+
+
+/*
+  blue green : #1bf8f1;
+  green blue: #34d4a7;
+*/;
 section{
   padding: 10px;
   padding-top: 0px;
@@ -9,6 +55,7 @@ section{
 
 section h1{
   font-size: 1em;
+  color: #1bf8f1;
 }
 
 .labeledSlider{
@@ -21,7 +68,54 @@ section h1{
   top:200px;
   width: 300px;
   height: 300px;
+}
 
+/*chart settings*/
+
+.graph{
+  width: 30%;
+  position: relative;
+  float: left;
+}
+
+.mg-chart-title{
+  color: #1bf8f1 !important;
+  font-weight: 500;
+}
+.mg-line-legend{
+  color:white !important;
+  fill : #ffffff !important;
+}
+
+.mg-x-axis text {
+  color: #1bf8f1 !important;
+  fill : #1bf8f1 !important;
+}
+.mg-y-axis text {
+  color: #1bf8f1 !important;
+  fill : #1bf8f1 !important;
+}
+
+.mg-line-legend text {
+  color: #FFFFFF !important;
+  fill:#FFFFFF !important;
+}
+
+.mg-x-axis text, .mg-y-axis text, .mg-histogram .axis text {
+}
+
+.mg-line1-color{
+  color: #1bf8f1  !important;
+  stroke: #1bf8f1  !important;
+}
+
+.mg-area1-color {
+    fill: #FFFFFF !important;
+}
+
+.mg-active-datapoint {
+  fill: #FFFFFF !important;
+  opacity: 0.6 !important;
 }
 
 /*from http://codereview.stackexchange.com/questions/62338/stylish-underline-when-input-is-focused-modern-browsers-only*/
