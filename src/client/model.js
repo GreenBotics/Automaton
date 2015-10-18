@@ -1,9 +1,11 @@
 import Immutable from 'seamless-immutable'
 import {Rx} from '@cycle/core'
 import "babel-core/polyfill"
+var rxDom = require("rx-dom")
 
 import {makeModel, makeModifications} from './model/modelHelper'
-import {mergeData,combineLatestObj} from './utils'
+import {mergeData,combineLatestObj,slidingAccumulator} from './utils'
+
 
 //these all are actual "api functions"  
 function toggleRelay(state, input){
@@ -123,25 +125,77 @@ export default function model(actions){
     //other helper: specifies model "paths", these are mapped to the state output
     let paths = {relays:"relays", coolers:"coolers", sensors:"sensors"}
 
-    //for testing
-    let sensor1Data$ = Rx.Observable
-      .interval(100 )//ms
-      .timeInterval()
-      .map(e=> Math.random())
-      //.map(e=>Immutable(e))
+
+    /*function formatEntry(fieldName,entry){
+      console.log("formatEntry",fieldName,entry)      
+      return entry.map(function(e,index){
+        let result = {time:index+''}
+        result[fieldName] = e[fieldName]
+        return result
+      })
+    }
+
+    let dataPoints = 10
+    let sensors$ = Rx.Observable.interval(2000)
+      .flatMap(function(){
+        return rxDom.DOM.ajax({url:"http://192.168.1.20:3020"
+          ,crossDomain:true
+          ,credentials:false
+          ,responseType:"json"})
+      })
+      .pluck("response")
+      .pluck("variables")
+      
+
+    let bufferedTemp$ = slidingAccumulator( sensors$, dataPoints ).map(formatEntry.bind(null,"temperature"))
+    let bufferedHum$  = slidingAccumulator( sensors$, dataPoints ).map(formatEntry.bind(null,"humidity"))
+    let bufferedPres$ = slidingAccumulator( sensors$, dataPoints ).map(formatEntry.bind(null,"pressure"))*/
+    
+
+    let fakeData = [
+      {temperature:25,humidity:10,pressure:20}
+      ,{temperature:15,humidity:10,pressure:20}
+      ,{temperature:25,humidity:10,pressure:20}
+      ,{temperature:15,humidity:10,pressure:20}
+    ]
+
+    let just = Rx.Observable.just
+
+    let bufferedTemp$ = just(
+      [
+        {time:"0",temperature:10}
+        ,{time:"1",temperature:20}
+        ,{time:"2",temperature:23}
+        ,{time:"3",temperature:19}
+        ,{time:"4",temperature:21}
+        ,{time:"5",temperature:19}
+      ])
+    let bufferedHum$ = just(
+      [
+        {time:"0",humidity:10}
+        ,{time:"1",humidity:20}
+        ,{time:"3",humidity:50}
+      ])
+    let bufferedPres$ = just(
+      [
+        {time:"0",pressure:10}
+        ,{time:"1",pressure:20}
+        ,{time:"2",pressure:100}
+      ])
 
 
-    let sensor2Data$ = Rx.Observable
-      .interval(500 )//ms
-      .timeInterval()
-      .map(e=> Math.random())
-      //.map(e=>Immutable(e))
+     let bla$ = Rx.Observable.interval(2).take(2).map("foo")
 
     const model$ = makeModel(updateFns, actions, defaults)
+
     return combineLatestObj({
       model$
-      ,sensor1Data$
-      ,sensor2Data$
+      ,temperature$:bufferedTemp$
+      ,humidity$:bufferedHum$
+      ,pressure$:bufferedPres$
+      ,bla$
+      //,sensor1Data$
+      //,sensor2Data$
     })
     .map(e=>Immutable(e))
 

@@ -23,6 +23,7 @@
     "metrics-graphics": "^2.6.0",
     "rpi-gpio": "^0.6.0",
     "rx": "^3.1.2",
+    "rx-dom": "^7.0.3",
     "rx-lite": "^2.5.2",
     "rx-node": "^1.0.1",
     "rx.observable.combinetemplate": "^0.2.6",
