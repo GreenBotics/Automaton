@@ -12,7 +12,7 @@ function GraphWidget(data, settings) {
     const defaults = {
         title: undefined,
         description:undefined,
-        width:650,
+        //width:650,
         height:150,
         x_accessor: undefined,
         y_accessor: undefined,
@@ -31,10 +31,14 @@ function GraphWidget(data, settings) {
     this.data = data
 
     this.settings  = Object.assign(defaults,settings,{data})
+
+    console.log("DONE")
 }
 
 GraphWidget.prototype.init = function () {
-  return document.createElement('div')
+  let elem = document.createElement('div')
+  elem.className = "graph"
+  return elem
 }
 
 GraphWidget.prototype.update = function (prev, elem) {
