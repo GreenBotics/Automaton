@@ -16,8 +16,6 @@ export default function view(state$){
   let graphSettingsTemperature = {
     title: "Temperature (C)",
     description:"Temperature curves for env#0",
-    //width:650,
-    //height:150,
     max_x:maxPts,
     x_accessor: 'time',
     y_accessor: 'temperature',
@@ -29,8 +27,6 @@ export default function view(state$){
   let graphSettingsHumidity = {
     title: "Humidity (%)",
     description:"humitidy curves for env#0",
-    //width:650,
-    //height:150,
     max_x:maxPts,
     x_accessor: 'time',
     y_accessor: 'humidity',
@@ -39,11 +35,9 @@ export default function view(state$){
     //baselines: [{value:12, label:'critical humidity stuff'}],
   }
 
-   let graphSettingsPressure = {
+  let graphSettingsPressure = {
     title: "Pressure (hpa)",
     description:"pressure curves for env#0",
-    //width:650,
-    //height:150,
     max_x:maxPts,
     x_accessor: 'time',
     y_accessor: 'pressure',
@@ -52,20 +46,75 @@ export default function view(state$){
     //baselines: [{value:12, label:'critical pressure stuff'}],
   }
 
-  /*
-   {new GraphWidget(humidity,graphSettingsHumidity)}
-        {new GraphWidget(pressure,graphSettingsPressure)}*/
+  let graphSettingsWindSpd = {
+    title: "Wind speed (km/h)",
+    description:"wind speed curves for env#0",
+    max_x:maxPts,
+    x_accessor: 'time',
+    y_accessor: 'windSpd',
+    legend:["WS0"],
+    //baselines: [{value:12, label:'critical pressure stuff'}],
+  }
+
+  let graphSettingsWindDir = {
+    title: "Wind direction",
+    description:"wind direction curves for env#0",
+    max_x:maxPts,
+    x_accessor: 'time',
+    y_accessor: 'windDir',
+    legend:["WS0"],
+    //baselines: [{value:12, label:'critical pressure stuff'}],
+  }
+
+  let graphSettingslight = {
+    title: "Light level",
+    description:"Light level curves for env#0",
+    max_x:maxPts,
+    x_accessor: 'time',
+    y_accessor: 'light',
+    legend:["L0"],
+    //baselines: [{value:12, label:'critical pressure stuff'}],
+  }
+
+  let graphSettingsUv = {
+    title: "UV level",
+    description:"UV level curves for env#0",
+    max_x:maxPts,
+    x_accessor: 'time',
+    y_accessor: 'uv',
+    legend:["UV0"],
+    //baselines: [{value:12, label:'critical pressure stuff'}],
+  }
+
+
+  let graphSettingsRain = {
+    title: "Precipitations (mm)",
+    description:"Rain curves for env#0",
+    max_x:maxPts,
+    x_accessor: 'time',
+    y_accessor: 'rain',
+    legend:["R0"],
+    //baselines: [{value:12, label:'critical pressure stuff'}],
+  }
+
+
 
   return state$
     //.map(m=>m.asMutable({deep: true}))//for seamless immutable
     .map(function(state)
     {
       console.log("state",state)
-      let {temperature,humidity,pressure} = state
+      let {temperature,humidity,pressure,windSpd,windDir,light,uv,rain} = state
       console.log("sensor data",temperature,humidity,pressure)
       return <div>
         {new GraphWidget(temperature,graphSettingsTemperature)}
-       
+        {new GraphWidget(humidity,graphSettingsHumidity)}
+        {new GraphWidget(pressure,graphSettingsPressure)}
+        {new GraphWidget(windSpd,graphSettingsWindSpd)}
+        {new GraphWidget(windDir,graphSettingsWindDir)}
+        {new GraphWidget(light,graphSettingslight)}
+        {new GraphWidget(uv,graphSettingsUv)}
+        {new GraphWidget(rain,graphSettingsRain)}
       </div>
     })
     /*.map((state)=>
