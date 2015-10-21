@@ -126,14 +126,49 @@ export default function model(actions){
     let paths = {relays:"relays", coolers:"coolers", sensors:"sensors"}
 
 
+    function formatedNowTime(index){
+      
+      let dateTime =  new Date( Date.now()+index*50000 ) 
+
+      return dateTime
+      let Y = dateTime.getFullYear()
+      let m = dateTime.getMonth()
+      let d = dateTime.getDay()
+
+      let H = dateTime.getHours()
+      let M = dateTime.getMinutes()
+      let S = dateTime.getSeconds()
+
+      //console.log("h",h,"m",m)
+      // "%Y-%m-%d-%H-%M-%S"
+      return `${Y}-${m}-${d}T${H}:${M}:${S}`
+      
+    }
+
     function formatEntry(fieldName,entry){
       console.log("formatEntry",fieldName,entry)      
       return entry.map(function(e,index){
-        let result = {time:index+''}
-        result[fieldName] = e[fieldName]
+        let result = {time: formatedNowTime(index)} //index+''}//
+        result["value"] = e[fieldName]
         return result
       })
     }
+
+    function formatSingleEntry(entry){
+      return {value: entry, time: formatedNowTime(0) }
+    }
+
+    function packageData(source$, fieldName, dataPoints){
+      return slidingAccumulator( source$.pluck(fieldName).map(formatSingleEntry), dataPoints )
+    }
+
+     function makeFakeData(count=10){
+        let data = new Array(count).join().split(',')//will not work without this , cannot map empty values
+        return data.map(function(d,index){
+          return {value:Math.random()*25,time:formatedNowTime(index)}
+
+        })
+      }
 
 
     let bufferedTemp$ = undefined
@@ -144,7 +179,11 @@ export default function model(actions){
     let bufferedLight$ = undefined
     let bufferedUv$ = undefined
     let bufferedRain$ = undefined
-    let useFakeData = true
+    let useFakeData = false
+
+    let just = Rx.Observable.just
+
+
 
     if(useFakeData){
       let fakeData = [
@@ -154,66 +193,57 @@ export default function model(actions){
         ,{temperature:15,humidity:10,pressure:20}
       ]
 
-      let just = Rx.Observable.just
-
-      bufferedTemp$ = just(
-        [
-          {time:"0",temperature:10}
-          ,{time:"1",temperature:20}
-          ,{time:"2",temperature:23}
-          ,{time:"3",temperature:19}
-          ,{time:"4",temperature:21}
-          ,{time:"5",temperature:19}
-        ])
+      bufferedTemp$ = just( makeFakeData() )
+        
       bufferedHum$ = just(
         [
-          {time:"0",humidity:10}
-          ,{time:"1",humidity:20}
-          ,{time:"3",humidity:50}
+          {time:"0",value:10}
+          ,{time:"1",value:20}
+          ,{time:"3",value:50}
         ])
       bufferedPres$ = just(
         [
-          {time:"0",pressure:10}
-          ,{time:"1",pressure:20}
-          ,{time:"2",pressure:100}
+          {time:"0",value:10}
+          ,{time:"1",value:20}
+          ,{time:"2",value:100}
         ])
       bufferedWindSpd$ = just(
         [
-          {time:"0",windSpd:27.5}
-          ,{time:"1",windSpd:20}
-          ,{time:"2",windSpd:76}
+          {time:"0",value:27.5}
+          ,{time:"1",value:20}
+          ,{time:"2",value:76}
         ])
       bufferedWindDir$ = just(
         [
-          {time:"0",windDir:27.5}
-          ,{time:"1",windDir:20}
-          ,{time:"2",windDir:76}
+          {time:"0",value:27.5}
+          ,{time:"1",value:20}
+          ,{time:"2",value:76}
         ])
 
       bufferedLight$ = just(
         [
-          {time:"0",light:27.5}
-          ,{time:"1",light:20}
-          ,{time:"2",light:76}
+          {time:"0",value:27.5}
+          ,{time:"1",value:20}
+          ,{time:"2",value:76}
         ])
 
       bufferedUv$ = just(
         [
-          {time:"0",uv:27.5}
-          ,{time:"1",uv:20}
-          ,{time:"2",uv:76}
+          {time:"0",value:27.5}
+          ,{time:"1",value:20}
+          ,{time:"2",value:76}
         ])
 
       bufferedRain$ = just(
         [
-          {time:"0",rain:27.5}
-          ,{time:"1",rain:20}
-          ,{time:"2",rain:76}
+          {time:"0",value:27.5}
+          ,{time:"1",value:20}
+          ,{time:"2",value:76}
         ])
     }
     else{
       let dataPoints = 10
-      let sensors$ = Rx.Observable.interval(2000)
+      let sensors$ = Rx.Observable.interval(5000)
         .flatMap(function(){
           return rxDom.DOM.ajax({url:"http://192.168.1.20:3020"
             ,crossDomain:true
@@ -222,13 +252,26 @@ export default function model(actions){
         })
         .pluck("response")
         .pluck("variables")
-        
+        //.distinctUntilChanged()
+        .shareReplay(1)
 
-      bufferedTemp$ = slidingAccumulator( sensors$, dataPoints ).map(formatEntry.bind(null,"temperature"))
-      bufferedHum$  = slidingAccumulator( sensors$, dataPoints ).map(formatEntry.bind(null,"humidity"))
-      bufferedPres$ = slidingAccumulator( sensors$, dataPoints ).map(formatEntry.bind(null,"pressure"))
-      bufferedWindSpd$ = slidingAccumulator( sensors$, dataPoints ).map(formatEntry.bind(null,"pressure"))
-      bufferedWindDir$ = slidingAccumulator( sensors$, dataPoints ).map(formatEntry.bind(null,"pressure"))
+
+      //sensors$.subscribe(e=>console.log("sensors",e))
+
+      
+      bufferedTemp$ = packageData(sensors$,"temperature",dataPoints)
+
+      bufferedHum$  = packageData(sensors$,"humidity",dataPoints)
+      bufferedPres$ = packageData(sensors$,"pressure",dataPoints)
+      
+      bufferedWindSpd$ = just( makeFakeData() )//packageData(sensors$,"windSpd",dataPoints)
+      bufferedWindDir$ = just( makeFakeData() ) //packageData(sensors$,"windDir",dataPoints)
+
+      bufferedRain$  = just( makeFakeData() ) //packageData(sensors$,"rain",dataPoints)
+
+      bufferedLight$ = just( makeFakeData() )//packageData(sensors$,"visL",dataPoints)
+      bufferedUv$    = just( makeFakeData() )//packageData(sensors$,"UVL",dataPoints)
+
     }
    
     
@@ -238,18 +281,16 @@ export default function model(actions){
 
     return combineLatestObj({
       model$
-      ,temperature$:bufferedTemp$
-      ,humidity$:bufferedHum$
-      ,pressure$:bufferedPres$
-      ,windSpd$:bufferedWindSpd$
-      ,windDir$:bufferedWindDir$
-      ,light$: bufferedLight$
-      ,uv$:bufferedUv$
-      ,rain$:bufferedRain$
+      ,temperature$:bufferedTemp$.startWith(undefined)
+      ,humidity$:bufferedHum$.startWith(undefined)
+      ,pressure$:bufferedPres$.startWith(undefined)
+      ,windSpd$:bufferedWindSpd$.startWith(undefined)
+      ,windDir$:bufferedWindDir$.startWith(undefined)
+      ,light$: bufferedLight$.startWith(undefined)
+      ,uv$:bufferedUv$.startWith(undefined)
+      ,rain$:bufferedRain$.startWith(undefined)
       ,bla$
-      //,sensor1Data$
-      //,sensor2Data$
     })
-    .map(e=>Immutable(e))
+    //.map(e=>Immutable(e))
 
 }
