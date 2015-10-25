@@ -46,7 +46,7 @@
 /*
   blue green : #1bf8f1;
   green blue: #34d4a7;
-*/;
+*/
 section{
   padding: 10px;
   padding-top: 0px;
@@ -72,6 +72,7 @@ section h1{
 
 /*chart settings*/
 
+
 .graph{
   width: 30%;
   position: relative;
@@ -82,6 +83,12 @@ section h1{
   color: #1bf8f1 !important;
   font-weight: 500;
 }
+.mg-header{
+  color: #1bf8f1 !important;
+  font-weight: 500;
+  fill:#1bf8f1 !important;
+}
+
 .mg-line-legend{
   color:white !important;
   fill : #ffffff !important;
