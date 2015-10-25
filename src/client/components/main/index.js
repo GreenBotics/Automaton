@@ -5,17 +5,19 @@ import intent from './intent'
 import model from './model'
 import view   from './view'
 
-
+import {GraphsGroupWrapper} from './wrappers'
 
 export default function main(drivers) {
   let DOM      = drivers.DOM
   let socketIO = drivers.socketIO
 
   const actions = intent(drivers)
+  const state$   = model(actions)
 
-  const data$   = model(actions)
-  const state$  = data$
-  const vtree$  = view(state$)
+  //create visual elements
+  const GraphGroup = GraphsGroupWrapper(state$,DOM)
+
+  const vtree$  = view(state$, GraphGroup.DOM)
 
   let stream$ = state$ //anytime our model changes , dispatch it via socket.io
   const incomingMessages$ = socketIO.get('messageType')
