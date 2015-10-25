@@ -2,6 +2,7 @@ import Immutable from 'seamless-immutable'
 import {Rx} from '@cycle/core'
 import "babel-core/polyfill"
 var rxDom = require("rx-dom")
+const just = Rx.Observable.just
 
 import {makeModel, makeModifications} from './model/modelHelper'
 import {mergeData,combineLatestObj,slidingAccumulator} from './utils'
@@ -165,7 +166,7 @@ export default function model(actions){
      function makeFakeData(count=10){
         let data = new Array(count).join().split(',')//will not work without this , cannot map empty values
         return data.map(function(d,index){
-          return {value:Math.random()*25,time:formatedNowTime(index)}
+          return {value:Math.random()*25,time:formatedNowTime(-index*100)}
 
         })
       }
@@ -174,25 +175,37 @@ export default function model(actions){
     let bufferedTemp$ = undefined
     let bufferedHum$  = undefined
     let bufferedPres$ = undefined
+
     let bufferedWindSpd$ = undefined
     let bufferedWindDir$ = undefined
+
     let bufferedLight$ = undefined
+    let bufferedIR$ = undefined
     let bufferedUv$ = undefined
+
     let bufferedRain$ = undefined
+
     let useFakeData = false
+    let dataPoints  = 20
 
     let just = Rx.Observable.just
 
 
+    let sensors$ = Rx.Observable.interval(60000)
+      .flatMap(function(){
+        return rxDom.DOM.ajax({url:"http://192.168.1.20:3020"
+          ,crossDomain:true
+          ,credentials:false
+          ,responseType:"json"})
+      })
+      .retry(10)
+      .pluck("response")
+      .pluck("variables")
+      .shareReplay(1)
+
 
     if(useFakeData){
-      let fakeData = [
-        {temperature:25,humidity:10,pressure:20}
-        ,{temperature:15,humidity:10,pressure:20}
-        ,{temperature:25,humidity:10,pressure:20}
-        ,{temperature:15,humidity:10,pressure:20}
-      ]
-
+     
       bufferedTemp$ = just( makeFakeData() )
         
       bufferedHum$ = just(
@@ -242,54 +255,89 @@ export default function model(actions){
         ])
     }
     else{
-      let dataPoints = 10
-      let sensors$ = Rx.Observable.interval(5000)
-        .flatMap(function(){
-          return rxDom.DOM.ajax({url:"http://192.168.1.20:3020"
-            ,crossDomain:true
-            ,credentials:false
-            ,responseType:"json"})
-        })
-        .pluck("response")
-        .pluck("variables")
-        //.distinctUntilChanged()
-        .shareReplay(1)
-
-
-      //sensors$.subscribe(e=>console.log("sensors",e))
+      
+      
 
       
-      bufferedTemp$ = packageData(sensors$,"temperature",dataPoints)
+      bufferedTemp$ = packageData(sensors$,"temperature",dataPoints).startWith([{value:0,time:new Date()}])
 
-      bufferedHum$  = packageData(sensors$,"humidity",dataPoints)
-      bufferedPres$ = packageData(sensors$,"pressure",dataPoints)
+      bufferedHum$  = packageData(sensors$,"humidity",dataPoints).startWith([{value:0,time:new Date()}])
+      bufferedPres$ = packageData(sensors$,"pressure",dataPoints).startWith([{value:0,time:new Date()}])
       
-      bufferedWindSpd$ = just( makeFakeData() )//packageData(sensors$,"windSpd",dataPoints)
-      bufferedWindDir$ = just( makeFakeData() ) //packageData(sensors$,"windDir",dataPoints)
+      bufferedWindSpd$ = packageData(sensors$,"windSpd",dataPoints).startWith([{value:0,time:new Date()}])
+      bufferedWindDir$ = packageData(sensors$,"windDir",dataPoints).startWith([{value:0,time:new Date()}])
 
-      bufferedRain$  = just( makeFakeData() ) //packageData(sensors$,"rain",dataPoints)
+      bufferedRain$  = packageData(sensors$,"rain",dataPoints).startWith([{value:0,time:new Date()}])
 
-      bufferedLight$ = just( makeFakeData() )//packageData(sensors$,"visL",dataPoints)
-      bufferedUv$    = just( makeFakeData() )//packageData(sensors$,"UVL",dataPoints)
+      bufferedLight$ = packageData(sensors$,"visL",dataPoints).startWith([{value:0,time:new Date()}])
+      bufferedIR$    = packageData(sensors$,"irL",dataPoints).startWith([{value:0,time:new Date()}])
+      bufferedUv$    = packageData(sensors$,"UVL",dataPoints).startWith([{value:0,time:new Date()}])
 
     }
    
-    
-     let bla$ = Rx.Observable.interval(2).take(2).map("foo")
 
     const model$ = makeModel(updateFns, actions, defaults)
 
+
+    //for each sensor node/group
+    const sensorNodes$ = just([
+        {id:0,name:"Weather station",uri:"http://192.168.1.20:3020"}
+        ,{id:1,name:"indoor station",uri:"http://192.168.1.21:3020"}
+      ])
+
+    const sensorsFeeds$ = just([
+      {nodeId:0, feedId:0, type:"temperature"}
+      ,{nodeId:0, feedId:1, type:"humidity" }
+      ,{nodeId:0, feedId:2, type:"pressure" }
+      ,{nodeId:0, feedId:3, type:"windSpd" }
+      ,{nodeId:0, feedId:4, type:"windDir" }
+      ,{nodeId:0, feedId:5, type:"rain" }
+      ,{nodeId:0, feedId:6, type:"light" }
+      ,{nodeId:0, feedId:7, type:"UV" }
+      ,{nodeId:0, feedId:8, type:"IR" }
+
+
+      ,{nodeId:1, feedId:0, type:"temperature"}
+      ,{nodeId:1, feedId:1, type:"humidity"}
+      ,{nodeId:1, feedId:2, type:"pressure" }
+      ])
+      
+
+    const filteredFeeds$ = actions.selectNode$
+      .withLatestFrom(sensorsFeeds$,function(nodeId,feeds){
+        if(nodeId===-1){//wildcard case
+          return feeds
+        }
+        return feeds.filter(f=>f.nodeId === nodeId)
+      })
+      .startWith(just([]))
+
+    const filteredSensorData$ = filteredFeeds$
+      .map(function(feeds){
+        return feeds.map(function(feed){
+          return packageData(sensors$, feed.type, dataPoints).startWith([{value:0,time:new Date()}])
+        })
+      })
+      //.flatMap(Rx.Observable.fromArray)
+      //.subscribe(e=>console.log("filteredSensorData",e))
+    //let foo$ = Rx.Observable.combineLatest(filteredSensorData$)
+
     return combineLatestObj({
       model$
-      ,temperature$:bufferedTemp$.startWith(undefined)
-      ,humidity$:bufferedHum$.startWith(undefined)
-      ,pressure$:bufferedPres$.startWith(undefined)
-      ,windSpd$:bufferedWindSpd$.startWith(undefined)
-      ,windDir$:bufferedWindDir$.startWith(undefined)
-      ,light$: bufferedLight$.startWith(undefined)
-      ,uv$:bufferedUv$.startWith(undefined)
-      ,rain$:bufferedRain$.startWith(undefined)
-      ,bla$
+      ,temperature$:bufferedTemp$
+      ,humidity$:bufferedHum$
+      ,pressure$:bufferedPres$
+      ,windSpd$:bufferedWindSpd$
+      ,windDir$:bufferedWindDir$
+      ,light$: bufferedLight$
+      ,UV$:bufferedUv$
+      ,IR$:bufferedIR$
+      ,rain$:bufferedRain$
+
+      ,sensorNodes$
+      ,sensorsFeeds$:filteredFeeds$
+      ,sensorsData$:filteredSensorData$
+      
     })
     //.map(e=>Immutable(e))
 

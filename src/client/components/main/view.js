@@ -164,34 +164,72 @@ export default function view(state$){
     //.map(m=>m.asMutable({deep: true}))//for seamless immutable
     //.distinctUntilChanged()
     //.shareReplay(1)
-    .do(e=>console.log("here"))
     .map(function(state)
     {
-      console.log("state",state)
       let {temperature,humidity,pressure,windSpd,windDir,light,UV,IR,rain} = state
-      console.log("sensor data",temperature,humidity,pressure)
+      //console.log("sensor data",temperature,humidity,pressure)
+
+      let sensorFeedsList = state.sensorsFeeds.map(function(feed){
+        return <option value={feed.id}>{feed.type}</option>
+      })
+      
+      let sensorNodeList = state.sensorNodes.map(function(node){
+        return <option value={node.id}>{node.name}</option> 
+      })
+
+      //console.log("sensorsData",state.sensorsData)
+      let graphs = state.sensorsData.map(function(data){
+        console.log("sensorsData",data)
+      })
+
+      //update graphs
+      let graphList = [
+        temperatureGraph
+        ,humidityGraph
+        ,pressureGraph
+        ,windSpdGraph
+        ,windDirGraph
+        ,rainGraph
+        ,UVGraph
+        ,IRGraph
+        ,VLGraph
+      ]
+
+      let dataList = [
+        temperature
+        ,humidity
+        ,pressure
+        ,windSpd
+        ,windDir
+        ,rain
+        ,UV
+        ,IR
+        ,light
+      ]
+
+      //update all graphs
+      dataList.forEach(function(data,index){
+        graphList[index].updateData(data)
+      })    
+
+      const graphsList = graphList.map(function(graph){
+        return graph
+      })
+
       return <div>
-        {temperatureGraph.updateData(temperature)}
-        {temperatureGraph}
-
-        {humidityGraph.updateData(humidity)}
-        {humidityGraph}
-
-        {pressureGraph.updateData(pressure)}
-        {pressureGraph}   
-
-        {windSpdGraph.updateData(windSpd)}
-        {windSpdGraph}  
-
-        {UVGraph.updateData(UV)}
-        {UVGraph} 
-
-        {IRGraph.updateData(IR)}
-        {IRGraph}     
-
-        {VLGraph.updateData(light)}
-        {VLGraph}      
-
+        <section id="nodeSelect">
+          <select id="nodeChooser">
+            <option value="-1"> All </option> 
+            {sensorNodeList}
+          </select>
+          <select id="sensorFeedChooser">
+            <option value="-1"> All </option> 
+            {sensorFeedsList}
+          </select>
+        </section>
+        <section id="graphs">
+          {graphsList}   
+        </section>
       </div>
     })
     /*.map((state)=>

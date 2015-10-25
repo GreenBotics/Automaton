@@ -54,6 +54,9 @@ export default function intent({DOM}, other){
   let redo$ = DOM.select('#redo').events('click')
     .map(false)
 
+  let selectNode$ = DOM.select("#nodeChooser").events('change')
+    .map(e=>parseInt(e.target.value))
+
 
   return {
     toggleRelay$
@@ -64,6 +67,8 @@ export default function intent({DOM}, other){
 
     ,setCoolerPower$
     ,toggleSensor$
+
+    ,selectNode$
 
     , undo$
     , redo$}
