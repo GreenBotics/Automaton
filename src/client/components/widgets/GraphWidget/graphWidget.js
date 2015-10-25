@@ -3,6 +3,9 @@ var MG = require('metrics-graphics')
 require("metrics-graphics/dist/metricsgraphics.css")
 //var d3 = require('metrics-graphics/node_modules/d3')
 
+//require("mg-line-brushing/dist/mg-line-brushing.css")
+//var bla = require('mg-line-brushing')
+
 
 function GraphWidget(data, settings) {
     console.log("CREATING GraphWidget")
@@ -12,15 +15,13 @@ function GraphWidget(data, settings) {
     const defaults = {
         title: undefined,
         description:undefined,
-        //width:650,
         height:150,
+
         x_accessor: 'time',
         y_accessor: 'value',
         max_x:undefined,
 
-        data: [],
-
-        //markers: [{'year': 1964, 'label': '"The Creeping Terror" released'}],
+        markers: [],
         animate_on_load:false,
         baselines: undefined,
         legend:undefined,
@@ -28,6 +29,8 @@ function GraphWidget(data, settings) {
         missing_is_zero: true,
         transition_on_update:false,//disable for very high frequency data updates (no time for transition)
         show_tooltips:false,//no jquery please
+
+        axes_not_compact:false
 
         //linked_format: "%Y-%m-%d-%H-%M-%S",
     }
@@ -54,6 +57,14 @@ GraphWidget.prototype.updateData = function (data) {
   if(data){
     //data = MG.convert.date(data, 'time', '%Y-%m-%dT%H:%M:%S');
     this.settings = Object.assign(this.settings,{data})
+  }
+  this.draw()
+}
+
+GraphWidget.prototype.updateSettings = function (settings) {
+  console.log("updateSettings GraphWidget")
+  if(settings){
+    this.settings  = Object.assign(defaults,settings)
   }
   this.draw()
 }
