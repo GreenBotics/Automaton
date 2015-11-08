@@ -1,6 +1,6 @@
 /** @jsx hJSX */
 import Cycle from '@cycle/core'
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 import {makeDOMDriver, hJSX} from '@cycle/dom'
 import SocketIO from 'cycle-socket.io'
 

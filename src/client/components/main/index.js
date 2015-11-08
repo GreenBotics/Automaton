@@ -1,4 +1,4 @@
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 let just = Rx.Observable.just
 
 import intent from './intent'

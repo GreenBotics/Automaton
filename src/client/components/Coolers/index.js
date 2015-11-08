@@ -1,6 +1,6 @@
 /** @jsx hJSX */
 import {hJSX} from '@cycle/dom'
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 
 export function coolers({DOM, props$}, name = ''){
   let data$ = props$

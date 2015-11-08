@@ -1,5 +1,5 @@
 import Immutable from 'seamless-immutable'
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 import "babel-core/polyfill"
 var rxDom = require("rx-dom")
 const just = Rx.Observable.just
@@ -7,6 +7,7 @@ const just = Rx.Observable.just
 import {makeModel, makeModifications} from './model/modelHelper'
 import {mergeData,combineLatestObj,slidingAccumulator} from './utils'
 
+import {flatten,find,prop} from 'Ramda'
 
 //these all are actual "api functions"  
 function toggleRelay(state, input){
@@ -191,7 +192,7 @@ export default function model(actions){
     let just = Rx.Observable.just
 
 
-    let sensors$ = Rx.Observable.interval(60000)
+    let sensors$ = Rx.Observable.interval(3000)//60000)
       .flatMap(function(){
         return rxDom.DOM.ajax({url:"http://192.168.1.20:3020"
           ,crossDomain:true
@@ -301,10 +302,50 @@ export default function model(actions){
       ,{nodeId:1, feedId:1, type:"humidity"}
       ,{nodeId:1, feedId:2, type:"pressure" }
       ])
-      
 
+
+    function addObsSourceToSensorNodes(sensorNodes$){
+      return sensorNodes$.map(function(sensorNodes){
+        return sensorNodes.map(function(node){
+          const source$ = Rx.Observable.interval(3000)//60000)
+            .flatMap(function(){
+              return rxDom.DOM.ajax({url:node.uri
+                ,crossDomain:true
+                ,credentials:false
+                ,responseType:"json"})
+            })
+            .retry(10)
+            .pluck("response")
+            .pluck("variables")
+            .shareReplay(1)
+          return Object.assign({},node,{source$:source$})
+        })
+      })
+    }
+
+    function addObsSourceToSensorFeeds(sensorsFeeds$, sensorNodes$){
+      return sensorsFeeds$.combineLatest(sensorNodes$,function(sensorsFeeds,sensorNodes){
+        return sensorsFeeds.map(function(feed){
+
+          const sensorNode = find(n=>n.id === feed.nodeId )(sensorNodes)  //sensorNodes.filter()
+          const nodeSource$ = prop('source$', sensorNode) 
+          const source$ = packageData(nodeSource$, feed.type, dataPoints).startWith([{value:0,time:new Date()}])
+
+          return Object.assign({},feed,{source$:source$})
+          
+        })
+      })
+    }
+
+    const augSensorNodes$ = addObsSourceToSensorNodes(sensorNodes$)
+    const augSensorFeeds$ = addObsSourceToSensorFeeds(sensorsFeeds$, augSensorNodes$)
+    
+    augSensorNodes$.subscribe(e=>console.log("augmentedSensorNodes",e))
+    augSensorFeeds$.subscribe(e=>console.log("augmentedSensorFeeds",e))
+
+      
     const filteredFeeds$ = actions.selectNode$
-      .withLatestFrom(sensorsFeeds$,function(nodeId,feeds){
+      .withLatestFrom(augSensorFeeds$,function(nodeId,feeds){
         if(nodeId===-1){//wildcard case
           return feeds
         }
@@ -314,17 +355,17 @@ export default function model(actions){
 
     const filteredSensorData$ = filteredFeeds$
       .map(function(feeds){
-        return feeds.map(function(feed){
+        return flatten( feeds.map(function(feed){
+          //const source$ = fee
           return packageData(sensors$, feed.type, dataPoints).startWith([{value:0,time:new Date()}])
         })
+        )
       })
-      //.flatMap(Rx.Observable.fromArray)
-      //.subscribe(e=>console.log("filteredSensorData",e))
-    //let foo$ = Rx.Observable.combineLatest(filteredSensorData$)
+
 
     return combineLatestObj({
       model$
-      ,temperature$:bufferedTemp$
+      /*,temperature$:bufferedTemp$
       ,humidity$:bufferedHum$
       ,pressure$:bufferedPres$
       ,windSpd$:bufferedWindSpd$
@@ -332,7 +373,7 @@ export default function model(actions){
       ,light$: bufferedLight$
       ,UV$:bufferedUv$
       ,IR$:bufferedIR$
-      ,rain$:bufferedRain$
+      ,rain$:bufferedRain$*/
 
       ,sensorNodes$
       ,sensorsFeeds$:filteredFeeds$

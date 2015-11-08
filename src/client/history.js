@@ -1,5 +1,5 @@
 import Immutable from 'seamless-immutable'
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 
 import {modelHelper} from './model/modelHelper'
 

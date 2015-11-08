@@ -1,4 +1,4 @@
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 import Immutable from 'seamless-immutable'
 
 import {mergeData} from '../utils'

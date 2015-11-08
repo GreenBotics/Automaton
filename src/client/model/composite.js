@@ -1,4 +1,4 @@
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 import {makeModelNoHistory} from './modelHelper'
 import {mergeData} from '../utils'
 

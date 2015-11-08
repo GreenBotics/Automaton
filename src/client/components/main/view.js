@@ -1,7 +1,7 @@
 /** @jsx hJSX */
 import Cycle from '@cycle/core'
 import {hJSX} from '@cycle/dom'
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 const combineLatest = Rx.Observable.combineLatest
 
 import {combineLatestObj} from '../../utils'
@@ -21,11 +21,6 @@ export default function view(state$, graphsGroupVTree$){
       
       let sensorNodeList = state.sensorNodes.map(function(node){
         return <option value={node.id}>{node.name}</option> 
-      })
-
-      //console.log("sensorsData",state.sensorsData)
-      let graphs = state.sensorsData.map(function(data){
-        console.log("sensorsData",data)
       })
 
       return <div>

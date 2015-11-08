@@ -1,6 +1,6 @@
 /** @jsx hJSX */
 import {hJSX} from '@cycle/dom'
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 
 
 export function renderCheckbox(checked, id, className) {

@@ -1,6 +1,6 @@
 /** @jsx hJSX */
 import {hJSX} from '@cycle/dom'
-import {Rx} from '@cycle/core'
+import Rx from 'rx'
 
 export default function LabeledInputSlider({DOM, props$}, name = '') {
   let initialValue$ = props$.map(props => props.initial).first()
