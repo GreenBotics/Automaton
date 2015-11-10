@@ -1,5 +1,5 @@
 import Rx from 'rx'
-let just = Rx.Observable.just
+const just = Rx.Observable.just
 
 import intent from './intent'
 import model from './model'
@@ -19,8 +19,17 @@ export default function main(drivers) {
 
   const vtree$  = view(state$, GraphGroup.DOM)
 
-  let stream$ = state$ //anytime our model changes , dispatch it via socket.io
-  const incomingMessages$ = socketIO.get('messageType')
+  const stream$ = state$ //anytime our model changes , dispatch it via socket.io
+  /*let stream$ = Rx.Observable
+    .interval(3000)
+    .map(function(){
+      return {bar:242}
+    })  */ 
+
+  const initialData$      = socketIO.get("initialData")
+    .map(e=>JSON.parse(e))
+    .forEach(e=>console.log("got initialData",e))
+
   const outgoingMessages$ = stream$.map( 
     function(eventData){
       return {
@@ -28,6 +37,11 @@ export default function main(drivers) {
         message: JSON.stringify(eventData)
       }
     })
+    .shareReplay(1)
+    .startWith({messageType:"initialData"})
+
+  outgoingMessages$
+    .forEach(e=>console.log("output to socketIO",e))
 
   return {
       DOM: vtree$
