@@ -77,6 +77,22 @@ function toggleSensor(state, input){
 }
 
 
+function setNodes(state, input){
+  state = mergeData( state, {nodes:input})
+  return state
+}
+
+function selectNodes(state, input){
+  state = mergeData( state, {selectedNodes:input})
+  return state
+}
+
+function selectFeeds(state, input){
+  state = mergeData( state, {selectedFeeds:input})
+  return state
+}
+
+
 export default function model(actions){
 
     const defaults = { 
@@ -98,11 +114,12 @@ export default function model(actions){
           {toggled:true,type:"temperature", name:"t0", recordMode:"continuous"}
           ,{toggled:false,type:"temperature", name:"t1", recordMode:"continuous"}
         ]
-        ,
-        data:{
-          "t0":{},
-          "t1":{}
-        }
+        ,nodes:[]
+        ,feeds:[]
+
+
+        ,selectedNodes:[]
+        ,selectedFeeds:[]
       }
       //only for undo/redo , experimental
       ,history:{
@@ -122,7 +139,11 @@ export default function model(actions){
       toggleRelay,
       removeRelay,
       removeAllRelays,
-      toggleSensor}
+      toggleSensor
+
+      ,setNodes
+      ,selectNodes
+    }
 
     //other helper: specifies model "paths", these are mapped to the state output
     let paths = {relays:"relays", coolers:"coolers", sensors:"sensors"}
@@ -282,12 +303,18 @@ export default function model(actions){
 
     //for each sensor node/group
     const sensorNodes$ = just([
-        {id:0,name:"Weather station",uri:"http://192.168.1.20:3020"}
-        ,{id:1,name:"indoor station",uri:"http://192.168.1.21:3020"}
+        
       ])
 
     const sensorsFeeds$ = just([
-      {nodeId:0, feedId:0, type:"temperature"}
+      ]) 
+
+
+    /* 
+       {id:0,name:"Weather station",uri:"http://192.168.1.20:3020"}
+        ,{id:1,name:"indoor station",uri:"http://192.168.1.21:3020"}
+
+    {nodeId:0, feedId:0, type:"temperature"}
       ,{nodeId:0, feedId:1, type:"humidity" }
       ,{nodeId:0, feedId:2, type:"pressure" }
       ,{nodeId:0, feedId:3, type:"windSpd" }
@@ -300,9 +327,7 @@ export default function model(actions){
 
       ,{nodeId:1, feedId:0, type:"temperature"}
       ,{nodeId:1, feedId:1, type:"humidity"}
-      ,{nodeId:1, feedId:2, type:"pressure" }
-      ])
-
+      ,{nodeId:1, feedId:2, type:"pressure" }*/
 
     function addObsSourceToSensorNodes(sensorNodes$){
       return sensorNodes$.map(function(sensorNodes){
@@ -340,11 +365,13 @@ export default function model(actions){
     const augSensorNodes$ = addObsSourceToSensorNodes(sensorNodes$)
     const augSensorFeeds$ = addObsSourceToSensorFeeds(sensorsFeeds$, augSensorNodes$)
     
-    augSensorNodes$.subscribe(e=>console.log("augmentedSensorNodes",e))
-    augSensorFeeds$.subscribe(e=>console.log("augmentedSensorFeeds",e))
+    //augSensorNodes$.subscribe(e=>console.log("augmentedSensorNodes",e))
+    //augSensorFeeds$.subscribe(e=>console.log("augmentedSensorFeeds",e))
+
+
 
       
-    const filteredFeeds$ = actions.selectNode$
+    const filteredFeeds$ = actions.selectNodes$
       .withLatestFrom(augSensorFeeds$,function(nodeId,feeds){
         if(nodeId===-1){//wildcard case
           return feeds
@@ -362,24 +389,14 @@ export default function model(actions){
         )
       })
 
-
-    return combineLatestObj({
+    return model$
+    /*return combineLatestObj({
       model$
-      /*,temperature$:bufferedTemp$
-      ,humidity$:bufferedHum$
-      ,pressure$:bufferedPres$
-      ,windSpd$:bufferedWindSpd$
-      ,windDir$:bufferedWindDir$
-      ,light$: bufferedLight$
-      ,UV$:bufferedUv$
-      ,IR$:bufferedIR$
-      ,rain$:bufferedRain$*/
-
-      ,sensorNodes$
-      ,sensorsFeeds$:filteredFeeds$
-      ,sensorsData$:filteredSensorData$
+      //,sensorNodes$
+      //,sensorsFeeds$:filteredFeeds$
+      //,sensorsData$:filteredSensorData$
       
-    })
+    })*/
     //.map(e=>Immutable(e))
 
 }

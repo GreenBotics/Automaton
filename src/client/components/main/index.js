@@ -12,7 +12,7 @@ export default function main(drivers) {
   let socketIO = drivers.socketIO
 
   const actions = intent(drivers)
-  const state$   = model(actions)
+  let state$  = model(actions)
 
   //create visual elements
   const GraphGroup = GraphsGroupWrapper(state$,DOM)
@@ -26,9 +26,6 @@ export default function main(drivers) {
       return {bar:242}
     })  */ 
 
-  const initialData$      = socketIO.get("initialData")
-    .map(e=>JSON.parse(e))
-    .forEach(e=>console.log("got initialData",e))
 
   const outgoingMessages$ = stream$.map( 
     function(eventData){

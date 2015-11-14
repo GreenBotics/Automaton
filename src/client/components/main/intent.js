@@ -17,7 +17,7 @@ function idAndValue(e){
 }
 
 
-export default function intent({DOM}, other){
+export default function intent({DOM,socketIO}, other){
   let toggleRelay$ =  DOM.select('.relayToggler').events('click')
     .map(idAndChecked)
 
@@ -54,8 +54,18 @@ export default function intent({DOM}, other){
   let redo$ = DOM.select('#redo').events('click')
     .map(false)
 
-  let selectNode$ = DOM.select("#nodeChooser").events('change')
+  let selectNodes$ = DOM.select("#nodeChooser").events('change')
     .map(e=>parseInt(e.target.value))
+
+
+  //////
+  const setInitialData$      = socketIO.get("initialData")
+    .map(e=>JSON.parse(e))
+  
+  const setNodes$ = setInitialData$
+
+  selectNodes$.forEach(e=>console.log("selectNodes",e))
+  setInitialData$.forEach(e=>console.log("got initialData",e))
 
 
   return {
@@ -68,7 +78,9 @@ export default function intent({DOM}, other){
     ,setCoolerPower$
     ,toggleSensor$
 
-    ,selectNode$
+    ,selectNodes$
+
+    ,setNodes$
 
     , undo$
     , redo$}

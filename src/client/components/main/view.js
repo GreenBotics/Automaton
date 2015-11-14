@@ -13,14 +13,14 @@ export default function view(state$, graphsGroupVTree$){
    //.map(m=>m.asMutable({deep: true}))//for seamless immutable
     //.distinctUntilChanged()
     //.shareReplay(1)
-  return combineLatest(state$,graphsGroupVTree$,function(state,graphsGroup)
+  return combineLatest(state$.map(m=>m.asMutable({deep: true})).pluck("state"),graphsGroupVTree$,function(state,graphsGroup)
     {
-      let sensorFeedsList = state.sensorsFeeds.map(function(feed){
-        return <option value={feed.id}>{feed.type}</option>
+      let sensorFeedsList = state.feeds.map(function(feed){
+        return <option value={feed._id}>{feed.type}</option>
       })
       
-      let sensorNodeList = state.sensorNodes.map(function(node){
-        return <option value={node.id}>{node.name}</option> 
+      let sensorNodeList = state.nodes.map(function(node){
+        return <option value={node._id}>{node.name}</option> 
       })
 
       return <div>
