@@ -4,6 +4,9 @@ import {hJSX} from '@cycle/dom'
 import Rx from 'rx'
 const combineLatest = Rx.Observable.combineLatest
 
+import Class from 'classnames'
+import {find,propEq} from 'ramda'
+
 import {combineLatestObj} from '../../utils'
 
 import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from '../uiElements'
@@ -18,10 +21,49 @@ export default function view(state$, graphsGroupVTree$){
       let sensorFeedsList = state.feeds.map(function(feed){
         return <option value={feed._id}>{feed.type}</option>
       })
+      console.log("FEEDS",state.feeds, state.nodes)
       
       let sensorNodeList = state.nodes.map(function(node){
         return <option value={node._id}>{node.name}</option> 
       })
+
+      const nameMappings = {
+        "windSpd":"wind speed"
+        ,"windDir":"wind direction"
+      }
+
+      let feedsSelector = undefined
+      if(state.feedsSelectionToggled){
+        const allFeeds = state.nodes.map(function(node){
+          return node.sensorFeeds.map(function(feed){
+              //const attributes = attributes={{"data-name": row.name, "data-id":row.id}} key={row.id}
+              //key={feed.feedId}
+              const key = `${node._id}${feed.feedId}`
+              const valid = (propEq('node',node._id)&&propEq('feed',feed.feedId))
+              const selected = find(valid, state.selectedFeeds)
+              //console.log("selected",selected)
+
+              return <li className={ Class("feed",{ "selected": selected }) }  
+                attributes={{"data-node": node._id, "data-feed":feed.feedId}} 
+              >
+                <div>{feed.type}</div>
+                <div>(Node_{node._id})</div>
+              </li>
+          })
+
+        })
+
+        feedsSelector = <section id="feedsSelector">
+          <h1> Select feeds </h1>
+          <section>
+            <ul>
+              {allFeeds}
+            </ul>
+          </section>
+        </section>
+      }
+
+
 
       return <div>
         <section id="nodeSelect">
@@ -33,7 +75,15 @@ export default function view(state$, graphsGroupVTree$){
             <option value="-1"> All </option> 
             {sensorFeedsList}
           </select>
+          <button id="feedsSelect">Select feeds </button>
+
+          <span> Start </span> <input type="range" />
+          <span> End </span> <input type="range" />
         </section>
+
+        
+
+        {feedsSelector}
         
         {graphsGroup}
       </div>

@@ -1,3 +1,4 @@
+import {toArray} from '../../utils'
 
 function getId(e){
   let id = parseInt( e.target.id.split("_").pop() )
@@ -54,18 +55,34 @@ export default function intent({DOM,socketIO}, other){
   let redo$ = DOM.select('#redo').events('click')
     .map(false)
 
-  let selectNodes$ = DOM.select("#nodeChooser").events('change')
+  //////
+
+  const selectNodes$ = DOM.select("#nodeChooser").events('change')
     .map(e=>parseInt(e.target.value))
 
+  const selectFeeds$ = DOM.select(".feed").events('click')
+    .map(function(e){
+      const node = parseInt(e.currentTarget.dataset.node)
+      const feed = parseInt(e.currentTarget.dataset.feed)
+      return {node,feed}
+    })
+    .map(toArray)
+
+  const toggleFeedsSelection$ = DOM.select("#feedsSelect").events("click")
 
   //////
   const setInitialData$      = socketIO.get("initialData")
     .map(e=>JSON.parse(e))
   
-  const setNodes$ = setInitialData$
+  const setNodes$ = setInitialData$  
+
+  const setFeedsData$ = socketIO.get("getFeedsData")
+    .map(e=>JSON.parse(e))
+
 
   selectNodes$.forEach(e=>console.log("selectNodes",e))
   setInitialData$.forEach(e=>console.log("got initialData",e))
+  selectFeeds$.forEach(e=>console.log("selectFeeds",e))
 
 
   return {
@@ -79,8 +96,12 @@ export default function intent({DOM,socketIO}, other){
     ,toggleSensor$
 
     ,selectNodes$
-
+    ,selectFeeds$
     ,setNodes$
+    ,setFeedsData$
+
+    ,toggleFeedsSelection$
+
 
     , undo$
     , redo$}

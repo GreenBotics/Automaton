@@ -1,5 +1,6 @@
 import Rx from 'rx'
-const just = Rx.Observable.just
+const just   = Rx.Observable.just
+const merge  = Rx.Observable.merge
 
 import intent from './intent'
 import model from './model'
@@ -8,17 +9,26 @@ import view   from './view'
 import {GraphsGroupWrapper} from './wrappers'
 
 
-function socketIO(state$){
+function socketIO(state$, actions){
   const stream$ = state$ //anytime our model changes , dispatch it via socket.io
 
-  const outgoingMessages$ = stream$.map( 
+
+  const getFeedsData$ = actions
+    .selectNodes$
+    .map(e=>({messageType:'getFeedsData',message:e}))
+
+  const saveState$    = stream$.map( 
     function(eventData){
       return {
         messageType: 'someEvent',
         message: JSON.stringify(eventData)
       }
     })
-    .shareReplay(1)
+
+  const outgoingMessages$ = merge(
+      saveState$
+      ,getFeedsData$
+    )
     .startWith({messageType:"initialData"})
 
   outgoingMessages$
@@ -37,7 +47,7 @@ export default function main(drivers) {
   const GraphGroup = GraphsGroupWrapper(state$, DOM)
 
   const vtree$  = view(state$, GraphGroup.DOM)
-  const sIO$    = socketIO(state$)
+  const sIO$    = socketIO(state$, actions)
 
   return {
       DOM: vtree$

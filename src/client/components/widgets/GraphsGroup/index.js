@@ -158,6 +158,10 @@ function view(state$){
   rainGraph.init()
 
 
+  state$
+    .pluck("feeds")
+    //.forEach(e=>console.lo)
+
   state$.pluck("sensorsFeeds")
     .distinctUntilChanged()
     /*.map(function(entry){
@@ -174,7 +178,7 @@ function view(state$){
   state$.pluck("sensorsFeeds")
     .distinctUntilChanged()
     .filter(s=>s!==undefined)
-    .flatMap(function(entries){
+    /*.flatMap(function(entries){
       return entries.map(function(entry){
         if(entry.source$ && entry.feedId){          
           return combineLatestObj({data:entry.source$,id:just(entry.feedId)})
@@ -182,7 +186,7 @@ function view(state$){
       })
       
     })
-    .filter(s=>s!==undefined)
+    .filter(s=>s!==undefined)*/
     .subscribe(function(e){
       console.log("sensorsData",e)
       if(e){
@@ -222,34 +226,42 @@ function view(state$){
     return undefined
   })*/
 
-  return state$.map(function(state){
+  return state$.distinctUntilChanged().map(function(state){
+    const feeds = state.state.feeds
+
+    const temperature = feeds//.map(s=>s.feeds)
+      .map(f=>({value:f.temperature,time:new Date(f.timestamp*1000)}))
+      //.slice(0,10)
+
+    const humidity = feeds
+      .map(f=>({value:f.humidity,time:new Date(f.timestamp*1000)}))
 
     /*let {temperature,humidity,pressure,windSpd,windDir,light,UV,IR,rain} = state
-    //console.log("sensor data",temperature,humidity,pressure)
+    console.log("sensor data",temperature,humidity,pressure)*/
 
     //update graphs
     let graphList = [
       temperatureGraph
       ,humidityGraph
-      ,pressureGraph
+      /*,pressureGraph
       ,windSpdGraph
       ,windDirGraph
       ,rainGraph
       ,UVGraph
       ,IRGraph
-      ,VLGraph
+      ,VLGraph*/
     ]
 
     let dataList = [
       temperature
       ,humidity
-      ,pressure
+      /*,pressure
       ,windSpd
       ,windDir
       ,rain
       ,UV
       ,IR
-      ,light
+      ,light*/
     ]
 
     //update all graphs
@@ -259,9 +271,10 @@ function view(state$){
 
     const graphsList = graphList.map(function(graph){
       return graph
-    })*/ 
+    })
 
-    let graphsList = undefined
+
+    //let graphsList = undefined
 
     return <section id="graphs">
         {graphsList}   

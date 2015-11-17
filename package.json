@@ -16,6 +16,7 @@
     "@cycle/core": "^5.0.1",
     "@cycle/dom": "^7.1.1",
     "addressbar": "^0.2.0",
+    "classnames": "^2.2.0",
     "cron": "ncb000gt/node-cron",
     "cycle-socket.io": "^1.0.0",
     "cyclejs": "^0.24.1",
