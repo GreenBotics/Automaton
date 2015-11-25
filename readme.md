@@ -44,6 +44,6 @@ https://github.com/killercup/cycle-webpack-starter
 - - -
 
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
-[![Build Status](https://travis-ci.org/GreenBotics/Automaton.svg?branch=master)](https://travis-ci.org/GreenBotics/Automaton)
+[![Build Status](https://travis-ci.org/GreenBotics/Automaton.svg)](https://travis-ci.org/GreenBotics/Automaton)
 [![Dependency Status](https://david-dm.org/GreenBotics/Automaton.svg)](https://david-dm.org/GreenBotics/Automaton)
 [![devDependency Status](https://david-dm.org/GreenBotics/Automaton/dev-status.svg)](https://david-dm.org/GreenBotics/Automaton#info=devDependencies)
