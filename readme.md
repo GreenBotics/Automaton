@@ -32,10 +32,7 @@ Reza 'zer0s'
 Mark 'kaosat-dev' Moissette
 
 
-## Useful tools
-
-https://github.com/killercup/cycle-webpack-starter
-
+"build2": "webpack -wdc --progress",
 
 ## LICENSE
 
