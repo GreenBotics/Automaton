@@ -1,4 +1,4 @@
-import "babel-core/polyfill"//needed for object.assign
+//import "babel-core/polyfill"//needed for object.assign
 
 
 /*converts input data to array if it is not already an array*/
