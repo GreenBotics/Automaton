@@ -8,13 +8,22 @@ import view   from './view'
 
 import {GraphsGroupWrapper} from './wrappers'
 
+import {equals} from 'ramda'
+
 
 function socketIO(state$, actions){
   const stream$ = state$ //anytime our model changes , dispatch it via socket.io
 
 
-  const getFeedsData$ = actions
-    .selectNodes$
+  /*const getFeedsData$ = actions
+    .selectFeeds$
+    .map(e=>({messageType:'getFeedsData',message:e}))*/
+  const getFeedsData$ = state$
+    .pluck("state")
+    .pluck("selectedFeeds")
+    .do(e=>console.log("selectedFeeds",e))
+    //.map(e=>JSON.stringify(e))
+    .distinctUntilChanged(null,equals)
     .map(e=>({messageType:'getFeedsData',message:e}))
 
   const saveState$    = stream$.map( 
@@ -26,8 +35,8 @@ function socketIO(state$, actions){
     })
 
   const outgoingMessages$ = merge(
-      saveState$
-      ,getFeedsData$
+      //saveState$
+      getFeedsData$
     )
     .startWith({messageType:"initialData"})
 

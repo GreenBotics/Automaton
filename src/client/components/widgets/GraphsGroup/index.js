@@ -6,6 +6,8 @@ const combineLatest = Rx.Observable.combineLatest
 const just          = Rx.Observable.just
 //import {GraphWidget} from '../widgets/GraphWidget'
 import {GraphWidget} from '../GraphWidget/graphWidget'
+var d3 = require('metrics-graphics/node_modules/d3')
+
 
 import {combineLatestObj} from '../../../utils'
 
@@ -231,10 +233,13 @@ function view(state$){
 
     const temperature = feeds//.map(s=>s.feeds)
       .map(f=>({value:f.temperature,time:new Date(f.timestamp*1000)}))
-      //.slice(0,10)
+      .slice(0,20)
 
     const humidity = feeds
       .map(f=>({value:f.humidity,time:new Date(f.timestamp*1000)}))
+      .slice(0,20)
+
+    //console.log("actual data passed to GraphsGroup",temperature,humidity)
 
     /*let {temperature,humidity,pressure,windSpd,windDir,light,UV,IR,rain} = state
     console.log("sensor data",temperature,humidity,pressure)*/

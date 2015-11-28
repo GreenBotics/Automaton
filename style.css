@@ -118,7 +118,7 @@ section h1{
 }
 
 .mg-area1-color {
-    fill: #FFFFFF !important;
+    /*fill: #FFFFFF !important;*/
 }
 
 .mg-active-datapoint {
@@ -246,13 +246,23 @@ input[type=range]:focus::-ms-fill-upper {
   background: rgba(46, 151, 255, 0.78);
 }
 
+
+#adder{
+  position: absolute;
+  height: 200px;
+  width: 400px;
+  background: #615E5E;
+  z-index: 1;
+  border: 1px solid white;
+}
+
 #feedsSelector{
   position: absolute;
   height: 200px;
   width: 400px;
-    background: #615E5E;
-    z-index: 1;
-    border: 1px solid white;
+  background: #615E5E;
+  z-index: 1;
+  border: 1px solid white;
 }
 
 #feedsSelector section{
