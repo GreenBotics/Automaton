@@ -1,13 +1,13 @@
 import Immutable from 'seamless-immutable'
 import Rx from 'rx'
-import "babel-core/polyfill"
+//import "babel-core/polyfill"
 var rxDom = require("rx-dom")
 const just = Rx.Observable.just
 
 import {makeModel, makeModifications} from './model/modelHelper'
 import {mergeData,combineLatestObj,slidingAccumulator} from './utils'
 
-import {flatten,find,prop,difference,findIndex,equals,uniqBy} from 'Ramda'
+import {flatten,find,prop,difference,findIndex,equals,uniqBy} from 'ramda'
 
 //these all are actual "api functions"  
 function toggleRelay(state, input){
@@ -77,6 +77,8 @@ function toggleSensor(state, input){
 }
 
 
+//////////////////
+
 function setNodes(state, input){
   state = mergeData( state, {nodes:input})
   return state
@@ -131,12 +133,12 @@ function selectFeeds(state, input){
       }
       return true
     })
-  console.log("selectedFeed2",selectedFeeds)
+  //console.log("selectedFeed2",selectedFeeds)
 
   //filter feeds accordingly
   const filteredFeeds = state.feeds
     .filter(function(feed){
-      console.log("feed to filter",feed)
+      //console.log("feed to filter",feed)
     })
 
   state = mergeData( state, {selectedFeeds})
@@ -144,15 +146,24 @@ function selectFeeds(state, input){
 }
 
 function setFeedsData(state, input){
-  console.log("setFeedsData",input)
   state = mergeData( state, {feeds:input})
   return state
 }
 
+//ui 
 function toggleFeedsSelection(state, input){
   const feedsSelectionToggled = !state.feedsSelectionToggled
-  state = mergeData( state, {feedsSelectionToggled})
-  console.log("toggleFeedsSelection",state)
+  const addItemsToggled = false //UGH , refactor
+
+
+  state = mergeData( state, {feedsSelectionToggled,addItemsToggled})
+  return state
+}
+
+function toggleAddItems(state, input){
+  const addItemsToggled = !state.addItemsToggled
+  const feedsSelectionToggled = false //UGH , refactor
+  state = mergeData( state, {addItemsToggled,feedsSelectionToggled})
   return state
 }
 
@@ -187,6 +198,7 @@ export default function model(actions){
 
         //ui state
         ,feedsSelectionToggled:false
+        ,addItemsToggled:false
       }
       //only for undo/redo , experimental
       ,history:{
@@ -214,6 +226,7 @@ export default function model(actions){
       ,setFeedsData
 
       ,toggleFeedsSelection
+      ,toggleAddItems
     }
 
     //other helper: specifies model "paths", these are mapped to the state output
@@ -223,13 +236,5 @@ export default function model(actions){
     const model$ = makeModel(updateFns, actions, defaults)
 
     return model$
-    /*return combineLatestObj({
-      model$
-      //,sensorNodes$
-      //,sensorsFeeds$:filteredFeeds$
-      //,sensorsData$:filteredSensorData$
-      
-    })*/
-    //.map(e=>Immutable(e))
 
 }
