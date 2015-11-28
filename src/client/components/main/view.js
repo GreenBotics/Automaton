@@ -18,10 +18,8 @@ export default function view(state$, graphsGroupVTree$){
     //.shareReplay(1)
   return combineLatest(state$.map(m=>m.asMutable({deep: true})).pluck("state"),graphsGroupVTree$,function(state,graphsGroup)
     {
-      let sensorFeedsList = state.feeds.map(function(feed){
-        return <option value={feed._id}>{feed.type}</option>
-      })
-      console.log("FEEDS",state.feeds, state.nodes)
+     
+      //console.log("FEEDS",state.feeds, state.nodes)
       
       let sensorNodeList = state.nodes.map(function(node){
         return <option value={node._id}>{node.name}</option> 
@@ -35,16 +33,16 @@ export default function view(state$, graphsGroupVTree$){
       let feedsSelector = undefined
       if(state.feedsSelectionToggled){
         const allFeeds = state.nodes.map(function(node){
-          return node.sensorFeeds.map(function(feed){
+          return node.sensors.map(function(feed){
               //const attributes = attributes={{"data-name": row.name, "data-id":row.id}} key={row.id}
-              //key={feed.feedId}
-              const key = `${node._id}${feed.feedId}`
-              const valid = (propEq('node',node._id)&&propEq('feed',feed.feedId))
+              //key={feed.id}
+              const key = `${node._id}${feed.id}`
+              const valid = (propEq('node',node._id)&&propEq('feed',feed.id))
               const selected = find(valid, state.selectedFeeds)
               //console.log("selected",selected)
 
               return <li className={ Class("feed",{ "selected": selected }) }  
-                attributes={{"data-node": node._id, "data-feed":feed.feedId}} 
+                attributes={{"data-node": node._id, "data-feed":feed.id}} 
               >
                 <div>{feed.type}</div>
                 <div>(Node_{node._id})</div>
@@ -63,27 +61,36 @@ export default function view(state$, graphsGroupVTree$){
         </section>
       }
 
+      ////
+      let adder = undefined
+      if(state.addItemsToggled){
+        adder = <section id="adder">
+          <h1> Add nodes/sensors </h1>
+          <section>
+            <ul>
+              
+            </ul>
+          </section>
+        </section>
+      }
+
 
 
       return <div>
         <section id="nodeSelect">
-          <select id="nodeChooser">
-            <option value="-1"> All </option> 
-            {sensorNodeList}
-          </select>
-          <select id="sensorFeedChooser">
-            <option value="-1"> All </option> 
-            {sensorFeedsList}
-          </select>
+          <button id="addItems">Add items</button>
           <button id="feedsSelect">Select feeds </button>
 
           <span> Start </span> <input type="range" />
           <span> End </span> <input type="range" />
+          
+          
         </section>
 
         
 
         {feedsSelector}
+        {adder}
         
         {graphsGroup}
       </div>

@@ -70,6 +70,9 @@ export default function intent({DOM,socketIO}, other){
 
   const toggleFeedsSelection$ = DOM.select("#feedsSelect").events("click")
 
+  const toggleAddItems$ = DOM.select("#addItems").events("click")
+
+
   //////
   const setInitialData$      = socketIO.get("initialData")
     .map(e=>JSON.parse(e))
@@ -82,6 +85,7 @@ export default function intent({DOM,socketIO}, other){
 
   selectNodes$.forEach(e=>console.log("selectNodes",e))
   setInitialData$.forEach(e=>console.log("got initialData",e))
+  setFeedsData$.forEach(e=>console.log("got feeds data",e))
   selectFeeds$.forEach(e=>console.log("selectFeeds",e))
 
 
@@ -101,6 +105,7 @@ export default function intent({DOM,socketIO}, other){
     ,setFeedsData$
 
     ,toggleFeedsSelection$
+    ,toggleAddItems$
 
 
     , undo$
