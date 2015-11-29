@@ -29,15 +29,16 @@
     "xhr2": "^0.1.3"
   },
   "devDependencies": {
-    "babel-core": "^6.2.1",
     "babel-cli": "^6.2.0",
+    "babel-core": "^6.2.1",
     "babel-preset-es2015": "^6.1.18",
     "babel-preset-react": "^6.1.18",
     "babelify": "^7.2.0",
     "browserify": "^12.0.1",
     "css-modulesify": "^0.15.0",
-    "watchify": "^3.6.1",
-    "nodemon": "^1.8.1"
+    "mocha": "^2.3.4",
+    "nodemon": "^1.8.1",
+    "watchify": "^3.6.1"
   },
   "scripts": {
     "browserify": "browserify src/client  -t babelify -p [ css-modulesify -o dist/client/main.css ] --o dist/client/bundle.js",
@@ -48,7 +49,7 @@
     "run-server": "nodemon --watch dist/server/ dist/server/index.js",
     "start-dev": "npm run run-server &  npm run watch-server & npm run watch-client",
     "start": "npm run run-server",
-    "mocha": "mocha specs --compilers js:babel-core/register",
+    "mocha": "mocha src --compilers js:babel-core/register",
     "test": "npm run mocha"
   },
   "browserify-shim": {
