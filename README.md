@@ -5,24 +5,52 @@
 > garden (and home) automaton etc
 
 
+## Whas is this ?
 
-## Building
-
-
-client side code (uses webpack, continuous build)
-
-          npm run build2
+  A simple client & server system for environement monitoring (sensors etc) , meant to "just work"
 
 
-server side code
+## Usage
 
-  build:
+          npm start 
 
-          npm run build-srv
 
-  run:
+  Then go to http://localhost:3001/index.html
 
-          node dist/server/index.js
+
+## Development
+
+  continuous rebuild mode (simplest, the one you usually want): this will rebuild
+  the client & server builds as you change the code (no live reload for the client for now)
+
+          npm run start-dev
+
+  you can also manually rebuild things:
+
+    client 
+
+          npm run build-client
+
+    server 
+
+          npm run build-server
+
+
+  please also check out the [package.json](https://github.com/GreenBotics/Automaton/blob/master/package.json)
+  file for more useful scripts
+
+
+## Tech 
+
+  "Mostly" writen in a functional (functional reactive) way (I always was very OOP oriented so quality may vary)
+
+  A few notable libs in use
+
+  - [Cycle.js](http://cycle.js.org/) on both client and server as a sort of "app basis"
+  - [tingodb.js](http://www.tingodb.com/) for storage 
+  - browserify and various transforms to package things nicely for the client side 
+  - socket.io , etc etc 
+
 
 
 ## Authors
@@ -31,8 +59,6 @@ server side code
 Reza 'zer0s'
 Mark 'kaosat-dev' Moissette
 
-
-"build2": "webpack -wdc --progress",
 
 ## LICENSE
 
