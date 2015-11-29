@@ -11,16 +11,13 @@ import {combineLatestObj} from '../../utils'
 
 import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from '../uiElements'
 
-
 export default function view(state$, graphsGroupVTree$){
    //.map(m=>m.asMutable({deep: true}))//for seamless immutable
     //.distinctUntilChanged()
     //.shareReplay(1)
   return combineLatest(state$.map(m=>m.asMutable({deep: true})).pluck("state"),graphsGroupVTree$,function(state,graphsGroup)
     {
-     
-      //console.log("FEEDS",state.feeds, state.nodes)
-      
+      //console.log("FEEDS",state.feeds, state.nodes) 
       let sensorNodeList = state.nodes.map(function(node){
         return <option value={node._id}>{node.name}</option> 
       })
@@ -34,12 +31,14 @@ export default function view(state$, graphsGroupVTree$){
       if(state.feedsSelectionToggled){
         const allFeeds = state.nodes.map(function(node){
           return node.sensors.map(function(feed){
+            //console.log("bla",node,feed)
               //const attributes = attributes={{"data-name": row.name, "data-id":row.id}} key={row.id}
               //key={feed.id}
               const key = `${node._id}${feed.id}`
-              const valid = (propEq('node',node._id)&&propEq('feed',feed.id))
-              const selected = find(valid, state.selectedFeeds)
-              //console.log("selected",selected)
+              
+              const selected = state.selectedFeeds.reduce(function(acc,cur){
+                return acc || (cur.node === node._id && cur.feed === feed.id)
+              },false) // Is this node & feed combo selected
 
               return <li className={ Class("feed",{ "selected": selected }) }  
                 attributes={{"data-node": node._id, "data-feed":feed.id}} 

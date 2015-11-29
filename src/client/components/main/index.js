@@ -21,7 +21,6 @@ function socketIO(state$, actions){
   const getFeedsData$ = state$
     .pluck("state")
     .pluck("selectedFeeds")
-    .do(e=>console.log("selectedFeeds",e))
     //.map(e=>JSON.stringify(e))
     .distinctUntilChanged(null,equals)
     .map(e=>({messageType:'getFeedsData',message:e}))

@@ -63,7 +63,7 @@ export default function intent({DOM,socketIO}, other){
   const selectFeeds$ = DOM.select(".feed").events('click')
     .map(function(e){
       const node = parseInt(e.currentTarget.dataset.node)
-      const feed = parseInt(e.currentTarget.dataset.feed)
+      const feed = e.currentTarget.dataset.feed
       return {node,feed}
     })
     .map(toArray)
