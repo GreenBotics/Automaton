@@ -6,33 +6,53 @@
 
 
 
-## Building
+## What is this ?
+
+  A server & client system for environment monitoring and control ( no I will not add any wow "IOT" comment here)
+
+## Usage
+
+          npm start
+
+  this starts the server, you can then access the web based UI at 
+
+  `http://localhost:3001/index.html`
 
 
-client side code (uses webpack, continuous build)
+## Development/building
 
-          npm run build2
+
+All code is written in ES6/ES2015, and transpiled using [babel.js](https://babeljs.io/)
+and browserify (& a few browserify tools like babelify, watchify etc)
+
+
+client side code 
+
+          npm run build-client
 
 
 server side code
 
   build:
 
-          npm run build-srv
+          npm run build-server
 
   run:
 
-          node dist/server/index.js
+          npm run run-server
+
+
+watch and regenerate both client & server
+
+          npm run start-dev
+
 
 
 ## Authors
 
-
 Reza 'zer0s'
 Mark 'kaosat-dev' Moissette
 
-
-"build2": "webpack -wdc --progress",
 
 ## LICENSE
 
