@@ -8,8 +8,9 @@ const just          = Rx.Observable.just
 import {GraphWidget} from '../GraphWidget/graphWidget'
 var d3 = require('metrics-graphics/node_modules/d3')
 
-
 import {combineLatestObj} from '../../../utils'
+
+import {mergeAll,flatten,nth} from 'ramda'
 
 function model(props$, actions){
   return props$
@@ -48,241 +49,147 @@ function view(state$){
 
   }
 
-  let graphSettingsTemperature = {
-    title: "Temperature (C)"
-    ,description:"Temperature curves for env#0"
-    ,legend:["T0"]
-    ,min_y:-30
-    ,max_y:50
-    ,y_label:"°C"
-    //baselines: [{value:12, label:'critical temperature stuff'}],
-  }
-  graphSettingsTemperature = Object.assign({},commonGraphSettings,graphSettingsTemperature)
-
-  let graphSettingsHumidity = {
-    title: "Humidity (%)"
-    ,description:"humitidy curves for env#0"
-    ,legend:["H0"]
-    ,min_y:0
-    ,max_y:100
-    ,y_label:"%"
-    //baselines: [{value:12, label:'critical humidity stuff'}],
-  }
-  graphSettingsHumidity = Object.assign({},commonGraphSettings,graphSettingsHumidity)
-
-  let graphSettingsPressure = {
-    title: "Pressure (hpa)",
-    description:"pressure curves for env#0",
-    legend:["P0"],
-    //baselines: [{value:12, label:'critical pressure stuff'}],
-  }
-  graphSettingsPressure = Object.assign({},commonGraphSettings,graphSettingsPressure)
-
-  let graphSettingsWindSpd = {
-    title: "Wind speed (km/h)"
-    ,description:"wind speed curves for env#0"
-    ,legend:["WS0"]
-    ,min_y:0
-    ,max_y:200
-    //baselines: [{value:12, label:'critical pressure stuff'}],
-  }
-  graphSettingsWindSpd = Object.assign({},commonGraphSettings,graphSettingsWindSpd)
-
-  let graphSettingsWindDir = {
-    title: "Wind direction",
-    description:"wind direction curves for env#0",
-    legend:["WS0"],
-    //baselines: [{value:12, label:'critical pressure stuff'}],
-  }
-  graphSettingsWindDir = Object.assign({},commonGraphSettings,graphSettingsWindDir)
-
-  let graphSettingslight = {
-    title: "Light level",
-    description:"Light level curves for env#0",
-    legend:["L0"],
-    //baselines: [{value:12, label:'critical pressure stuff'}],
-  }
-  graphSettingslight = Object.assign({},commonGraphSettings,graphSettingslight)
-
-  let graphSettingsUv = {
-    title: "UV level",
-    description:"UV level curves for env#0",
-    legend:["UV0"],
-    //baselines: [{value:12, label:'critical pressure stuff'}],
-  }
-  graphSettingsUv = Object.assign({},commonGraphSettings,graphSettingsUv)
-
-
-  let graphSettingsIR = {
-    title: "IR level",
-    description:"IR level curves for env#0",
-    legend:["IR0"],
-    //baselines: [{value:12, label:'critical pressure stuff'}],
-  }
-  graphSettingsIR = Object.assign({},commonGraphSettings,graphSettingsIR)
-
-
-  let graphSettingsRain = {
-    title: "Precipitations (mm)",
-    description:"Rain curves for env#0",
-    max_x:maxPts,
-    legend:["R0"],
-    //baselines: [{value:12, label:'critical pressure stuff'}],
-  }
-  graphSettingsRain = Object.assign({},commonGraphSettings,graphSettingsRain)
-
-
-  const temperatureGraph = new GraphWidget(undefined,graphSettingsTemperature)
-  temperatureGraph.init()
-
-  const humidityGraph = new GraphWidget(undefined,graphSettingsHumidity)
-  humidityGraph.init()
-
-  const pressureGraph = new GraphWidget(undefined,graphSettingsPressure)
-  pressureGraph.init()
-
-  const windSpdGraph = new GraphWidget(undefined,graphSettingsWindSpd)
-  windSpdGraph.init()
-
-  const windDirGraph = new GraphWidget(undefined,graphSettingsWindDir)
-  windDirGraph.init()
-
-  const UVGraph = new GraphWidget(undefined,graphSettingsUv)
-  UVGraph.init()
-
-  const IRGraph = new GraphWidget(undefined,graphSettingsIR)
-  IRGraph.init()
-
-  const VLGraph = new GraphWidget(undefined,graphSettingslight)
-  VLGraph.init()
-
-  const rainGraph = new GraphWidget(undefined,graphSettingsRain)
-  rainGraph.init()
-
-
-  state$
-    .pluck("feeds")
-    //.forEach(e=>console.lo)
-
-  state$.pluck("sensorsFeeds")
-    .distinctUntilChanged()
-    /*.map(function(entry){
-      console.log("entry",entry)
-      //combineLatestObj({entry.source$})
-      //return 
-    })*/
-    .filter(s=>s!==undefined)
-    .subscribe(function(e){
-    console.log("filteredFeeds",e)
-  })
-
-  //sensor data itself
-  state$.pluck("sensorsFeeds")
-    .distinctUntilChanged()
-    .filter(s=>s!==undefined)
-    /*.flatMap(function(entries){
-      return entries.map(function(entry){
-        if(entry.source$ && entry.feedId){          
-          return combineLatestObj({data:entry.source$,id:just(entry.feedId)})
-        }        
-      })
-      
-    })
-    .filter(s=>s!==undefined)*/
-    .subscribe(function(e){
-      console.log("sensorsData",e)
-      if(e){
-        e.subscribe(e=>console.log("sensor data",e))
-      }
-  })
-
-
-  /*let sensorsData$ = state$.pluck("sensorsData")
-    .filter(s=>s!==undefined)
-    .flatMap(combineLatest)
+  //type can be temperature, pressure , speed etc 
+  function makeSettingsByType(type){
    
-  sensorsData$
-    .map(function(sensorsData){
-      console.log("sensorsData",sensorsData)
-    })
-    .subscribe(e=>console.log("FOOO",e))*/
+    const mappings = {
+      'temperature' : {
+        title: "Temperature (C)"
+        ,description:"Temperature curves for env#0"
+        ,legend:["T0"]
+        ,min_y:-30
+        ,max_y:50
+        ,y_label:"°C"
+      },
+      'humidity':{
+        title: "Humidity (%)"
+        ,description:"humitidy curves for env#0"
+        ,legend:["H0"]
+        ,min_y:0
+        ,max_y:100
+        ,y_label:"%"
+      },
+      'pressure' : {
+        title: "Pressure (hpa)",
+        description:"pressure curves for env#0",
+        legend:["P0"],
+        //baselines: [{value:12, label:'critical pressure stuff'}],
+      },
+      'windSpd' : {
+        title: "Wind speed (km/h)"
+        ,description:"wind speed curves for env#0"
+        ,legend:["WS0"]
+        ,min_y:0
+        ,max_y:200
+        //baselines: [{value:12, label:'critical pressure stuff'}],
+      },
+      'windDir' : {
+        title: "Wind direction",
+        description:"wind direction curves for env#0",
+        legend:["WS0"],
+        //baselines: [{value:12, label:'critical pressure stuff'}],
+      },
+      'rain':{
+        title: "Precipitations (mm)",
+        description:"Rain curves for env#0",
+        max_x:maxPts,
+        legend:["R0"],
+        //baselines: [{value:12, label:'critical pressure stuff'}],
+      },
+      'UV' : {
+        title: "UV level",
+        description:"UV level curves for env#0",
+        legend:["UV0"],
+        //baselines: [{value:12, label:'critical pressure stuff'}],
+      },
+      'IR' : {
+        title: "IR level",
+        description:"IR level curves for env#0",
+        legend:["IR0"],
+        //baselines: [{value:12, label:'critical pressure stuff'}],
+      },
+      'light' : {
+        title: "Light level",
+        description:"Light level curves for env#0",
+        legend:["L0"],
+        //baselines: [{value:12, label:'critical pressure stuff'}],
+      }
 
+    }
 
-  /*let foo$ = Rx.Observable.zip(sensorsData$)
-    .subscribe(e=>console.log("FOOO",e))*/
-    /*.flatMap(function(data$){
+    return mappings[type]
 
-      //data.subscribe(e=>console.log("sensorsData",e))
-      return data$.flatMap(function(data){
-        //return <div>{JSON.stringify(data)} </div>
-        return data
-      })
-    })*/
-  //sensor data is a list of observables
-  //the content of those observables needs to be rendered with a graph
-  //console.log("graphs",graphs$)
-  //graphs$.subscribe(e=>console.log("FOOO",e))
-  /*return graphs$.map(function(graphs){
-    console.log("here mofo",graphs)
+  }
 
-    return undefined
-  })*/
+  function initGraph(dataType){
+    const typeSettings = makeSettingsByType(dataType)
+    const graphSettings = Object.assign({},commonGraphSettings,typeSettings)
+
+    const graph = new GraphWidget(undefined,graphSettings)
+    graph.init()
+    return graph
+  }
+
 
   return state$.distinctUntilChanged().map(function(state){
-    const feeds = state.state.feeds
+    console.log("GraphsGroup state",state)
+    const feeds = state.feeds
 
-    const temperature = feeds//.map(s=>s.feeds)
-      .map(f=>({value:f.temperature,time:new Date(f.timestamp*1000)}))
-      .slice(0,20)
+    /* TO DISPLAY WE NEED
+     - feed raw data 
+     - feed type
+     - feed id ?
+    */
 
-    const humidity = feeds
-      .map(f=>({value:f.humidity,time:new Date(f.timestamp*1000)}))
-      .slice(0,20)
 
-    //console.log("actual data passed to GraphsGroup",temperature,humidity)
+    //FIXME: horrible
+    function getFeedType(feedId){
+      const types = state.nodes.map(node =>{
+        return node.sensors
+          .filter(s=>s.id === feedId)
+          .map(s=>s.type)
+      })
+      .filter(l=>l.length > 0)
+      //console.log("getFeedType", nth(0,types) )
 
-    /*let {temperature,humidity,pressure,windSpd,windDir,light,UV,IR,rain} = state
-    console.log("sensor data",temperature,humidity,pressure)*/
+      return nth(0,flatten(types))
+    }
 
-    //update graphs
-    let graphList = [
-      temperatureGraph
-      ,humidityGraph
-      /*,pressureGraph
-      ,windSpdGraph
-      ,windDirGraph
-      ,rainGraph
-      ,UVGraph
-      ,IRGraph
-      ,VLGraph*/
-    ]
+    const refinedFeedsData = state.selectedFeeds
+      .map(sf=>sf.feed)
+      .map(function(feedId){
+        const timeSeries = state.feeds.map( feed => ( {value:feed[feedId], time:new Date(feed.timestamp*1000)} ) )
+        const type   = getFeedType(feedId)
+        const data = {
+          id:feedId
+          ,type
+          ,timeSeries
+        }
+        return data
+      })
 
-    let dataList = [
-      temperature
-      ,humidity
-      /*,pressure
-      ,windSpd
-      ,windDir
-      ,rain
-      ,UV
-      ,IR
-      ,light*/
-    ]
+    console.log("feed TEST",refinedFeedsData)
+
+    let temperature = []
+    if(refinedFeedsData.length>0){
+     temperature = refinedFeedsData[0].timeSeries
+    }
+    
+
+    let _graphList = refinedFeedsData
+      .asMutable()//needed , otherwise we loose prototypes, needed for graphWidget
+      .map( feed => {
+        return initGraph(feed.type)//do lookup to prevent re-creating
+      })
 
     //update all graphs
-    dataList.forEach(function(data,index){
-      graphList[index].updateData(data)
+    refinedFeedsData.forEach(function(data,index){
+      _graphList[index].updateData(data.timeSeries)
     })   
 
-    const graphsList = graphList.map(function(graph){
-      return graph
-    })
-
-
-    //let graphsList = undefined
 
     return <section id="graphs">
-        {graphsList}   
+        {_graphList}   
       </section>
     })
 }
