@@ -11,6 +11,81 @@ import {combineLatestObj} from '../../utils'
 
 import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from '../uiElements'
 
+
+
+function renderTopToolBar (state) {
+  let feedsSelector = undefined
+  if(state.feedsSelectionToggled){
+    feedsSelector = renderFeedsSelector(state)
+  }
+
+  ////
+  let adder = undefined
+  if(state.addItemsToggled){
+    adder = renderNodeEditor(state)
+  }
+
+  return <section id="nodeSelect">
+    <button id="addItems">Add items</button>
+    <button id="feedsSelect">Select feeds </button>
+
+    <span> Start </span> <input type="range" />
+    <span> End </span> <input type="range" />
+    RealTime: <input type='checkbox' id="realTimeStream"></input>
+    
+
+    {feedsSelector}
+    {adder}
+    
+  </section>
+}
+
+function renderFeedsSelector (state) {
+  const allFeeds = state.nodes.map(function(node){
+    return node.sensors.map(function(feed){
+      //const attributes = attributes={{"data-name": row.name, "data-id":row.id}} key={row.id}
+      //key={feed.id}
+      const key = `${node._id}${feed.id}`
+      
+      const selected = state.selectedFeeds.reduce(function(acc,cur){
+        return acc || (cur.node === node._id && cur.feed === feed.id)
+      },false) // Is this node & feed combo selected
+
+      return <li className={ Class("feed",{ "selected": selected }) }  
+        attributes={{"data-node": node._id, "data-feed":feed.id}} 
+      >
+        <div>{feed.type}</div>
+        <div>(Node_{node._id})</div>
+      </li>
+    })
+  })
+
+  return <section id="feedsSelector">
+    <header>
+      <h1> Select feeds </h1>
+      <input type="text"> </input>
+    </header>
+    <section>
+      <ul>
+        {allFeeds}
+      </ul>
+    </section>
+  </section>
+}
+
+
+function renderNodeEditor (state){
+  return <section id="adder">
+    <h1> Add nodes/sensors </h1>
+    <section>
+      <ul>
+        
+      </ul>
+    </section>
+  </section>
+}
+
+
 export default function view(state$, graphsGroupVTree$){
    //.map(m=>m.asMutable({deep: true}))//for seamless immutable
     //.distinctUntilChanged()
@@ -27,70 +102,10 @@ export default function view(state$, graphsGroupVTree$){
         ,"windDir":"wind direction"
       }
 
-      let feedsSelector = undefined
-      if(state.feedsSelectionToggled){
-        const allFeeds = state.nodes.map(function(node){
-          return node.sensors.map(function(feed){
-            //console.log("bla",node,feed)
-              //const attributes = attributes={{"data-name": row.name, "data-id":row.id}} key={row.id}
-              //key={feed.id}
-              const key = `${node._id}${feed.id}`
-              
-              const selected = state.selectedFeeds.reduce(function(acc,cur){
-                return acc || (cur.node === node._id && cur.feed === feed.id)
-              },false) // Is this node & feed combo selected
-
-              return <li className={ Class("feed",{ "selected": selected }) }  
-                attributes={{"data-node": node._id, "data-feed":feed.id}} 
-              >
-                <div>{feed.type}</div>
-                <div>(Node_{node._id})</div>
-              </li>
-          })
-
-        })
-
-        feedsSelector = <section id="feedsSelector">
-          <h1> Select feeds </h1>
-          <section>
-            <ul>
-              {allFeeds}
-            </ul>
-          </section>
-        </section>
-      }
-
-      ////
-      let adder = undefined
-      if(state.addItemsToggled){
-        adder = <section id="adder">
-          <h1> Add nodes/sensors </h1>
-          <section>
-            <ul>
-              
-            </ul>
-          </section>
-        </section>
-      }
-
-
-
+      const topToolbar = renderTopToolBar(state)
+    
       return <div>
-        <section id="nodeSelect">
-          <button id="addItems">Add items</button>
-          <button id="feedsSelect">Select feeds </button>
-
-          <span> Start </span> <input type="range" />
-          <span> End </span> <input type="range" />
-          
-          
-        </section>
-
-        
-
-        {feedsSelector}
-        {adder}
-        
+        {topToolbar}
         {graphsGroup}
       </div>
     })
