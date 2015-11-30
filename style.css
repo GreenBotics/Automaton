@@ -78,12 +78,14 @@ section h1{
   width: 30%;
   position: relative;
   float: left;
+  font-size: 0.55rem;
 }
 
 .mg-chart-title{
   color: #1bf8f1 !important;
   font-weight: 500;
 }
+
 .mg-header{
   color: #1bf8f1 !important;
   font-weight: 500;
@@ -109,7 +111,13 @@ section h1{
   fill:#FFFFFF !important;
 }
 
-.mg-x-axis text, .mg-y-axis text, .mg-histogram .axis text {
+/*.mg-x-axis text, .mg-y-axis text, .mg-histogram .axis text {
+}*/
+.mg-x-axis line, .mg-y-axis line {
+    opacity: 1;
+    shape-rendering: auto;
+    stroke: #b3b2b2;
+    stroke-width: 1px;
 }
 
 .mg-line1-color{
@@ -118,8 +126,8 @@ section h1{
 }
 
 .mg-area1-color {
-    /*fill: #FFFFFF !important;*/
-}
+    fill: rgba(255, 255, 255, 0);
+  }
 
 .mg-active-datapoint {
   fill: #FFFFFF !important;
@@ -258,11 +266,30 @@ input[type=range]:focus::-ms-fill-upper {
 
 #feedsSelector{
   position: absolute;
-  height: 200px;
+  height: 90%;
   width: 400px;
   background: #615E5E;
   z-index: 1;
   border: 1px solid white;
+}
+
+
+#feedsSelector header{
+  padding: 15px;
+}
+
+#feedsSelector header h1{
+  display: inline-block;
+}
+
+
+#feedsSelector header input[type=text]{
+  
+    width: 70%;
+    border: none;
+    box-shadow: none;
+    display: inline-block;
+        margin-left: 20px;
 }
 
 #feedsSelector section{

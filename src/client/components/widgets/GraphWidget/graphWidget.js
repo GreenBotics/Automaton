@@ -7,18 +7,25 @@ require("metrics-graphics/dist/metricsgraphics.css")
 //var bla = require('mg-line-brushing')
 
 
-function GraphWidget(data, settings) {
-    console.log("CREATING GraphWidget")
+function GraphWidget(data, settings, id) {
+    //console.log("CREATING GraphWidget")
 
-    this.type = 'Widget'
+    this.type       = 'Widget'
+    this.classNames = ''
+    this.id         = id
+    this.key        = id
 
     const defaults = {
         title: undefined,
         description:undefined,
-        height:150,
 
         x_accessor: 'time',
         y_accessor: 'value',
+
+        show_tooltips:false,//no jquery please
+
+        height:150,
+
         max_x:undefined,
 
         markers: [],
@@ -28,7 +35,6 @@ function GraphWidget(data, settings) {
         interpolate: 'linear',
         missing_is_zero: true,
         transition_on_update:false,//disable for very high frequency data updates (no time for transition)
-        show_tooltips:false,//no jquery please
 
         axes_not_compact:false
 
@@ -39,13 +45,14 @@ function GraphWidget(data, settings) {
 
     this.settings  = Object.assign(defaults,settings,{data})
 
-    console.log("DONE")
+   
 }
 
 GraphWidget.prototype.init = function () {
-  console.log("INIT GraphWidget")
+  //console.log("INIT GraphWidget")
   let elem = document.createElement('div')
-  elem.className = "graph"
+  elem.className = "graph " + this.classNames
+  elem.id = this.id
   this.elem = elem 
   this.settings = Object.assign(this.settings,{target:elem})
   this.draw()
@@ -53,8 +60,9 @@ GraphWidget.prototype.init = function () {
 }
 
 GraphWidget.prototype.updateData = function (data) {
-  console.log("updateData GraphWidget")
-  if(data){
+  
+  if(data && data.length >0){
+    console.log("updateData GraphWidget",data)
     //data = MG.convert.date(data, 'time', '%Y-%m-%dT%H:%M:%S');
     this.settings = Object.assign(this.settings,{data})
   }
@@ -62,7 +70,7 @@ GraphWidget.prototype.updateData = function (data) {
 }
 
 GraphWidget.prototype.updateSettings = function (settings) {
-  console.log("updateSettings GraphWidget")
+  //console.log("updateSettings GraphWidget")
   if(settings){
     this.settings  = Object.assign(defaults,settings)
   }
@@ -70,7 +78,7 @@ GraphWidget.prototype.updateSettings = function (settings) {
 }
 
 GraphWidget.prototype.update = function (prev, elem) {
-    console.log("UPDATING GraphWidget")
+  console.log("UPDATING GraphWidget")
 
   //this.graph = this.graph || prev.graph
   let settings = Object.assign(this.settings,{target:elem})
@@ -79,7 +87,10 @@ GraphWidget.prototype.update = function (prev, elem) {
 }
 
 GraphWidget.prototype.draw = function(){
-  this.graph = MG.data_graphic(this.settings)
+  if(this.settings && this.settings.data && this.settings.data.length >0){
+    this.graph = MG.data_graphic(this.settings)
+  }
+  
 }
 
 export {GraphWidget}

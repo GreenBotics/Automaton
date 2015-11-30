@@ -8,6 +8,8 @@ const just          = Rx.Observable.just
 import {GraphWidget} from '../GraphWidget/graphWidget'
 var d3 = require('metrics-graphics/node_modules/d3')
 
+import fecha from 'fecha'
+
 import {combineLatestObj} from '../../../utils'
 
 import {mergeAll,flatten,nth} from 'ramda'
@@ -47,6 +49,10 @@ function view(state$){
     ,show_secondary_x_label:false
     ,x_rug:true
 
+    ,chart_type:'line'
+    ,area:false
+
+    ,decimals:5
   }
 
   //type can be temperature, pressure , speed etc 
@@ -121,11 +127,34 @@ function view(state$){
 
   }
 
-  function initGraph(dataType){
-    const typeSettings = makeSettingsByType(dataType)
-    const graphSettings = Object.assign({},commonGraphSettings,typeSettings)
 
-    const graph = new GraphWidget(undefined,graphSettings)
+  
+
+  function initGraph(dataType, id){
+    console.log("initGraph",dataType,id)
+    const typeSettings = makeSettingsByType(dataType)
+    let graphSettings = Object.assign({},commonGraphSettings,typeSettings)
+    const graphId = "_"+id//we need to prevent leading numeric values see http://stackoverflow.com/questions/20306204/using-queryselector-with-ids-that-are-numbers
+
+    graphSettings.mouseover = function onGraphMouseOver (d,i) {
+      let selector = `#${graphId} svg .mg-active-datapoint`
+      let elem =  document.querySelector(selector)
+      //console.log("selector",selector,"match",elem)
+
+      if(elem){
+        const timeString = fecha.format(d.time, 'YYYY-MM-DD hh:mm:ss A')
+        elem.innerHTML = `${dataType}: ${d.value}    ${timeString}`
+      } 
+    }
+    /*,mouseover: function(d, i) {
+      console.log("rollover",d,i)
+        //custom format the rollover text, show days
+        let elem =  document.querySelector('svg .mg-active-datapoint')
+        console.log("elem",elem)
+        elem.innerHTML = "GNA GNA" + d.value +"  "+ d.time.toString() 
+    }*/
+
+    const graph = new GraphWidget(undefined, graphSettings, graphId)
     graph.init()
     return graph
   }
@@ -140,7 +169,6 @@ function view(state$){
      - feed type
      - feed id ?
     */
-
 
     //FIXME: horrible
     function getFeedType(feedId){
@@ -158,7 +186,9 @@ function view(state$){
     const refinedFeedsData = state.selectedFeeds
       .map(sf=>sf.feed)
       .map(function(feedId){
-        const timeSeries = state.feeds.map( feed => ( {value:feed[feedId], time:new Date(feed.timestamp*1000)} ) )
+        const timeSeries = state.feeds
+          .filter( feed => feed[feedId] !== undefined )
+          .map( feed => ( {value:feed[feedId], time:new Date(feed.timestamp*1000)} ) )
         const type   = getFeedType(feedId)
         const data = {
           id:feedId
@@ -167,6 +197,7 @@ function view(state$){
         }
         return data
       })
+      .asMutable()//needed , otherwise we loose prototypes, needed for graphWidget
 
     console.log("feed TEST",refinedFeedsData)
 
@@ -176,63 +207,25 @@ function view(state$){
     }
     
 
-    let _graphList = refinedFeedsData
-      .asMutable()//needed , otherwise we loose prototypes, needed for graphWidget
+    function makeShit(feed){
+      return initGraph(feed.type, feed.id)//do lookup to prevent re-creating 
+    }
+
+    let graphList = refinedFeedsData
       .map( feed => {
-        return initGraph(feed.type)//do lookup to prevent re-creating
+        return makeShit(feed)
       })
 
     //update all graphs
     refinedFeedsData.forEach(function(data,index){
-      _graphList[index].updateData(data.timeSeries)
+      graphList[index].updateData(data.timeSeries)
     })   
 
 
     return <section id="graphs">
-        {_graphList}   
+        {graphList}   
       </section>
     })
-}
-
-
-function view2(state$){
-  let endOfDay = new Date()
-  endOfDay.setHours(23)
-  endOfDay.setMinutes(59)
-  endOfDay.setSeconds(59)
-  //endOfDay = new Date( Date.now()+2000000 ) 
-
-  let startOfDay = new Date()
-  startOfDay.setHours(9)
-  startOfDay.setMinutes(0)
-  startOfDay.setSeconds(0)
-
-  const maxPts = endOfDay
-
-  let commonGraphSettings = {
-    animate_on_load:true
-    ,transition_on_update:true
-    ,axes_not_compact:true
-    //,max_x:endOfDay
-    //,min_x:startOfDay
-    ,height:200
-    ,xax_format:d3.time.format('%H:%M:%S')
-    ,xax_count:8
-    ,show_secondary_x_label:false
-    ,x_rug:true
-
-  }
-
-  let graphSettingsTemperature = {
-    title: "Temperature (C)"
-    ,description:"Temperature curves for env#0"
-    ,legend:["T0"]
-    ,min_y:-30
-    ,max_y:50
-    ,y_label:"°C"
-    //baselines: [{value:12, label:'critical temperature stuff'}],
-  }
-  graphSettingsTemperature = Object.assign({},commonGraphSettings,graphSettingsTemperature)
 }
 
 
