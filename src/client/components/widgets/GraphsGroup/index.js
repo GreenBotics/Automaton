@@ -43,16 +43,19 @@ function view(state$){
     ,axes_not_compact:true
     //,max_x:endOfDay
     //,min_x:startOfDay
-    ,height:200
+    //,height:200
     ,xax_format:d3.time.format('%H:%M:%S')
-    ,xax_count:8
+    //,xax_count:8
     ,show_secondary_x_label:false
     ,x_rug:true
 
     ,chart_type:'line'
-    ,area:false
+    ,area:true
 
-    ,decimals:5
+    //,decimals:5
+    ,height: 300
+    ,full_width: true
+    //,full_height:true
   }
 
   //type can be temperature, pressure , speed etc 
@@ -164,12 +167,6 @@ function view(state$){
     console.log("GraphsGroup state",state)
     const feeds = state.feeds
 
-    /* TO DISPLAY WE NEED
-     - feed raw data 
-     - feed type
-     - feed id ?
-    */
-
     //FIXME: horrible
     function getFeedType(feedId){
       const types = state.nodes.map(node =>{
@@ -200,27 +197,64 @@ function view(state$){
       .asMutable()//needed , otherwise we loose prototypes, needed for graphWidget
 
     console.log("feed TEST",refinedFeedsData)
+ 
+    //multi graph version
+    function makeComboGraph(refinedFeedsData){
+      let combinedData = refinedFeedsData.reduce(function(acc, data, index){
+        console.log("current data",data)
+        acc.timeSeries.push( data.timeSeries.asMutable({deep:true}) )
+        acc.types.push( data.type )
+        acc.ids.push( data.id)
+        return acc
+      },{ids:[],timeSeries:[],types:[] })
 
-    let temperature = []
-    if(refinedFeedsData.length>0){
-     temperature = refinedFeedsData[0].timeSeries
+
+      console.log("foo",combinedData)
+      //comboGraph.updateData(combinedData.timeSeries)   
+
+      const typeSettings =  {
+        title: "Combo"
+        ,description:""
+        ,missing_is_hidden: false
+        ,missing_is_zero: false
+        //,y_accessor: combinedData.types
+        ,legend:combinedData.types
+        //,colors:['#FF0000','#00FF00']
+      }
+      let graphSettings = Object.assign({},commonGraphSettings,typeSettings)
+
+      var shortid = require('shortid')
+
+      const graphId = "foo"// "_"+shortid.generate()//undefined//"foo"
+      const graph = new GraphWidget(undefined, graphSettings, graphId)
+      graph.init()
+
+      if(combinedData.timeSeries.length>0 && combinedData.timeSeries[0].length>0){
+        graph.updateData(combinedData.timeSeries)
+        return graph
+      }else
+      {
+        return null
+      }
+      
     }
-    
 
-    function makeShit(feed){
-      return initGraph(feed.type, feed.id)//do lookup to prevent re-creating 
+    function makeMultiGraphs(refinedFeedsData){
+      let graphList = refinedFeedsData
+        .map( feed => {
+          return initGraph(feed.type, feed.id)
+        })
+
+      //update all graphs
+      refinedFeedsData.forEach(function(data,index){
+        graphList[index].updateData(data.timeSeries)
+      }) 
+
+      return graphList  
     }
 
-    let graphList = refinedFeedsData
-      .map( feed => {
-        return makeShit(feed)
-      })
-
-    //update all graphs
-    refinedFeedsData.forEach(function(data,index){
-      graphList[index].updateData(data.timeSeries)
-    })   
-
+    //let graphList = makeComboGraph(refinedFeedsData)
+    let graphList = makeMultiGraphs(refinedFeedsData)
 
     return <section id="graphs">
         {graphList}   
@@ -233,7 +267,6 @@ function view(state$){
 function GraphsGroup({DOM, props$}, name = '') {
   const state$ = model(props$)
 
-  //const {changeCore$, changeTransforms$} = refineActions( props$, intent(DOM) )
   const vtree$ = view(state$)
   
   return {

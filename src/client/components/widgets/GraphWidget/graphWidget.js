@@ -24,7 +24,7 @@ function GraphWidget(data, settings, id) {
 
         show_tooltips:false,//no jquery please
 
-        height:150,
+        //height:150,
 
         max_x:undefined,
 
@@ -78,11 +78,13 @@ GraphWidget.prototype.updateSettings = function (settings) {
 }
 
 GraphWidget.prototype.update = function (prev, elem) {
-  console.log("UPDATING GraphWidget")
-
-  //this.graph = this.graph || prev.graph
-  let settings = Object.assign(this.settings,{target:elem})
-
+  console.log("UPDATING GraphWidget",prev,elem)
+  this.elem = elem || prev.elem
+  
+  this.graph = this.graph || prev.graph
+  this.settings = this.settings || prev.settings
+  let settings = Object.assign(this.settings,{target:this.elem})
+  
   this.graph = MG.data_graphic(settings)
 }
 
