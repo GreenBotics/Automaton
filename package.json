@@ -11,6 +11,8 @@
     "addressbar": "^0.4.2",
     "classnames": "^2.2.0",
     "cron": "ncb000gt/node-cron",
+    "cycle-mqtt-driver": "kaosat-dev/cycle-mqtt-driver",
+    "cycle-simple-http-driver": "kaosat-dev/cycle-simple-http-driver",
     "cycle-socket.io": "kaosat-dev/cycle-socket.io",
     "cycle-tingodb": "kaosat-dev/cycle-tingodb",
     "cyclejs": "^0.24.1",
