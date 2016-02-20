@@ -25,13 +25,13 @@ function renderTopToolBar (state) {
     adder = renderNodeEditor(state)
   }
 
-  return <section id="nodeSelect">
-    <button id="addItems">Add items</button>
+  return <section id="topToolbar">
+    <button id="addItems">Manage items</button>
     <button id="feedsSelect">Select feeds </button>
 
     <span> Start </span> <input type="range" />
     <span> End </span> <input type="range" />
-    RealTime: <input type='checkbox' id="realTimeStream"></input>
+    <span> RealTime </span> <input type='checkbox' id="realTimeStream"></input>
     
 
     {feedsSelector}
@@ -63,7 +63,7 @@ function renderFeedsSelector (state) {
   return <section id="feedsSelector">
     <header>
       <h1> Select feeds </h1>
-      <input type="text"> </input>
+      <input id="feedSearch" type="text"> </input>
     </header>
     <section>
       <ul>
@@ -75,12 +75,23 @@ function renderFeedsSelector (state) {
 
 
 function renderNodeEditor (state){
+  const allNodes = state.nodes
+    .map( node => {
+      return <li>
+        {node.name} <button> Add sensor </button> <button> Delete </button>
+      </li>
+    })
+
   return <section id="adder">
-    <h1> Add nodes/sensors </h1>
+    <header>
+      <h1> Manage nodes/sensors </h1>
+      <button> Add </button>
+    </header>
     <section>
-      <ul>
-        
-      </ul>
+      <header> Nodes </header>
+        <ul>
+          {allNodes} 
+        </ul>
     </section>
   </section>
 }

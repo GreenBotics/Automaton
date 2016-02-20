@@ -7,7 +7,7 @@ const just = Rx.Observable.just
 import {makeModel, makeModifications} from './model/modelHelper'
 import {mergeData,combineLatestObj,slidingAccumulator} from './utils'
 
-import {flatten,find,prop,difference,findIndex,equals,uniqBy} from 'ramda'
+import {flatten,find,prop,difference,findIndex,equals,uniqBy,contains} from 'ramda'
 
 //these all are actual "api functions"  
 function toggleRelay(state, input){
@@ -167,6 +167,18 @@ function toggleAddItems(state, input){
   return state
 }
 
+function searchFeeds(state, input){
+  console.log("searchFeeds",input)
+
+  const founds = state.nodes
+    .filter( feed=> feed.name.indexOf(input)>-1 )//contains(input,feed.name) )
+    .map(f=>f.asMutable())
+    .map(f=>f.name)
+  console.log("founds",founds)
+
+  return state 
+} 
+
 export default function model(actions){
 
     const defaults = { 
@@ -224,6 +236,7 @@ export default function model(actions){
       ,selectNodes
       ,selectFeeds
       ,setFeedsData
+      ,searchFeeds
 
       ,toggleFeedsSelection
       ,toggleAddItems

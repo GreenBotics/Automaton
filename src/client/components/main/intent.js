@@ -69,9 +69,10 @@ export default function intent({DOM,socketIO}, other){
     .map(toArray)
 
   const toggleFeedsSelection$ = DOM.select("#feedsSelect").events("click")
-
   const toggleAddItems$ = DOM.select("#addItems").events("click")
 
+  const searchFeeds$ = DOM.select("#feedSearch").events('input')
+    .map(e=>e.target.value)
 
   //////
   const setInitialData$      = socketIO.get("initialData")
@@ -98,11 +99,14 @@ export default function intent({DOM,socketIO}, other){
 
     ,setCoolerPower$
     ,toggleSensor$
+    //
 
     ,selectNodes$
     ,selectFeeds$
     ,setNodes$
     ,setFeedsData$
+
+    ,searchFeeds$
 
     ,toggleFeedsSelection$
     ,toggleAddItems$
