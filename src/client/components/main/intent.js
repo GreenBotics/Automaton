@@ -19,18 +19,22 @@ function idAndValue(e){
 
 
 export default function intent({DOM,socketIO}, other){
-  let toggleRelay$ =  DOM.select('.relayToggler').events('click')
+  let toggleRelay$ =  DOM.select('.relayToggler')
+    .events('click')
     .map(idAndChecked)
 
-  let removeRelay$ = DOM.select('.removeRelay').events('click')
+  let removeRelay$ = DOM.select('.removeRelay')
+    .events('click')
     .map(getId)
 
-  let removeAllRelays$ = DOM.select('#removeAllRelays').events('click')
+  let removeAllRelays$ = DOM.select('#removeAllRelays')
+    .events('click')
     .map(true)
 
-  let setCoolerPower$ = DOM.select('.coolerSlider').events('input')//input vs change events
-    //.merge( DOM.select('.coolerSlider_number'.events('change') )
-    .merge( DOM.select('.labeled-input-slider-cooler').events('change') )
+  let setCoolerPower$ = DOM.select('.coolerSlider')
+      .events('input')//input vs change events
+    .merge( DOM.select('.labeled-input-slider-cooler')
+      .events('change') )
     //DOM.select('.coolerSlider_number','change')
     .debounce(30)
     .map(idAndValue)
@@ -38,29 +42,42 @@ export default function intent({DOM,socketIO}, other){
 
   //let setCoolerPower$ = other.setCoolerPower$//.debounce(30)
 
-  DOM.select('.labeled-input-slider-cooler').events('newValue')
+  DOM.select('.labeled-input-slider-cooler')
+    .events('newValue')
     .subscribe(e=>console.log("saw cooler slider change",e))
 
-  let emergencyShutdown$ = DOM.select('#shutdown').events('click')
+  let emergencyShutdown$ = DOM.select('#shutdown')
+    .events('click')
     .map(false)
 
-  let toggleSensor$ = DOM.select('.sensorToggler').events('click')
+  let toggleSensor$ = DOM.select('.sensorToggler')
+    .events('click')
     .map(idAndChecked)
 
   
   //////////
-  let undo$ = DOM.select('#undo').events('click')
+  let undo$ = DOM.select('#undo')
+    .events('click')
     .map(true)
 
-  let redo$ = DOM.select('#redo').events('click')
+  let redo$ = DOM.select('#redo')
+    .events('click')
     .map(false)
 
   //////
 
-  const selectNodes$ = DOM.select("#nodeChooser").events('change')
+  const startAddingNodes$ = DOM.select("#addNode")
+    .events('click')
+    .map(true)
+
+  const selectNodes$ = DOM.select("#nodeChooser")
+    .events('change')
     .map(e=>parseInt(e.target.value))
 
-  const selectFeeds$ = DOM.select(".feed").events('click')
+
+
+  const selectFeeds$ = DOM.select(".feed")
+    .events('click')
     .map(function(e){
       const node = parseInt(e.currentTarget.dataset.node)
       const feed = e.currentTarget.dataset.feed
@@ -68,11 +85,16 @@ export default function intent({DOM,socketIO}, other){
     })
     .map(toArray)
 
-  const toggleFeedsSelection$ = DOM.select("#feedsSelect").events("click")
-  const toggleAddItems$ = DOM.select("#addItems").events("click")
-
-  const searchFeeds$ = DOM.select("#feedSearch").events('input')
+  const searchFeeds$ = DOM.select("#feedSearch")
+    .events('input')
     .map(e=>e.target.value)
+
+  const toggleFeedsSelection$ = DOM.select("#feedsSelect")
+    .events("click")
+  const toggleAddItems$ = DOM.select("#addItems")
+    .events("click")
+
+  
 
   //////
   const setInitialData$      = socketIO.get("initialData")
@@ -101,14 +123,16 @@ export default function intent({DOM,socketIO}, other){
     ,toggleSensor$
     //
 
+    ,startAddingNodes$
     ,selectNodes$
-    ,selectFeeds$
     ,setNodes$
+
+
+    ,selectFeeds$
     ,setFeedsData$
-
     ,searchFeeds$
-
     ,toggleFeedsSelection$
+
     ,toggleAddItems$
 
 
