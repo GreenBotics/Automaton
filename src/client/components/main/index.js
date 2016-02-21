@@ -52,9 +52,9 @@ export default function main(drivers) {
   let state$  = model(actions)
 
   //create visual elements
-  const GraphGroup = GraphsGroupWrapper(state$, DOM)
+  //const GraphGroup = GraphsGroupWrapper(state$, DOM)
 
-  const vtree$  = view(state$, GraphGroup.DOM)
+  const vtree$  = view(state$)//, GraphGroup.DOM)
   const sIO$    = socketIO(state$, actions)
 
   return {
