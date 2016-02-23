@@ -51,7 +51,7 @@
   border-radius: 0;
   cursor: pointer;
   display: inline-block;
-  background: #909090;
+  background: #615E5E;
   border: none;
   color: white;
   margin: 10px;
@@ -139,7 +139,7 @@ shape-rendering: auto;
 */
 .mg-x-axis line, .mg-y-axis line {
     opacity: 1;
-    
+
     stroke: #b3b2b2;
     stroke-width: 1px;
 }
@@ -304,11 +304,12 @@ input[type=range]:focus::-ms-fill-upper {
 
 #feedsSelector header h1{
   display: inline-block;
+  margin: 5px;
 }
 
 
 #feedsSelector header input[type=text]{
-  
+
     width: 70%;
     border: none;
     box-shadow: none;
@@ -332,20 +333,24 @@ input[type=range]:focus::-ms-fill-upper {
 #feedsSelector li {
   width: 60px;
   min-height: 60px;
-  border: 1px solid #000;
+  /* border: 1px solid #000; */
   display: -moz-inline-stack;
   display: inline-block;
   vertical-align: top;
   margin: 5px;
   zoom: 1;
-  *display: inline;
   _height: 60px;
-
   padding: 10px;
+  color: white;
+  background: mediumaquamarine;
 }
 
 #feedsSelector li.selected{
-  border: 1px solid #FFB100 ;
+  /*border: 1px solid #FFB100 ;*/
+
+  font-style: italic;
+  color: #000000;
+  background: white;
 }
 
 #topToolbar{
@@ -356,4 +361,8 @@ input[type=range]:focus::-ms-fill-upper {
 
 #topToolbar span{
   margin: 10px;
+}
+
+.feed{
+  color:white;
 }
