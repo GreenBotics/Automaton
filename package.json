@@ -13,7 +13,7 @@
     "cron": "ncb000gt/node-cron",
     "cycle-mqtt-driver": "kaosat-dev/cycle-mqtt-driver",
     "cycle-simple-http-driver": "kaosat-dev/cycle-simple-http-driver",
-    "cycle-snabbdom": "^1.0.3",
+    "cycle-snabbdom": "^1.1.0",
     "cycle-socket.io": "kaosat-dev/cycle-socket.io",
     "cycle-tingodb-driver": "kaosat-dev/cycle-tingodb-driver",
     "fast.js": "^0.1.1",
