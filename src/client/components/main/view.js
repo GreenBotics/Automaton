@@ -6,7 +6,7 @@ import Rx from 'rx'
 const combineLatest = Rx.Observable.combineLatest
 
 import Class from 'classnames'
-import {find,propEq} from 'ramda'
+import {find,propEq,flatten} from 'ramda'
 
 import {combineLatestObj} from '../../utils'
 
@@ -42,6 +42,7 @@ function renderTopToolBar (state) {
 
 
 function renderFeedsSelector (state) {
+  //console.log("state",state)
   const allFeeds = state.nodes.map(function(node){
     return node.sensors.map(function(feed){
       //const attributes = attributes={{"data-name": row.name, "data-id":row.id}} key={row.id}
@@ -51,13 +52,14 @@ function renderFeedsSelector (state) {
         return acc || (cur.node === node._id && cur.feed === feed.id)
       },false) // Is this node & feed combo selected
 
-      let className = Class("feed",{ "selected": selected })
+      let className = Class(".feed",{ ".selected": selected })
       //console.log("foo",className)
 
-      return li('.feed',{"data-node": node._id, "data-feed":feed.id},[
+      const entry = li(className,{attrs:{"data-node": node._id, "data-feed":feed.id}},[
           div('',feed.type),
           div('',`Node_${node._id}`)
         ])
+      return entry
     })
   })
 
@@ -68,7 +70,7 @@ function renderFeedsSelector (state) {
         input('#feedSearch', {type: 'text'})
       ]),
       section([
-        ul(allFeeds)
+        ul('feeds',flatten(allFeeds))
       ])
     ])
 }
@@ -92,7 +94,6 @@ function renderNodeEditor (state){
       ul([allNodes])
     ]),
   ])
-
 }
 
 
@@ -100,9 +101,7 @@ function renderAddNodeScreen(state){
 
 }
 
-
 export default function view(state$, graphsGroupVTree$){
-
 
   return state$
     .map(m=>m.asMutable({deep: true})).pluck("state")

@@ -1,6 +1,5 @@
 import Rx from 'rx'
-const just   = Rx.Observable.just
-const merge  = Rx.Observable.merge
+const {just,merge}   = Rx.Observable
 
 import intent from './intent'
 import model from './model'
@@ -10,6 +9,24 @@ import {GraphsGroupWrapper} from './wrappers'
 
 import {equals} from 'ramda'
 
+
+
+/*workflow to add new nodes
+
+- select microcontroller (UI)
+  esp8266 only for now (UI)
+- select sensors attached to node (UI)
+ -> select sub sensors if not all are needed ? (for 'multi sensor' boards) (UI)
+
+- create uuid
+- write wifi config (master node)
+  -> setups static ip etc ?
+
+- upload firmware => not trivial
+  -> give feedback on compile/ upload
+  -> encapsulate avrdude + extras
+  -> see https://github.com/AdamMagaluk/leo or more generally https://www.npmjs.com/browse/keyword/gcc?offset=0
+*/
 
 function socketIO(state$, actions){
   const stream$ = state$ //anytime our model changes , dispatch it via socket.io
@@ -25,7 +42,7 @@ function socketIO(state$, actions){
     .distinctUntilChanged(null,equals)
     .map(e=>({messageType:'getFeedsData',message:e}))
 
-  const saveState$    = stream$.map( 
+  const saveState$    = stream$.map(
     function(eventData){
       return {
         messageType: 'someEvent',
