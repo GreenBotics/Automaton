@@ -1,5 +1,4 @@
-//import "babel-core/polyfill"//needed for object.assign
-
+import Rx from 'rx'
 
 /*converts input data to array if it is not already an array*/
 export function toArray(data){
