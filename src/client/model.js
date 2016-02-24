@@ -9,7 +9,7 @@ import {mergeData,combineLatestObj,slidingAccumulator} from './utils'
 
 import {flatten,find,prop,difference,findIndex,equals,uniqBy,contains} from 'ramda'
 
-//these all are actual "api functions"  
+//these all are actual "api functions"
 function toggleRelay(state, input){
   let relays = state.relays
     .map(function(relay,index){
@@ -92,12 +92,12 @@ function selectNodes(state, input){
 function selectFeeds(state, input){
   //if already there, remove
   //if not , add
-  
+
   const added   = difference(input,state.selectedFeeds)
-  //const removed = difference(state.selectedFeeds,input) 
+  //const removed = difference(state.selectedFeeds,input)
 
   function eqs(a,b){return a.node === b.node && a.feed === b.feed}
-  /*let selectedFeeds =  [].concat(input, state.selectedFeeds) 
+  /*let selectedFeeds =  [].concat(input, state.selectedFeeds)
   selectedFeeds = uniqBy(eqs,selectedFeeds)*/
   function findIdenticals(listA,listB){
     /*let arrays = [listA,listB]
@@ -150,7 +150,15 @@ function setFeedsData(state, input){
   return state
 }
 
-//ui 
+//node
+
+function addNode(state, input){
+  //console.log("add Node",input)
+  return state
+}
+
+
+//ui
 function toggleFeedsSelection(state, input){
   const feedsSelectionToggled = !state.feedsSelectionToggled
   const addItemsToggled = false //UGH , refactor
@@ -176,12 +184,12 @@ function searchFeeds(state, input){
     .map(f=>f.name)
   console.log("founds",founds)
 
-  return state 
-} 
+  return state
+}
 
 export default function model(actions){
 
-    const defaults = { 
+    const defaults = {
       state:{
         active:true,
 
@@ -218,8 +226,8 @@ export default function model(actions){
         ,future:[]
       }
     }
-    
-    /*list of "update functions", to be called based on mapping 
+
+    /*list of "update functions", to be called based on mapping
     between action names & update functions
     ie if you have an "action" called doFoo$, you should specify an function called doFoo(state,input)
     ie doFoo$ ---> function doFoo(state,input){}
@@ -234,6 +242,8 @@ export default function model(actions){
 
       ,setNodes
       ,selectNodes
+      ,addNode
+
       ,selectFeeds
       ,setFeedsData
       ,searchFeeds

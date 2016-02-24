@@ -1,6 +1,6 @@
 import Cycle from '@cycle/core'
 //import {h, h1, thunk, div, span, label, h4, input, hr, section, header, button, li, ul} from '@cycle/dom'
-import {h, h1, thunk, div, span, label, h4, input, hr, section, header, button, li, ul} from 'cycle-snabbdom'
+import {h, h1, thunk, div, span, label, h4, input, hr, section, header, button, li, ul, option, select} from 'cycle-snabbdom'
 
 import Rx from 'rx'
 const combineLatest = Rx.Observable.combineLatest
@@ -53,8 +53,6 @@ function renderFeedsSelector (state) {
       },false) // Is this node & feed combo selected
 
       let className = Class(".feed",{ ".selected": selected })
-      //console.log("foo",className)
-
       const entry = li(className,{attrs:{"data-node": node._id, "data-feed":feed.id}},[
           div('',feed.type),
           div('',`Node_${node._id}`)
@@ -80,25 +78,67 @@ function renderNodeEditor (state){
   const allNodes = state.nodes
     .map( node => {
       return li(node.name,[
-        button('Add sensor'), button('Delete')
+        button('Add sensor'),
+        button('Delete')
       ])
     })
 
   return section('#adder',[
     header([
       h1('Manage nodes/sensors'),
-      button('#addNode','Add')
+      button('#addNode','Add Node'),
+      renderAddNodeScreen(state)
     ]),
     header([
       h1('Nodes'),
-      ul([allNodes])
-    ]),
+      ul(allNodes)
+    ])
   ])
 }
 
 
 function renderAddNodeScreen(state){
+  const microcontrollers = [
+    'esp8266(Olimex MOD-WIFI-ESP8266-DEV)'
+  ]
+  const sensorModels = {
+    'BME280'  :'Adafruit_BME280'
+    , 'SI1145'  :'Adafruit_SI1145'
+  }
 
+  const sensorCaps = {
+    'BME280'  : ['temperature','humidity','baro']
+    , 'SI1145'  : ['v','uv','ir']
+  }
+
+  const microcontrollersList = microcontrollers
+    .map(m=>h('option.mc',{props:{value:m,selected:false}, attrs:{'data-foo': ""}},m))
+
+  const sensorModelsList = Object.keys(sensorModels)
+    .map(m=>h('option.sens',{props:{value:m}, attrs:{'data-foo': ""}},m))
+
+  return section('.addNode',[
+    h('h1', 'Devices'),
+      h('select.microcontroller',microcontrollersList),
+      h('button',{props:{type:'button'}},'select'),
+
+    h('h1','device infos'),
+      h('input.deviceName',{props:{type:'text',placeholder:'name'}}),
+      h('input.deviceUUID',{props:{type:'text',disabled:true}, placeholder:'UUID'}),
+
+    h('h1','wifi settings'),
+      h('input.wifiSSID',{props:{type:'text',placeholder:'ssid'}}),
+      h('input.wifiPass',{props:{type:'password',placeholder:'password'}}),
+
+    h('h1','Sensor Packages'),
+      h('select.sensorModel',sensorModelsList),
+      h('button#AddSensorPackageToNode',{props:{type:'button'}},'add'),
+
+    h('br'),
+
+    h('button#doAddNode',{props:{type:'submit'}},'finalize'),
+    h('button',{props:{type:'button',disabled:true}},'upload')
+  ])
 }
 
 export default function view(state$, graphsGroupVTree$){
