@@ -8,7 +8,7 @@ const combineLatest = Rx.Observable.combineLatest
 import Class from 'classnames'
 import {find,propEq,flatten} from 'ramda'
 
-import {combineLatestObj} from '../../utils'
+import {combineLatestObj} from '../../utils/utils'
 
 //import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from '../uiElements'
 
@@ -98,6 +98,7 @@ function renderNodeEditor (state){
 
 
 function renderAddNodeScreen(state){
+  console.log("state", state)
   const microcontrollers = [
     'esp8266(Olimex MOD-WIFI-ESP8266-DEV)'
   ]
@@ -136,8 +137,8 @@ function renderAddNodeScreen(state){
 
     h('br'),
 
-    h('button#doAddNode',{props:{type:'submit'}},'finalize'),
-    h('button',{props:{type:'button',disabled:true}},'upload')
+    h('button#doAddNode',{props:{type:'submit'}},'update'),
+    h('button',{props:{type:'button',disabled:true}},'upload')//only available if changed ?
   ])
 }
 

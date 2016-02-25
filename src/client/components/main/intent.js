@@ -1,4 +1,5 @@
-import {toArray,combineLatestObj} from '../../utils'
+import {toArray} from '../../utils/utils'
+import {combineLatestObj} from '../../utils/obsUtils'
 
 import Rx from 'rx'
 
@@ -94,14 +95,22 @@ export default function intent({DOM,socketIO}, other){
     return combineLatestObj( result )
   }
 
-  const addNode$ = DOM.select("#doAddNode")
+  const upsertNode$ = DOM.select("#doAddNode")
     .events('click')
     .withLatestFrom( selectMultiples(['.microcontroller','.sensorModel','.deviceName','.wifiSSID','.wifiPass']),(_,data)=>data )
     .tap(e=>console.log("adding Node",e))
 
-  const addSensorPackageToNode = DOM.select('#AddSensorPackageToNode')
+  const selectedSensorPackageToAdd$ = DOM.select('.sensorModel').observable
+    .filter(e=>e.length>0).map(e=>e[0])//get the first one if there is one
+    .map(e=>e.options[e.selectedIndex].text) //get current selection (initial value)
+    .merge(DOM.select('.sensorModel').events('change').map(e=>e.currentTarget.value))//combine with dynamic selection
+    //.tap(e=>console.log("sensorModel",e))
+
+  const addSensorToNode$ = DOM.select('#AddSensorPackageToNode')
     .events('click')
-    .forEach(e=>console.log("adding sensorPackage to Node",e))
+    .withLatestFrom( selectedSensorPackageToAdd$,(_,p)=>p )
+    .tap(e=>console.log("adding sensorPackage to Node",e))
+
 
   //feeds
   const selectFeeds$ = DOM.select(".feed")
@@ -149,7 +158,8 @@ export default function intent({DOM,socketIO}, other){
     ,startAddingNodes$
     ,selectNodes$
     ,setNodes$
-    ,addNode$
+    ,upsertNode$
+    ,addSensorToNode$
 
     ,selectFeeds$
     ,setFeedsData$

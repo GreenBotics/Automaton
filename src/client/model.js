@@ -5,7 +5,8 @@ var rxDom = require("rx-dom")
 const just = Rx.Observable.just
 
 import {makeModel, makeModifications} from './model/modelHelper'
-import {mergeData,combineLatestObj,slidingAccumulator} from './utils'
+import {mergeData} from './utils/utils'
+import {combineLatestObj,slidingAccumulator} from './utils/obsUtils'
 
 import {flatten,find,prop,difference,findIndex,equals,uniqBy,contains} from 'ramda'
 
@@ -152,8 +153,17 @@ function setFeedsData(state, input){
 
 //node
 
-function addNode(state, input){
+function upsertNode(state, input){
   //console.log("add Node",input)
+  return state
+}
+
+function addSensorToNode(state, input){
+  const _testNode = mergeData({}, state._testNode)
+  _testNode.sensors = _testNode.sensors.concat(input)
+
+  state = mergeData( state, {_testNode})
+  //state._testNodes[state.activeNode]
   return state
 }
 
@@ -208,6 +218,10 @@ export default function model(actions){
           {toggled:true,type:"temperature", name:"t0", recordMode:"continuous"}
           ,{toggled:false,type:"temperature", name:"t1", recordMode:"continuous"}
         ]
+
+        //testing
+        ,_testNode:{sensors:[]}
+
         ,nodes:[]
         ,feeds:[]
 
@@ -217,6 +231,7 @@ export default function model(actions){
         ,filteredFeeds:[]
 
         //ui state
+        ,activeNode:undefined
         ,feedsSelectionToggled:false
         ,addItemsToggled:false
       }
@@ -242,7 +257,8 @@ export default function model(actions){
 
       ,setNodes
       ,selectNodes
-      ,addNode
+      ,upsertNode
+      ,addSensorToNode
 
       ,selectFeeds
       ,setFeedsData
