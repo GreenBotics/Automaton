@@ -1,7 +1,7 @@
 import Rx from 'rx'
 import Immutable from 'seamless-immutable'
 
-import {mergeData} from '../utils'
+import {mergeData} from '../utils/utils'
 
 
 export function modelHelper(defaults,modFunction){
@@ -20,7 +20,7 @@ export function modelHelper(defaults,modFunction){
 }
 
 
-function logHistory(currentData, history){ 
+function logHistory(currentData, history){
   let past   = [currentData].concat(history.past)
   let future = []
 
@@ -50,12 +50,12 @@ export function makeModifications(actions, updateFns){
 
     //console.log("op",op,"opName",opName,"modFn",modFn)
     if(modFn){
-      return mod$ 
+      return mod$
     }
 
 
     //after this point, only undo/redo management
-    //TODO : how to make this better? 
+    //TODO : how to make this better?
     if(opName==="undo"){
       return actions.undo$
         .map((toggleInfo) => ({state,history}) => {
@@ -76,7 +76,7 @@ export function makeModifications(actions, updateFns){
           console.log("Redoing")
 
           let nState = history.future[0]
-          let past = [state].concat(history.past) 
+          let past = [state].concat(history.past)
           let future = history.future.slice(1)
 
           history = mergeData(history,{past,future})
@@ -84,7 +84,7 @@ export function makeModifications(actions, updateFns){
           return Immutable({state:nState,history})
         })
     }
-    
+
 
   })
   .filter(e=>e!==undefined)
@@ -111,7 +111,7 @@ export function makeModifications(actions, updateFns){
       console.log("Redoing")
 
       let nState = history.future[0]
-      let past = [state].concat(history.past) 
+      let past = [state].concat(history.past)
       let future = history.future.slice(1)
 
       history = mergeData(history,{past,future})
@@ -146,7 +146,7 @@ export function makeModificationsNoHistory(actions, updateFns){
 
     //console.log("op",op,"opName",opName,"modFn",modFn)
     if(modFn){
-      return mod$ 
+      return mod$
     }
   })
   .filter(e=>e!==undefined)
@@ -181,4 +181,3 @@ export function makeModelNoHistory(defaults, updateFns, actions){
     //.distinctUntilChanged()
     .shareReplay(1)
 }
-
