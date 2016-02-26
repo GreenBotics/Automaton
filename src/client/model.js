@@ -79,17 +79,6 @@ function toggleSensor(state, input){
 
 
 //////////////////
-
-function setNodes(state, input){
-  state = mergeData( state, {nodes:input})
-  return state
-}
-
-function selectNodes(state, input){
-  state = mergeData( state, {selectedNodes:input})
-  return state
-}
-
 function selectFeeds(state, input){
   //if already there, remove
   //if not , add
@@ -151,22 +140,7 @@ function setFeedsData(state, input){
   return state
 }
 
-//node
-
-function upsertNode(state, input){
-  //console.log("add Node",input)
-  return state
-}
-
-function addSensorToNode(state, input){
-  const _testNode = mergeData({}, state._testNode)
-  _testNode.sensors = _testNode.sensors.concat(input)
-
-  state = mergeData( state, {_testNode})
-  //state._testNodes[state.activeNode]
-  return state
-}
-
+//nodes
 
 //ui
 function toggleFeedsSelection(state, input){
@@ -255,10 +229,8 @@ export default function model(actions){
       removeAllRelays,
       toggleSensor
 
-      ,setNodes
-      ,selectNodes
-      ,upsertNode
-      ,addSensorToNode
+      //,setNodes
+      //,addSensorToNode
 
       ,selectFeeds
       ,setFeedsData

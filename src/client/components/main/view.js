@@ -11,7 +11,7 @@ import {find,propEq,flatten} from 'ramda'
 import {combineLatestObj} from '../../utils/utils'
 
 //import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from '../uiElements'
-
+/*
 function renderTopToolBar (state) {
   let feedsSelector = section('#feedsSelector',{style: {opacity: '0', transition: 'opacity 0.5s', remove: {opacity: '0'} } })
   if(state.feedsSelectionToggled){
@@ -140,57 +140,17 @@ function renderAddNodeScreen(state){
     h('button#doAddNode',{props:{type:'submit'}},'update'),
     h('button',{props:{type:'button',disabled:true}},'upload')//only available if changed ?
   ])
-}
+}*/
 
 export default function view(state$, graphsGroupVTree$){
 
   return state$
-    .map(m=>m.asMutable({deep: true})).pluck("state")
-    .map(state=>
-      div([
+    .tap(e=>console.log("state",e))
+    .map(state=> h('div'))
+      /*div([
         renderTopToolBar(state),
-      ])
-  )
+      ])*/
+  //)
 
-   //.map(m=>m.asMutable({deep: true}))//for seamless immutable
-    //.distinctUntilChanged()
-    //.shareReplay(1)
-  /*return combineLatest(state$.map(m=>m.asMutable({deep: true})).pluck("state"),graphsGroupVTree$,function(state,graphsGroup)
-    {
-      //console.log("FEEDS",state.feeds, state.nodes)
-      let sensorNodeList = state.nodes.map(function(node){
-        return <option value={node._id}>{node.name}</option>
-      })
-
-      const nameMappings = {
-        "windSpd":"wind speed"
-        ,"windDir":"wind direction"
-      }
-    })*/
-
-
-
-    /*.map((state)=>
-      <div>
-        <section id="overview">
-          <h1> System state: {state.active ? 'active' : 'inactive'} </h1>
-        </section>
-
-        <section id="relays">
-          <h1>Relays: </h1>
-          {renderRelays( state.relays )}
-        </section>
-
-        <section id="cooling">
-          <h1>Cooling </h1>
-          {renderCoolers( state.coolers )}
-        </section>
-
-        <section id="emergency">
-          <h1> Emergency shutdown </h1>
-          <button id="shutdown" disabled={!state.active}> shutdown </button>
-        </section>
-      </div>
-    )*/
 
 }

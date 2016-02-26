@@ -68,8 +68,11 @@ export default function intent({DOM,socketIO}, other){
     .map(false)
 
   //nodes
-  const setNodes$ = socketIO.get("initialData")
-    .map(e=>JSON.parse(e))
+  const setNodes$ = Rx.Observable.just('foo')
+    //socketIO.get("initialData")
+    //.map(e=>JSON.parse(e))
+
+  //socketIO.get("initialData").forEach(e=>console.log("getInitialData",e))
 
   const startAddingNodes$ = DOM.select("#addNode")
     .events('click')
@@ -95,7 +98,7 @@ export default function intent({DOM,socketIO}, other){
     return combineLatestObj( result )
   }
 
-  const upsertNode$ = DOM.select("#doAddNode")
+  const upsertNodes$ = DOM.select("#doAddNode")
     .events('click')
     .withLatestFrom( selectMultiples(['.microcontroller','.sensorModel','.deviceName','.wifiSSID','.wifiPass']),(_,data)=>data )
     .tap(e=>console.log("adding Node",e))
@@ -145,20 +148,22 @@ export default function intent({DOM,socketIO}, other){
 
 
   return {
-    toggleRelay$
+    /*toggleRelay$
     ,removeRelay$
     ,removeAllRelays$
 
     ,emergencyShutdown$
 
     ,setCoolerPower$
-    ,toggleSensor$
+    ,toggleSensor$*/
     //
 
-    ,startAddingNodes$
+    setNodes$
+    ,upsertNodes$
+
     ,selectNodes$
-    ,setNodes$
-    ,upsertNode$
+
+    /*,startAddingNodes$
     ,addSensorToNode$
 
     ,selectFeeds$
@@ -168,7 +173,7 @@ export default function intent({DOM,socketIO}, other){
 
     ,toggleAddItems$
 
-
     , undo$
-    , redo$}
+    , redo$*/
+  }
 }

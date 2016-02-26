@@ -2,14 +2,16 @@ import Rx from 'rx'
 const {just,merge}   = Rx.Observable
 
 import intent from './intent'
-import model from './model'
+//import model from './model'
 import view   from './view'
 
-import {GraphsGroupWrapper} from './wrappers'
+//import {GraphsGroupWrapper} from './wrappers'
 
 import {equals} from 'ramda'
 
 
+import nodes from '../../core/nodes'
+import {makeModel} from '../../utils/modelUtils'
 
 /*workflow to add new nodes
 
@@ -36,8 +38,7 @@ function socketIO(state$, actions){
     .selectFeeds$
     .map(e=>({messageType:'getFeedsData',message:e}))*/
   const getFeedsData$ = state$
-    .pluck("state")
-    .pluck("selectedFeeds")
+    .pluck("state","selectedFeeds")
     //.map(e=>JSON.stringify(e))
     .distinctUntilChanged(null,equals)
     .map(e=>({messageType:'getFeedsData',message:e}))
@@ -55,18 +56,16 @@ function socketIO(state$, actions){
       getFeedsData$
     )
     .startWith({messageType:"initialData"})
+  //  .tap(e=>console.log("output to socketIO",e))
 
-  outgoingMessages$
-    .forEach(e=>console.log("output to socketIO",e))
-
-  return outgoingMessages$
+  return Rx.Observable.never()//outgoingMessages$
 }
 
 export default function main(drivers) {
   let DOM      = drivers.DOM
 
   const actions = intent(drivers)
-  let state$  = model(actions)
+  let state$    = nodes(actions)
 
   //create visual elements
   //const GraphGroup = GraphsGroupWrapper(state$, DOM)
@@ -75,7 +74,7 @@ export default function main(drivers) {
   const sIO$    = socketIO(state$, actions)
 
   return {
-      DOM: vtree$
+    DOM: vtree$
     , socketIO: sIO$
   }
 }

@@ -1,6 +1,6 @@
 import Rx from 'rx'
 let Observable = Rx.Observable
-let {merge,just, fromEvent} = Rx.Observable.merge
+let {merge, just, fromEvent} = Rx.Observable
 
 import Immutable from 'seamless-immutable'
 import assign from 'fast.js/object/assign'//faster object.assign
@@ -12,6 +12,18 @@ export function mergeData(currentData, ...inputs){
     return currentData.merge(inputs)
   }
   return assign({}, currentData, ...inputs)
+}
+
+export function makeActionsFromApiFns(apiFns){
+
+  const actions = Object.keys(apiFns)
+    .reduce(function(prev,cur){
+      let key = cur+'$'
+      prev[key] = new Rx.Subject()
+      return prev
+    },{})
+
+   return actions
 }
 
 //need to make sure source data structure is right
@@ -77,7 +89,7 @@ export function makeModifications(actions, updateFns, options){
 
 
   let mods$ =  Object.keys(actions).map(function(key){
-    //console.log("actions in makeModifications",key)
+    console.log("actions in makeModifications",key,"updateFns",updateFns)
     let op     = actions[key]
     let opName = key.replace(/\$/g, "")
     let modFn  = updateFns[opName]
@@ -104,7 +116,6 @@ export function makeModifications(actions, updateFns, options){
           if(options.history){
             state = {state ,history}
           }
-
 
           if(options.doApplyTransform)//if we need to coerce data  to immutable etc
           {
