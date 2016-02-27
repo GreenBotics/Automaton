@@ -89,7 +89,7 @@ export function makeModifications(actions, updateFns, options){
 
 
   let mods$ =  Object.keys(actions).map(function(key){
-    console.log("actions in makeModifications",key,"updateFns",updateFns)
+    //console.log("actions in makeModifications",key,"updateFns",updateFns)
     let op     = actions[key]
     let opName = key.replace(/\$/g, "")
     let modFn  = updateFns[opName]
@@ -151,10 +151,13 @@ export function makeModifications(actions, updateFns, options){
    * where s2 = fn2(s1)
    */
 export function smartStateFold(prev, curr) {
+  //console.log("prev",prev,"cur",curr)
     if (typeof curr === 'function') {
       return curr(prev)
-    } else {
+    } else if(typeof curr === 'function'){
       return prev(curr)
+    }else{
+      return prev
     }
   }
 
@@ -162,7 +165,9 @@ export function smartStateFold(prev, curr) {
 export function makeModel(defaults, updateFns, actions, source, options={doApplyTransform:false} ){
   let mods$ =  makeModifications(actions, updateFns, options)
 
+  //console.log("defaults",defaults)
   let source$ = source || just( defaults)
+  //  .tap(e=>console.log("source",e))
 
   source$ = applyDefaults(source$, defaults)
 
@@ -172,8 +177,7 @@ export function makeModel(defaults, updateFns, actions, source, options={doApply
 
   return mods$
     .merge(source$)
-    .scan(smartStateFold)//combine existing data with new one
-    //.scan((currentData, modFn) => modFn(currentData))//combine existing data with new one
+    .scan(smartStateFold, defaults)//combine existing data with new one
     //.distinctUntilChanged()
     .shareReplay(1)
 }
