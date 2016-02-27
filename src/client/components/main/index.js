@@ -62,10 +62,12 @@ function socketIO(state$, actions){
   return outgoingMessages$
 }
 
-export default function main(drivers) {
-  let DOM      = drivers.DOM
+export default function main(sources) {
 
-  const actions = intent(drivers)
+  //const actions = actionsFromSources(sources, path.resolve(__dirname,'./actions')+'/' )
+  let DOM      = sources.DOM
+
+  const actions = intent(sources)
 
   const state$ = model(actions)
 
