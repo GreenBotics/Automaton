@@ -1,18 +1,9 @@
 import Rx from 'rx'
 let Observable = Rx.Observable
 let {merge, just, fromEvent} = Rx.Observable
+import {mergeData} from './utils'
 
 import Immutable from 'seamless-immutable'
-import assign from 'fast.js/object/assign'//faster object.assign
-
-//TODO: this needs to be an external lib, for re-use
-//merge the current data with any number of input data
-export function mergeData(currentData, ...inputs){
-  if("merge" in currentData){
-    return currentData.merge(inputs)
-  }
-  return assign({}, currentData, ...inputs)
-}
 
 export function makeActionsFromApiFns(apiFns){
 

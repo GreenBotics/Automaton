@@ -1,3 +1,4 @@
+import assign from 'fast.js/object/assign'//faster object.assign
 
 /*converts input data to array if it is not already an array*/
 export function toArray(data){
@@ -7,11 +8,13 @@ export function toArray(data){
 }
 
 //merge the current data with any number of input data
-export function mergeData(currentData,inputs){
+//TODO: this needs to be an external lib, for re-use
+//merge the current data with any number of input data
+export function mergeData(currentData, ...inputs){
   if("merge" in currentData){
     return currentData.merge(inputs)
   }
-  return Object.assign(currentData,inputs)
+  return assign({}, currentData, ...inputs)
 }
 
 export function findIdenticals(equals, listA, listB){
