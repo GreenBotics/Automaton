@@ -1,14 +1,17 @@
 import Rx from 'rx'
 const {merge} = Rx.Observable
 import {makeModel, mergeData} from '../../utils/modelUtils'
+import {combineLatestObj} from '../../utils/obsUtils'
 
 
 function setNodes(state, input){
   state = state.concat(input.data)
+  console.log("set nodes: state:",state,"input:", input)
   return state
 }
 
 function upsertNodes(state, input){
+  console.log("upsert nodes",state, input)
   const index = state.indexOf(input.id)
   return [
         ...state.slice(0, index),
@@ -20,10 +23,9 @@ function upsertNodes(state, input){
 }
 
 //sensor nodes model
-export function data(actions){
-    const updateFns  = {setNodes, upsertNodes}
-    const defaults   = []
-    return makeModel(defaults, updateFns, actions)
+export function nodesData(state=[], actions){
+  const updateFns  = {setNodes, upsertNodes}
+  return makeModel(state, updateFns, actions)
 }
 
 //node selections
@@ -32,32 +34,16 @@ function selectNodes(state, input){
   return state
 }
 
-export function selections(actions){
+//selections "model"
+export function nodesSelections(state=[], actions){
   const updateFns = {selectNodes}
-  const defaults  = []
-  return makeModel(defaults, updateFns, actions)
+  return makeModel([], updateFns, actions)
 }
 
 //node wrappers
-
 export default function nodes(actions){
-
-  const selections$ = merge(
-    actions.selectNodes$
-  )
-
-  const data$ = merge(
-    actions.upsertNodes$
-    ,actions.setNodes$
-  )
-  actions = {selections$, data$}
-
-  const updateFns = {selections, data}
-
-  const defaults = {
-    selections: []
-    ,nodes    : []
-  }
-
-  return makeModel(defaults, updateFns, actions)
+  return combineLatestObj({
+    selections: nodesSelections([], actions)
+    ,data    : nodesData(      [], actions)
+  }).shareReplay(1)
 }
