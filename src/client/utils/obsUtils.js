@@ -20,7 +20,6 @@ export function combineLatestObj(obj) {
   })
 }
 
-
 export function slidingAccumulator(data$, maxItems=10){
 
   let subject$ = new Rx.Subject()
