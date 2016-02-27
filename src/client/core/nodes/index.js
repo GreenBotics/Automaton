@@ -1,7 +1,8 @@
 import Rx from 'rx'
 const {merge} = Rx.Observable
-import {makeModel, mergeData} from '../../utils/modelUtils'
+import {makeModel} from '../../utils/modelUtils'
 import {combineLatestObj} from '../../utils/obsUtils'
+import {mergeData, findIdenticals} from '../../utils/utils'
 
 
 function setNodes(state, input){
