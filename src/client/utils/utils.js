@@ -13,3 +13,16 @@ export function mergeData(currentData,inputs){
   }
   return Object.assign(currentData,inputs)
 }
+
+export function findIdenticals(equals, listA, listB){
+  const result = listA.filter(function(a){
+    for(let i=0;i<listB.length;i++){
+      let b = listB[i]
+      if(equals(a,b)){
+        return true
+      }
+    }
+    return false
+  })
+  return result
+}
