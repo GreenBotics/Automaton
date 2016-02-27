@@ -11,16 +11,16 @@ import {find,propEq,flatten} from 'ramda'
 import {combineLatestObj} from '../../utils/utils'
 
 //import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from '../uiElements'
-/*
+
 function renderTopToolBar (state) {
   let feedsSelector = section('#feedsSelector',{style: {opacity: '0', transition: 'opacity 0.5s', remove: {opacity: '0'} } })
-  if(state.feedsSelectionToggled){
+  if(state.ui.feedsSelectionToggled){
     feedsSelector = renderFeedsSelector(state)
   }
 
   ////
   let adder = undefined
-  if(state.addItemsToggled){
+  if(state.ui.addItemsToggled){
     adder = renderNodeEditor(state)
   }
 
@@ -42,13 +42,13 @@ function renderTopToolBar (state) {
 
 
 function renderFeedsSelector (state) {
-  //console.log("state",state)
-  const allFeeds = state.nodes.map(function(node){
+  console.log("state",state)
+  const allFeeds = state.nodes.data.map(function(node){
     return node.sensors.map(function(feed){
       //const attributes = attributes={{"data-name": row.name, "data-id":row.id}} key={row.id}
       const key = `${node._id}${feed.id}`
 
-      const selected = state.selectedFeeds.reduce(function(acc,cur){
+      const selected = state.feeds.selections.reduce(function(acc,cur){
         return acc || (cur.node === node._id && cur.feed === feed.id)
       },false) // Is this node & feed combo selected
 
@@ -75,7 +75,7 @@ function renderFeedsSelector (state) {
 
 
 function renderNodeEditor (state){
-  const allNodes = state.nodes
+  const allNodes = state.nodes.data
     .map( node => {
       return li(node.name,[
         button('Add sensor'),
@@ -140,17 +140,12 @@ function renderAddNodeScreen(state){
     h('button#doAddNode',{props:{type:'submit'}},'update'),
     h('button',{props:{type:'button',disabled:true}},'upload')//only available if changed ?
   ])
-}*/
+}
 
 export default function view(state$, graphsGroupVTree$){
 
   return state$
     .tap(e=>console.log("state",e))
-    .map(state=> h('div'))
-      /*div([
-        renderTopToolBar(state),
-      ])*/
-  //)
-
+    .map(state=> h('div',[renderTopToolBar(state)]))
 
 }

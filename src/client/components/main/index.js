@@ -10,8 +10,9 @@ import view   from './view'
 import {equals} from 'ramda'
 
 
-import nodes from '../../core/nodes'
+import model from '../../model'
 import {makeModel} from '../../utils/modelUtils'
+import {combineLatestObj} from '../../utils/obsUtils'
 
 /*workflow to add new nodes
 
@@ -58,14 +59,15 @@ function socketIO(state$, actions){
     .startWith({messageType:"initialData"})
   //  .tap(e=>console.log("output to socketIO",e))
 
-  return Rx.Observable.never()//outgoingMessages$
+  return outgoingMessages$
 }
 
 export default function main(drivers) {
   let DOM      = drivers.DOM
 
   const actions = intent(drivers)
-  let state$    = nodes(actions)
+
+  const state$ = model(actions)
 
   //create visual elements
   //const GraphGroup = GraphsGroupWrapper(state$, DOM)
