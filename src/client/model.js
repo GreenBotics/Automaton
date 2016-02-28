@@ -21,19 +21,22 @@ function toggleAddItems(state, input){
   return state
 }
 
-function toggleAddNode(state, input){
+function toggleUpsertNode(state, input){
+  console.log("toggleUpsertNode",input)
   const addNodeToggled = !state.addNodeToggled
-  state = mergeData( state, {addNodeToggled})
+  const editedNode = addNodeToggled?input.id:undefined
+
+  state = mergeData( state, {addNodeToggled, editedNode})
   return state
 }
 
-function cancelAddNode(state, input){
+function cancelUpsertNode(state, input){
   const addNodeToggled = false
   state = mergeData( state, {addNodeToggled})
   return state
 }
 
-function confirmAddNode(state, input){
+function confirmUpsertNode(state, input){
   const addNodeToggled = false
   state = mergeData( state, {addNodeToggled})
   return state
@@ -41,8 +44,8 @@ function confirmAddNode(state, input){
 
 //selections "model"
 export function ui(actions){
-  const updateFns = {toggleFeedsSelection, toggleAddItems, toggleAddNode, cancelAddNode, confirmAddNode}
-  return makeModel({addItemsToggled:false, feedsSelectionToggled:false, addNodeToggled:false}, updateFns, actions)
+  const updateFns = {toggleFeedsSelection, toggleAddItems, toggleUpsertNode, cancelUpsertNode, confirmUpsertNode}
+  return makeModel({addItemsToggled:false, feedsSelectionToggled:false, addNodeToggled:false, editedNode:undefined}, updateFns, actions)
 }
 
 export default function model({actions, sources}){

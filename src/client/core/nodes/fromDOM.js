@@ -1,3 +1,5 @@
+import Rx from 'rx'
+const {merge} = Rx.Observable
 import {toArray, generateUUID} from '../../utils/utils'
 import {combineLatestObj} from '../../utils/obsUtils'
 
@@ -22,7 +24,7 @@ export default function actions(DOM){
     .events('change')
     .map(e=>parseInt(e.target.value))
 
-  const upsertNodes$ = DOM.select("#confirmAddNode")
+  const upsertNodes$ = DOM.select("#confirmUpsertNode")
     .events('click')
     .withLatestFrom( selectMultiples(DOM, ['.microcontroller','.sensorModel','.deviceName','.wifiSSID','.wifiPass']),(_,data)=>data )
     .map(function(data){
@@ -40,7 +42,6 @@ export default function actions(DOM){
 
   const removeNodes$ = DOM.select(".removeNodes")
     .events('click')
-    //.tap(e=>console.log("removeNodes",))
     .map(e=>({id:e.target.dataset.node}))
 
   /*const startAddingNodes$ = DOM.select("#addNode")
@@ -59,21 +60,24 @@ export default function actions(DOM){
     .tap(e=>console.log("adding sensorPackage to Node",e))
 
   //UI
-  const toggleAddNode$ = DOM.select('.addNode')
+  const toggleUpsertNode$ = merge(
+    DOM.select('.addNode').events('click').map(e=>({id:undefined}))
+    ,DOM.select('.editNodes').events('click').map(e=>({id:e.target.dataset.node}))
+  )
+
+  const cancelUpsertNode$ = DOM.select('#cancelUpsertNode')
     .events('click')
 
-  const cancelAddNode$ = DOM.select('#cancelAddNode')
-    .events('click')
-
-  const confirmAddNode$ = upsertNodes$
+  const confirmUpsertNode$ = upsertNodes$
 
   return {
     selectNodes$
     ,upsertNodes$
     ,removeNodes$
 
-    ,toggleAddNode$
-    ,cancelAddNode$
-    ,confirmAddNode$
+    ,toggleUpsertNode$
+    ,cancelUpsertNode$
+    ,confirmUpsertNode$
+
   }
 }
