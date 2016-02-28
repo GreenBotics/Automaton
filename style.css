@@ -399,3 +399,14 @@ select{
     font-family: 'Open Sans Condensed';
     background: white;
 }
+
+li.nodeEntry{
+  display:flex;
+  background: white;
+  padding: 10px;
+  margin: 10px;
+}
+
+li.nodeEntry .title{
+  flex-grow: 1;
+}

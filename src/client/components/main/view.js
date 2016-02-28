@@ -1,16 +1,12 @@
 import Cycle from '@cycle/core'
 //import {h, h1, thunk, div, span, label, h4, input, hr, section, header, button, li, ul} from '@cycle/dom'
 import {h, h1, thunk, div, span, label, h4, input, hr, section, header, button, li, ul, option, select} from 'cycle-snabbdom'
-
-import Rx from 'rx'
-const combineLatest = Rx.Observable.combineLatest
-
 import Class from 'classnames'
-import {find,propEq,flatten} from 'ramda'
+import Rx from 'rx'
+const {combineLatest} = Rx.Observable
+import {findIndex, find,propEq,flatten} from 'ramda'
+import {combineLatestObj, generateUUID} from '../../utils/utils'
 
-import {combineLatestObj} from '../../utils/utils'
-
-//import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from '../uiElements'
 
 function renderTopToolBar (state) {
   let feedsSelector = section('#feedsSelector',{style: {opacity: '0', transition: 'opacity 0.5s', remove: {opacity: '0'} } })
@@ -28,11 +24,11 @@ function renderTopToolBar (state) {
       h('button#addItems','Manage items'),
       h('button#feedsSelect','Select feeds'),
 
-      span('','Start', [ ] ),
+      h('span','Start'),
         input('.slider', {attrs:{type: 'range', min: 0, max: 100, value: 25} }),
-      span('','End'),
+      h('span','End' ),
         input('.slider', {attrs:{type: 'range', min: 0, max: 100, value: 75}}),
-      span('','RealTime'),
+      h('span','RealTime'),
         input('#realTimeStream.slider', {attrs:{type: 'checkbox'}}),
 
       feedsSelector,
@@ -53,8 +49,8 @@ function renderFeedsSelector (state) {
 
       let className = Class(".feed",{ ".selected": selected })
       const entry = li(className,{attrs:{"data-node": node._id, "data-feed":feed.id}},[
-          div('',feed.type),
-          div('',`Node_${node._id}`)
+          h('div',feed.type),
+          h('div',`Node_${node._id}`)
         ])
       return entry
     })
@@ -72,35 +68,40 @@ function renderFeedsSelector (state) {
     ])
 }
 
+/// nodes
 function renderNodeEditor (state){
   const allNodes = state.nodes.data
     .map( node => {
-      return h('li',[
-        h('div',[
-          h('span',node.name||''),
-          h('button.removeNodes',{attrs:{'data-node': node.uid}},'Delete')
-        ]),
-        h('button.addSensorToNode','Add sensor'),
+      return h('li.nodeEntry',[
+        h('span.title',node.name||''),
+        h('button.editNodes',{attrs:{'data-node': node.uid}},'Edit'),
+        h('button.removeNodes',{attrs:{'data-node': node.uid}},'Delete'),
       ])
     })
 
-
-
-  const nodeAdder = state.ui.addNodeToggled?renderAddNodeScreen(state):h('div',[ul(allNodes),button('.addNode','Add Node')])
+  const nodeList = h('div',{style: {opacity: '1', transition: 'opacity 0.5s', remove: {opacity: '0'} }} ,[
+    h('button.addNode','Add Node'),
+    ul(allNodes)
+  ])
+  const nodeAdder = state.ui.addNodeToggled?renderAddNodeScreen(state):nodeList
 
   return section('#adder',[
-    header([
-      h1('Manage nodes/sensors'),
+    h('header',[
+      h('h1','Manage nodes/sensors'),
     ]),
-    header([
+    h('header',[
       nodeAdder,
     ])
   ])
 }
 
-
 function renderAddNodeScreen(state){
-  console.log("state", state)
+  const activeNode = find(propEq('uid', state.ui.editedNode))(state.nodes.data) || {
+    name:undefined,
+    uid:generateUUID(),
+    sensors:[]
+  }
+
   const microcontrollers = [
     'esp8266(Olimex MOD-WIFI-ESP8266-DEV)'
   ]
@@ -120,14 +121,14 @@ function renderAddNodeScreen(state){
   const sensorModelsList = Object.keys(sensorModels)
     .map(m=>h('option.sens',{props:{value:m}, attrs:{'data-foo': ""}},m))
 
-  return section('.addNodeForm',[
+  return section('.addNodeForm',{style: {transition: 'opacity 0.2s', delayed:{opacity:'1'}, remove: {opacity: '0'}}},[
     h('h1', 'Devices'),
       h('select.microcontroller',microcontrollersList),
       h('button',{props:{type:'button'}},'select'),
 
     h('h1','device infos'),
-      h('input.deviceName',{props:{type:'text',placeholder:'name'}}),
-      h('input.deviceUUID',{props:{type:'text',disabled:true}, placeholder:'UUID'}),
+      h('input.deviceName',{props:{type:'text',placeholder:'name',value:activeNode.name}}),
+      h('input.deviceUUID',{props:{type:'text',disabled:true, placeholder:'UUID',value:activeNode.uid}}),
 
     h('h1','wifi settings'),
       h('input.wifiSSID',{props:{type:'text',placeholder:'ssid'}}),
@@ -139,16 +140,14 @@ function renderAddNodeScreen(state){
 
     h('br'),
 
-    h('button#confirmAddNode','update'),
+    h('button#confirmUpsertNode','update'),
     h('button',{props:{type:'button',disabled:true}},'upload'),//only available if changed ?
-    h('button#cancelAddNode','cancel'),
+    h('button#cancelUpsertNode','cancel'),
   ])
 }
 
 export default function view(state$, graphsGroupVTree$){
-
   return state$
     .tap(e=>console.log("state",e))
     .map(state=> h('div',[renderTopToolBar(state)]))
-
 }
