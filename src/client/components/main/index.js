@@ -14,26 +14,9 @@ import model from '../../model'
 import {makeModel} from '../../utils/modelUtils'
 import {combineLatestObj} from '../../utils/obsUtils'
 
-/*workflow to add new nodes
-
-- select microcontroller (UI)
-  esp8266 only for now (UI)
-- select sensors attached to node (UI)
- -> select sub sensors if not all are needed ? (for 'multi sensor' boards) (UI)
-
-- create uuid
-- write wifi config (master node)
-  -> setups static ip etc ?
-
-- upload firmware => not trivial
-  -> give feedback on compile/ upload
-  -> encapsulate avrdude + extras
-  -> see https://github.com/AdamMagaluk/leo or more generally https://www.npmjs.com/browse/keyword/gcc?offset=0
-*/
 
 function socketIO(state$, actions){
   const stream$ = state$ //anytime our model changes , dispatch it via socket.io
-
 
   /*const getFeedsData$ = actions
     .selectFeeds$
@@ -68,8 +51,7 @@ export default function main(sources) {
   let DOM      = sources.DOM
 
   const actions = intent(sources)
-
-  const state$ = model(actions)
+  const state$ = model({actions, sources})
 
   //create visual elements
   //const GraphGroup = GraphsGroupWrapper(state$, DOM)

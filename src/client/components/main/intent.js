@@ -4,7 +4,7 @@ import {mergeActionsByName} from '../../utils/actionUtils'
 
 export default function intent({DOM,socketIO}, other){
 
-  //ugh
+  //ugh, refactor
   const feedActionsFromDOM = require('../../core/feeds/fromDOM').default(DOM)
   const feedActionsFromSIO = require('../../core/feeds/fromSocketIO').default(socketIO)
 

@@ -13,7 +13,7 @@ import {combineLatestObj} from '../../utils/utils'
 //import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from '../uiElements'
 
 function renderTopToolBar (state) {
-  let feedsSelector = section('#feedsSelector')//,{style: {opacity: '0', transition: 'opacity 0.5s', remove: {opacity: '0'} } })
+  let feedsSelector = section('#feedsSelector',{style: {opacity: '0', transition: 'opacity 0.5s', remove: {opacity: '0'} } })
   if(state.ui.feedsSelectionToggled){
     feedsSelector = renderFeedsSelector(state)
   }
@@ -40,7 +40,6 @@ function renderTopToolBar (state) {
     ])
 }
 
-
 function renderFeedsSelector (state) {
   console.log("state",state)
   const allFeeds = state.nodes.data.map(function(node){
@@ -61,7 +60,7 @@ function renderFeedsSelector (state) {
     })
   })
 
-  return section('#feedsSelector',//,{style: {transition: 'opacity 0.5s', delayed:{opacity:'1'}} },
+  return section('#feedsSelector',{style: {transition: 'opacity 0.5s', delayed:{opacity:'1'}} },
     [
       header([
         h1('Select feeds'),
@@ -76,22 +75,25 @@ function renderFeedsSelector (state) {
 function renderNodeEditor (state){
   const allNodes = state.nodes.data
     .map( node => {
-      return li(node.name||'',[
-        button('Add sensor'),
-        button('Delete')
+      return h('li',[
+        h('div',[
+          h('span',node.name||''),
+          h('button.removeNodes',{attrs:{'data-node': node.uid}},'Delete')
+        ]),
+        h('button.addSensorToNode','Add sensor'),
       ])
     })
-  console.log("nodes",allNodes)
+
+
+
+  const nodeAdder = state.ui.addNodeToggled?renderAddNodeScreen(state):h('div',[ul(allNodes),button('.addNode','Add Node')])
 
   return section('#adder',[
     header([
       h1('Manage nodes/sensors'),
-      button('#addNode','Add Node'),
-      renderAddNodeScreen(state)
     ]),
     header([
-      h1('Nodes'),
-      ul(allNodes)
+      nodeAdder,
     ])
   ])
 }
@@ -118,7 +120,7 @@ function renderAddNodeScreen(state){
   const sensorModelsList = Object.keys(sensorModels)
     .map(m=>h('option.sens',{props:{value:m}, attrs:{'data-foo': ""}},m))
 
-  return section('.addNode',[
+  return section('.addNodeForm',[
     h('h1', 'Devices'),
       h('select.microcontroller',microcontrollersList),
       h('button',{props:{type:'button'}},'select'),
@@ -137,8 +139,9 @@ function renderAddNodeScreen(state){
 
     h('br'),
 
-    h('button#doAddNode',{props:{type:'submit'}},'update'),
-    h('button',{props:{type:'button',disabled:true}},'upload')//only available if changed ?
+    h('button#confirmAddNode','update'),
+    h('button',{props:{type:'button',disabled:true}},'upload'),//only available if changed ?
+    h('button#cancelAddNode','cancel'),
   ])
 }
 

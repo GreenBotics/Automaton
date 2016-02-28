@@ -21,13 +21,31 @@ function toggleAddItems(state, input){
   return state
 }
 
-//selections "model"
-export function ui(actions){
-  const updateFns = {toggleFeedsSelection, toggleAddItems}
-  return makeModel({addItemsToggled:false, feedsSelectionToggled:false}, updateFns, actions)
+function toggleAddNode(state, input){
+  const addNodeToggled = !state.addNodeToggled
+  state = mergeData( state, {addNodeToggled})
+  return state
 }
 
-export default function model(actions){
+function cancelAddNode(state, input){
+  const addNodeToggled = false
+  state = mergeData( state, {addNodeToggled})
+  return state
+}
+
+function confirmAddNode(state, input){
+  const addNodeToggled = false
+  state = mergeData( state, {addNodeToggled})
+  return state
+}
+
+//selections "model"
+export function ui(actions){
+  const updateFns = {toggleFeedsSelection, toggleAddItems, toggleAddNode, cancelAddNode, confirmAddNode}
+  return makeModel({addItemsToggled:false, feedsSelectionToggled:false, addNodeToggled:false}, updateFns, actions)
+}
+
+export default function model({actions, sources}){
 
   return combineLatestObj({
     nodes   :nodes(actions)
