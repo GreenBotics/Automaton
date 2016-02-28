@@ -13,7 +13,7 @@ import {combineLatestObj} from '../../utils/utils'
 //import {renderRelays, renderCoolers, renderSensors, renderHistory, renderSensorData} from '../uiElements'
 
 function renderTopToolBar (state) {
-  let feedsSelector = section('#feedsSelector',{style: {opacity: '0', transition: 'opacity 0.5s', remove: {opacity: '0'} } })
+  let feedsSelector = section('#feedsSelector')//,{style: {opacity: '0', transition: 'opacity 0.5s', remove: {opacity: '0'} } })
   if(state.ui.feedsSelectionToggled){
     feedsSelector = renderFeedsSelector(state)
   }
@@ -61,7 +61,7 @@ function renderFeedsSelector (state) {
     })
   })
 
-  return section('#feedsSelector',{style: {transition: 'opacity 0.5s', delayed:{opacity:'1'}} },
+  return section('#feedsSelector',//,{style: {transition: 'opacity 0.5s', delayed:{opacity:'1'}} },
     [
       header([
         h1('Select feeds'),
@@ -76,11 +76,12 @@ function renderFeedsSelector (state) {
 function renderNodeEditor (state){
   const allNodes = state.nodes.data
     .map( node => {
-      return li(node.name,[
+      return li(node.name||'',[
         button('Add sensor'),
         button('Delete')
       ])
     })
+  console.log("nodes",allNodes)
 
   return section('#adder',[
     header([
