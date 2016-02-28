@@ -25,8 +25,8 @@ function renderTopToolBar (state) {
   }
 
   return section('#topToolbar',[
-      button('#addItems','Manage items'),
-      button('#feedsSelect','Select feeds'),
+      h('button#addItems','Manage items'),
+      h('button#feedsSelect','Select feeds'),
 
       span('','Start', [ ] ),
         input('.slider', {attrs:{type: 'range', min: 0, max: 100, value: 25} }),
@@ -72,7 +72,6 @@ function renderFeedsSelector (state) {
       ])
     ])
 }
-
 
 function renderNodeEditor (state){
   const allNodes = state.nodes.data
