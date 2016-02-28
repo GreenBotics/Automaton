@@ -5,7 +5,7 @@ const merge = Object.assign.bind(null,{})
 export function mergeActionsByName(actionSources, validActions=[]){
 
   return actionSources.reduce(function(result, actions){
-    console.log("acions",Object.keys(actions),validActions)
+    //console.log("acions",Object.keys(actions),validActions)
     Object.keys(actions)
       .filter(key=> validActions.length === 0 || validActions.indexOf(key.replace('$',''))>-1)
       .map(function(key){
