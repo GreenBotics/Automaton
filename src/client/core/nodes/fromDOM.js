@@ -1,4 +1,4 @@
-import {toArray} from '../../utils/utils'
+import {toArray, generateUUID} from '../../utils/utils'
 import {combineLatestObj} from '../../utils/obsUtils'
 
 function selectMultiples(DOM, selectors, events=[]){
@@ -25,7 +25,18 @@ export default function actions(DOM){
   const upsertNodes$ = DOM.select("#doAddNode")
     .events('click')
     .withLatestFrom( selectMultiples(DOM, ['.microcontroller','.sensorModel','.deviceName','.wifiSSID','.wifiPass']),(_,data)=>data )
+    .map(function(data){
+      const outData = {
+        name:data.deviceName
+        ,uid:generateUUID()
+        ,microcontroller:data.microcontroller
+        ,sensors:[]
+        ,uri:undefined
+      }
+      return {data:outData,id:-1}
+    })
     .tap(e=>console.log("adding Node",e))
+
 
   /*const startAddingNodes$ = DOM.select("#addNode")
     .events('click')

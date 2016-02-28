@@ -14,13 +14,16 @@ function setNodes(state, input){
 function upsertNodes(state, input){
   console.log("upsert nodes",state, input)
   const index = state.indexOf(input.id)
-  return [
-        ...state.slice(0, index),
-        mergeData(state[index], {
-          foo: 'bar'
-        }),
-        ...state.slice(index + 1)
-      ]
+  if(index === -1){
+    return state.concat(input.data)
+  }
+  else{
+    return [
+          ...state.slice(0, index),
+          mergeData(state[index], input.data),
+          ...state.slice(index + 1)
+        ]
+  }
 }
 
 //sensor nodes model
