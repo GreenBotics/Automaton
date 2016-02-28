@@ -5,6 +5,7 @@ export default function actions(socketIO){
     socketIO.get("initialData")
     .map(e=>JSON.parse(e))
     .map(data=>({data}))
+    .tap(e=>console.log("initialData",e))
 
   return {
     setNodes$

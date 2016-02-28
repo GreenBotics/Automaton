@@ -22,7 +22,7 @@ export default function actions(DOM){
     .events('change')
     .map(e=>parseInt(e.target.value))
 
-  const upsertNodes$ = DOM.select("#doAddNode")
+  const upsertNodes$ = DOM.select("#confirmAddNode")
     .events('click')
     .withLatestFrom( selectMultiples(DOM, ['.microcontroller','.sensorModel','.deviceName','.wifiSSID','.wifiPass']),(_,data)=>data )
     .map(function(data){
@@ -36,11 +36,16 @@ export default function actions(DOM){
       return {data:outData,id:-1}
     })
     .tap(e=>console.log("adding Node",e))
+    .share()
 
+  const removeNodes$ = DOM.select(".removeNodes")
+    .events('click')
+    //.tap(e=>console.log("removeNodes",))
+    .map(e=>({id:e.target.dataset.node}))
 
   /*const startAddingNodes$ = DOM.select("#addNode")
     .events('click')
-    .map(true)
+    .map(true)*/
 
   const selectedSensorPackageToAdd$ = DOM.select('.sensorModel').observable
     .filter(e=>e.length>0).map(e=>e[0])//get the first one if there is one
@@ -51,10 +56,24 @@ export default function actions(DOM){
   const addSensorToNode$ = DOM.select('#AddSensorPackageToNode')
     .events('click')
     .withLatestFrom( selectedSensorPackageToAdd$,(_,p)=>p )
-    .tap(e=>console.log("adding sensorPackage to Node",e))*/
+    .tap(e=>console.log("adding sensorPackage to Node",e))
+
+  //UI
+  const toggleAddNode$ = DOM.select('.addNode')
+    .events('click')
+
+  const cancelAddNode$ = DOM.select('#cancelAddNode')
+    .events('click')
+
+  const confirmAddNode$ = upsertNodes$
 
   return {
     selectNodes$
     ,upsertNodes$
+    ,removeNodes$
+
+    ,toggleAddNode$
+    ,cancelAddNode$
+    ,confirmAddNode$
   }
 }
