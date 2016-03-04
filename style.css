@@ -297,7 +297,7 @@ input[type=range]:focus::-ms-fill-upper {
   position: absolute;
   height: 90%;
   width: 400px;
-  background: #615E5E;
+  background: white;/*#615E5E;*/
   z-index: 1;
   border: 1px solid white;
 }
@@ -313,15 +313,18 @@ input[type=range]:focus::-ms-fill-upper {
 
 #adder h1{
  margin: 5px;
+ color:black;
 }
 
 #feedsSelector{
   position: absolute;
   height: 90%;
   width: 400px;
-  background: #615E5E;
+  background: white;/*#615E5E;*/
   z-index: 1;
   border: 1px solid white;
+
+  color:black;
 }
 
 #feedsSelector header{
@@ -402,11 +405,28 @@ select{
 
 li.nodeEntry{
   display:flex;
-  background: white;
-  padding: 10px;
+  flex-wrap: wrap;
+  background: rgb(103, 103, 103);/*white;*/
   margin: 10px;
 }
 
 li.nodeEntry .title{
+  flex-grow: 1;
+  font-weight: bold;
+  color:white;
+}
+
+li.nodeEntry div{
+  width:100%;
+  display: flex;
+  padding: 20px 10px 20px 10px;
+}
+
+li.nodeEntry .details{
+  padding: 0px;
+  margin: 0px;
+  background: mediumaquamarine;
+}
+li.nodeEntry .status{
   flex-grow: 1;
 }
