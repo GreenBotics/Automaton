@@ -30,7 +30,7 @@ function setNodes(state, input){
 */
 function upsertNodes(state, input){
   console.log("upsert nodes",state, input)
-  const index = state.indexOf(input.id)
+  const index = findIndex(propEq('uid', input.id))(state)
   if(index === -1){
     state = state.concat(input.data)
   }
