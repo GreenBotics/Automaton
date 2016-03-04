@@ -61,3 +61,44 @@ export function generateUUID() {
     return uuid.join( '' )
   }()
 }
+
+
+/*
+Remap the field from the input object using the
+provided mapping object (key=>outkey) ie:
+input = {foo:42}
+remapObject({foo:baz},input) => {baz:42}
+*/
+export function remapObject(mapping, input){
+  const result =  Object.keys(input)
+    .reduce(function(obj, key){
+      if(key in mapping){
+        obj[mapping[key]] = input[key]
+      }
+      else{
+        obj[key] = input[key]
+      }
+      return obj
+    },{})
+  return result
+}
+
+/*
+applies the functions from the mapping hash to the input's fields,
+by field name
+input = {baz:"42"}
+coerceTypes({baz:parseFloat},input) => {baz:42}
+*/
+export function coerceTypes(mapping, input){
+  const result =  Object.keys(input)
+    .reduce(function(obj, key){
+      if(key in mapping && input[key] !== null && input[key] !== undefined){
+        obj[key] = mapping[key](input[key])
+      }
+      else{
+        obj[key] = input[key]
+      }
+      return obj
+    },{})
+  return result
+}
