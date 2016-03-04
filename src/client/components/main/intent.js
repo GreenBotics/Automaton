@@ -15,6 +15,6 @@ export default function intent({DOM,socketIO}, other){
     feedActionsFromDOM, feedActionsFromSIO,
     nodeActionsFromDOM, nodeActionsFromSIO])
 
-  console.log("actions",actions)
+  console.log("All actions",actions)
   return actions
 }

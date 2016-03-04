@@ -24,12 +24,12 @@ function renderTopToolBar (state) {
       h('button#addItems','Manage items'),
       h('button#feedsSelect','Select feeds'),
 
-      h('span','Start'),
+      /*h('span','Start'),
         input('.slider', {attrs:{type: 'range', min: 0, max: 100, value: 25} }),
       h('span','End' ),
         input('.slider', {attrs:{type: 'range', min: 0, max: 100, value: 75}}),
       h('span','RealTime'),
-        input('#realTimeStream.slider', {attrs:{type: 'checkbox'}}),
+        input('#realTimeStream.slider', {attrs:{type: 'checkbox'}}),*/
 
       feedsSelector,
       adder
@@ -70,12 +70,35 @@ function renderFeedsSelector (state) {
 
 /// nodes
 function renderNodeEditor (state){
-  const allNodes = state.nodes.data
-    .map( node => {
-      return h('li.nodeEntry',[
-        h('span.title',node.name||''),
-        h('button.editNodes',{attrs:{'data-node': node.uid}},'Edit'),
-        h('button.removeNodes',{attrs:{'data-node': node.uid}},'Delete'),
+  const margin = 10
+  const nodesData = state.nodes.data
+    .reduce((acc, m) => {
+      var last = acc[acc.length - 1]
+      m.offset = 0
+      m.offset = last ? last.offset + last.elmHeight + margin : margin
+      return acc.concat(m);
+    }, [])
+  //const totalHeight = nodesData[nodesData.length - 1].offset + nodesData[data.length - 1].elmHeight
+
+  const allNodes = nodesData
+    .map( (node,index) => {
+      return h('li.nodeEntry',/*{
+          key: index,
+          style: {opacity: '0', transform: 'translate(-200px)',
+                  delayed: {transform: `translateY(${node.offset}px)`, opacity: '1'},
+                  remove: {opacity: '0', transform: `translateY(${node.offset}px) translateX(200px)`}},
+          hook: {insert: (vnode) => { node.elmHeight = vnode.elm.offsetHeight }},
+        },*/
+        [
+        h('div',[
+          h('span.title',node.name||''),
+          h('button.editNodes',{attrs:{'data-node': node.uid}},'Edit'),
+          h('button.removeNodes',{attrs:{'data-node': node.uid}},'Delete'),
+        ]),
+        h('div.details',[
+          h('span.status','Status: running'),
+          h('span.sensors','Sensors:'+node.sensors.length),
+        ]),
       ])
     })
 
@@ -102,6 +125,8 @@ function renderAddNodeScreen(state){
     sensors:[]
   }
 
+  const validationButtonText = state.ui.editedNode? 'Update':'Add'
+
   const microcontrollers = [
     'esp8266(Olimex MOD-WIFI-ESP8266-DEV)'
   ]
@@ -122,32 +147,35 @@ function renderAddNodeScreen(state){
     .map(m=>h('option.sens',{props:{value:m}, attrs:{'data-foo': ""}},m))
 
   return section('.addNodeForm',{style: {transition: 'opacity 0.2s', delayed:{opacity:'1'}, remove: {opacity: '0'}}},[
-    h('h1', 'Devices'),
-      h('select.microcontroller',microcontrollersList),
-      h('button',{props:{type:'button'}},'select'),
+    h('form#addNodeForm',[
+      h('h1', 'Devices'),
+        h('select.microcontroller',microcontrollersList),
+        h('button',{props:{type:'button'}},'select'),
 
-    h('h1','device infos'),
-      h('input.deviceName',{props:{type:'text',placeholder:'name',value:activeNode.name}}),
-      h('input.deviceUUID',{props:{type:'text',disabled:true, placeholder:'UUID',value:activeNode.uid}}),
+      h('h1','device infos'),
+        h('input.deviceName',{props:{type:'text',placeholder:'name',value:activeNode.name}}),
+        h('textarea.deviceDescription',{props:{value:activeNode.description}},[activeNode.description]),
+        h('input.deviceUUID',{props:{type:'text',disabled:true, placeholder:'UUID',value:activeNode.uid}}),
 
-    h('h1','wifi settings'),
-      h('input.wifiSSID',{props:{type:'text',placeholder:'ssid'}}),
-      h('input.wifiPass',{props:{type:'password',placeholder:'password'}}),
+      h('h1','wifi settings'),
+        h('input.wifiSSID',{props:{type:'text',placeholder:'ssid'}}),
+        h('input.wifiPass',{props:{type:'password',placeholder:'password'}}),
 
-    h('h1','Sensor Packages'),
-      h('select.sensorModel',sensorModelsList),
-      h('button#AddSensorPackageToNode',{props:{type:'button'}},'add'),
+      h('h1','Sensor Packages'),
+        h('select.sensorModel',sensorModelsList),
+        h('button#AddSensorPackageToNode',{props:{type:'button'}},'add'),
 
-    h('br'),
+      h('br'),
 
-    h('button#confirmUpsertNode','update'),
-    h('button',{props:{type:'button',disabled:true}},'upload'),//only available if changed ?
-    h('button#cancelUpsertNode','cancel'),
+      h('button#confirmUpsertNode',{props:{type:'submit'}},validationButtonText),
+      h('button',{props:{type:'button',disabled:true}},'upload'),//only available if changed ?
+      h('button#cancelUpsertNode',{props:{type:'button'}},'cancel'),
+    ])
   ])
 }
 
 export default function view(state$, graphsGroupVTree$){
   return state$
-    .tap(e=>console.log("state",e))
+    //.tap(e=>console.log("state",e))
     .map(state=> h('div',[renderTopToolBar(state)]))
 }

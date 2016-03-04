@@ -13,7 +13,7 @@ import {equals} from 'ramda'
 import model from '../../model'
 import {makeModel} from '../../utils/modelUtils'
 import {combineLatestObj} from '../../utils/obsUtils'
-
+import {extractChangesBetweenArrays} from '../../utils/diffPatchUtils'
 
 function socketIO(state$, actions){
   const stream$ = state$ //anytime our model changes , dispatch it via socket.io
@@ -52,6 +52,15 @@ export default function main(sources) {
 
   const actions = intent(sources)
   const state$ = model({actions, sources})
+
+  const nodeUpserts$ = state$
+    .pluck('nodes','data')
+    .map(function(data){
+      //extractChangesBetweenArrays()
+      return data
+    })
+    .forEach(e=>console.log("nodeUpserts",e))
+
 
   //create visual elements
   //const GraphGroup = GraphsGroupWrapper(state$, DOM)
