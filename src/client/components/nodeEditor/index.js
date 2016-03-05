@@ -49,14 +49,19 @@ function view_inner (state){
   ])
   const nodeAdder = state.ui.addNodeToggled?renderAddNodeScreen(state):nodeList
 
-  return h('section#adder',[
-    h('header',[
-      h('h1','Manage nodes/sensors'),
-    ]),
-    h('header',[
-      nodeAdder,
+
+  if(state.ui.addItemsToggled){
+    return h('section#adder',[
+      h('header',[
+        h('h1','Manage nodes/sensors'),
+      ]),
+      h('header',[
+        nodeAdder,
+      ])
     ])
-  ])
+  }else{
+    return h('section#adder')
+  }
 }
 
 
@@ -116,5 +121,5 @@ export default function nodeEditor(sources) {
   return {
     DOM: vtree$
     //remove: actions.remove$,
-  };
+  }
 }
