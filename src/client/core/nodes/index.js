@@ -72,10 +72,22 @@ export function nodesSelections(state=[], actions){
   return makeModel([], updateFns, actions)
 }
 
+//microcontrollers "model"
+export function microcontrollers(state=[], actions){
+  const list = [//TODO store this remotely
+    'esp8266(Olimex MOD-WIFI-ESP8266-DEV)'
+  ]
+  const updateFns = {}
+
+  return makeModel(list, updateFns, actions)
+}
+
+
 //node wrappers
 export default function nodes(actions, sources){
   return combineLatestObj({
     selections: nodesSelections([], actions)
     ,data     : nodesData(      [], actions)
+    ,microcontrollers: microcontrollers([],actions)
   }).shareReplay(1)
 }

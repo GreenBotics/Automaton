@@ -127,18 +127,9 @@ function renderAddNodeScreen(state){
 
   const validationButtonText = state.ui.editedNode? 'Update':'Add'
 
-  const microcontrollers = [
-    'esp8266(Olimex MOD-WIFI-ESP8266-DEV)'
-  ]
-  const sensorModels = {
-    'BME280'  :'Adafruit_BME280'
-    , 'SI1145'  :'Adafruit_SI1145'
-  }
-
-  const sensorCaps = {
-    'BME280'  : ['temperature','humidity','baro']
-    , 'SI1145'  : ['v','uv','ir']
-  }
+  const microcontrollers = state.nodes.microcontrollers
+  const sensorModels = state.sensors.models.models
+  const sensorCaps   = state.sensors.models.caps
 
   const microcontrollersList = microcontrollers
     .map(m=>h('option.mc',{props:{value:m,selected:false}, attrs:{'data-foo': ""}},m))
@@ -176,6 +167,6 @@ function renderAddNodeScreen(state){
 
 export default function view(state$, graphsGroupVTree$){
   return state$
-    //.tap(e=>console.log("state",e))
+    .tap(e=>console.log("state",e))
     .map(state=> h('div',[renderTopToolBar(state)]))
 }
