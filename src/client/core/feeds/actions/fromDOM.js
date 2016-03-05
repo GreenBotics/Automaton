@@ -1,4 +1,4 @@
-import {toArray} from '../../utils/utils'
+import {toArray} from '../../../utils/utils'
 
 export default function actions(DOM){
   const selectFeeds$ = DOM.select(".feed")

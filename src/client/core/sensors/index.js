@@ -6,3 +6,12 @@ function addSensorToNode(state, input){
   //state._testNodes[state.activeNode]
   return state
 }
+
+
+
+export default function sensors(actions, sources){
+  return combineLatestObj({
+    selections: nodesSelections([], actions)
+    ,data     : nodesData(      [], actions)
+  }).shareReplay(1)
+}

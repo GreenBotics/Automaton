@@ -1,7 +1,7 @@
 import Rx from 'rx'
 const {merge} = Rx.Observable
-import {toArray, generateUUID, remapObject, mergeData} from '../../utils/utils'
-import {combineLatestObj} from '../../utils/obsUtils'
+import {toArray, generateUUID, remapObject, mergeData} from '../../../utils/utils'
+import {combineLatestObj} from '../../../utils/obsUtils'
 
 function selectMultiples(DOM, selectors, events=[]){
 
