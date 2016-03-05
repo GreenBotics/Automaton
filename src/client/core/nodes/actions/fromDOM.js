@@ -22,7 +22,7 @@ function selectMultiples(DOM, selectors, events=[]){
 
 function getFormResults(formElement) {
 
-  var formElements = formElement.elements;
+  var formElements = formElement.elements
   //var formParams = {};
   var i = 0;
   var elem = null;
