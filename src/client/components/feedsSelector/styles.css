@@ -1,0 +1,70 @@
+@import "~styles/palette.scss";
+@import "~styles/common.scss";
+
+
+.feed{
+  color:white;
+}
+
+#feedsSelector{
+  position: absolute;
+  height: 90%;
+  width: 400px;
+  background: $background;
+  z-index: 1;
+  border: 1px solid white;
+
+  color:black;
+}
+
+#feedsSelector header{
+  padding: 15px;
+}
+
+#feedsSelector header h1{
+  display: inline-block;
+  margin: 5px;
+}
+
+#feedsSelector header input[type=text]{
+  width: 70%;
+  border: none;
+  box-shadow: none;
+  display: inline-block;
+  margin-left: 20px;
+}
+
+#feedsSelector section{
+  padding: 0;
+  width: 100%;
+  height: 60%;
+}
+
+#feedsSelector ul{
+  width: 100%;
+  padding: 0px;
+  height: 100%;
+  overflow: auto;
+}
+
+#feedsSelector li {
+  width: 60px;
+  min-height: 60px;
+  /* border: 1px solid #000; */
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: top;
+  margin: 5px;
+  zoom: 1;
+  _height: 60px;
+  padding: 10px;
+  color: white;
+  background: mediumaquamarine;
+}
+
+#feedsSelector li.selected{
+  /*border: 1px solid #FFB100 ;*/
+  font-style: italic;
+  color: #000000;
+  background: white;
+}

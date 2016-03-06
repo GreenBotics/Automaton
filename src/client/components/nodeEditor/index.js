@@ -4,6 +4,7 @@ const {combineLatest} = Rx.Observable
 import {findIndex, find,propEq,flatten} from 'ramda'
 import {combineLatestObj, generateUUID} from '../../utils/utils'
 
+//import styles from './styles.scss'
 
 function view(state$){
   return state$.map(view_inner)

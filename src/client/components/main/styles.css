@@ -1,0 +1,21 @@
+@import "pal.css";
+/*@import "styles/common.css";*/
+
+#topToolbar{
+  padding: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background: red;
+}
+
+#topToolbar span{
+  margin: 10px;
+}
+
+.foo{
+  color:background;
+}
+
+#bar{
+  background: blue;
+}
