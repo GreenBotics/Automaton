@@ -60,7 +60,7 @@ function view_inner (state){
       ])
     ])
   }else{
-    return h('section#adder')
+    return h('section')
   }
 }
 

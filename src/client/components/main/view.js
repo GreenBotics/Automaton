@@ -25,9 +25,8 @@ function renderTopToolBar (state) {
 }
 
 export default function view(state$, graphsGroupVTree$){
-  const _nodeEditor = nodeEditor({props$:state$})
 
   return state$
     .tap(e=>console.log("state",e))
-    .map(state=> h('div',[renderTopToolBar(state,_nodeEditor)]))
+    .map(state=> h('div',[renderTopToolBar(state)]))
 }
