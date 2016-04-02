@@ -5,6 +5,8 @@ import {findIndex, find,propEq,flatten} from 'ramda'
 import {combineLatestObj, generateUUID} from '../../utils/utils'
 import Class from 'classnames'
 
+import styles from './styles.css'
+
 function view(state$){
   return state$.map(view_inner)
 }
@@ -29,7 +31,8 @@ function view_inner (state) {
   })
 
   if(state.ui.feedsSelectionToggled){
-    return h('section#feedsSelector',{style: {transition: 'opacity 0.5s', delayed:{opacity:'1'}} },
+    //FIXME: ugh ugly as heck styling handling
+    return h('section#'+styles.feedsSelector,{style: {transition: 'opacity 0.5s', delayed:{opacity:'1'}} },
       [
         h('header',[
           h('h1','Select feeds'),
@@ -41,7 +44,7 @@ function view_inner (state) {
       ])
     }
     else{
-      return h('section#feedsSelector',{style: {opacity: '0', transition: 'opacity 0.5s', remove: {opacity: '0'} } })
+      return h('section#'+styles.feedsSelector,{style: {opacity: '0', transition: 'opacity 0.5s', remove: {opacity: '0'} } })
     }
 }
 

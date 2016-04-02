@@ -1,21 +1,191 @@
-@import "pal.css";
-/*@import "styles/common.css";*/
+@import "../../styles/palette.css";
+@import "../../styles/common.css";
 
 #topToolbar{
   padding: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
-  background: red;
+  background: $background;
+
 }
 
 #topToolbar span{
   margin: 10px;
 }
 
-.foo{
-  color:background;
-}
 
-#bar{
-  background: blue;
+.mainWrap{
+
+  font-family: 'Open Sans';
+
+  button{
+    border-radius: 0;
+    cursor: pointer;
+    display: inline-block;
+    background: #615E5E;
+    border: none;
+    color: white;
+    margin: 10px;
+    padding: 5px;
+
+    font-family: 'Open Sans';
+    font-size: medium;
+  }
+
+  button:focus {outline:0;}
+
+  /*
+    blue green : #1bf8f1;
+    green blue: #34d4a7;
+  */
+  section{
+    padding: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
+  section h1{
+      font-size: 0.9em;
+      /*color: #F7F7F7;*/
+  }
+
+  select{
+      font-family: 'Open Sans';
+      background: white;
+  }
+
+
+  /*from http://codereview.stackexchange.com/questions/62338/stylish-underline-when-input-is-focused-modern-browsers-only*/
+  input[type=text] {
+    height:17px;
+    border: 0;
+    width: calc(100% - 2px);
+    margin-left:1px;
+    -webkit-transition: box-shadow 0.3s;
+    transition: box-shadow 0.3s;
+    margin: 5px;
+  }
+  input[type=text]:focus {
+    outline: none;
+    box-shadow: -8px 10px 0px -7px #4EA6EA, 8px 10px 0px -7px #4EA6EA;
+  }
+
+  input[type=password] {
+    height:17px;
+    border: 0;
+    width: calc(100% - 2px);
+    margin-left:1px;
+    -webkit-transition: box-shadow 0.3s;
+    transition: box-shadow 0.3s;
+    margin: 5px;
+  }
+  input[type=password]:focus {
+    outline: none;
+    box-shadow: -8px 10px 0px -7px #4EA6EA, 8px 10px 0px -7px #4EA6EA;
+  }
+
+  input[type=number] {
+    height:17px;
+    border: 0;
+    /*width: calc(100% - 2px);*/
+    width:60px;
+    margin-left:1px;
+    padding-left: 5px;
+    box-shadow: -2px 10px 0px -7px #ebebeb, 8px 10px 0px -7px #ebebeb;
+    -webkit-transition: box-shadow 0.3s;
+    transition: box-shadow 0.3s;
+  }
+  input[type=number]:focus {
+    outline: none;
+    box-shadow: -8px 10px 0px -7px #4EA6EA, 8px 10px 0px -7px #4EA6EA;
+  }
+
+  /*slider track from
+  http://danielstern.ca/range.css/?ref=css-tricks#/
+  */
+  input[type=range] {
+    -webkit-appearance: none;
+    /*width: 100%;*/
+    margin: 5px 0;
+  }
+  input[type=range]:focus {
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 1px;
+    cursor: pointer;
+    box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+    background: rgba(0, 128, 255, 0.78);
+    border-radius: 1.3px;
+    border: 0.2px solid #010101;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    box-shadow: 0px 0px 0px #000031, 0px 0px 0px #00004b;
+    border: 0px solid #00001e;
+    height: 11px;
+    width: 11px;
+    border-radius: 28px;
+    background: #0080ff;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -5.2px;
+  }
+  input[type=range]:focus::-webkit-slider-runnable-track {
+    background: rgba(46, 151, 255, 0.78);
+  }
+  input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 1px;
+    cursor: pointer;
+    box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+    background: rgba(0, 128, 255, 0.78);
+    border-radius: 1.3px;
+    border: 0.2px solid #010101;
+  }
+  input[type=range]::-moz-range-thumb {
+    box-shadow: 0px 0px 0px #000031, 0px 0px 0px #00004b;
+    border: 0px solid #00001e;
+    height: 11px;
+    width: 11px;
+    border-radius: 28px;
+    background: #0080ff;
+    cursor: pointer;
+  }
+  input[type=range]::-ms-track {
+    width: 100%;
+    height: 1px;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+  input[type=range]::-ms-fill-lower {
+    background: rgba(0, 105, 209, 0.78);
+    border: 0.2px solid #010101;
+    border-radius: 2.6px;
+    box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  }
+  input[type=range]::-ms-fill-upper {
+    background: rgba(0, 128, 255, 0.78);
+    border: 0.2px solid #010101;
+    border-radius: 2.6px;
+    box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  }
+  input[type=range]::-ms-thumb {
+    box-shadow: 0px 0px 0px #000031, 0px 0px 0px #00004b;
+    border: 0px solid #00001e;
+    height: 11px;
+    width: 11px;
+    border-radius: 28px;
+    background: #0080ff;
+    cursor: pointer;
+    height: 1px;
+  }
+  input[type=range]:focus::-ms-fill-lower {
+    background: rgba(0, 128, 255, 0.78);
+  }
+  input[type=range]:focus::-ms-fill-upper {
+    background: rgba(46, 151, 255, 0.78);
+  }
 }

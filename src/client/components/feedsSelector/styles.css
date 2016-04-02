@@ -1,6 +1,5 @@
-@import "~styles/palette.scss";
-@import "~styles/common.scss";
-
+@import "../../styles/palette.css";
+@import "../../styles/common.css";
 
 .feed{
   color:white;

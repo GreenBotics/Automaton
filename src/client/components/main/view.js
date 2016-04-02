@@ -11,17 +11,15 @@ import nodeEditor from '../nodeEditor'
 import feedsSelector from '../feedsSelector'
 
 import styles from './styles.css'
-import hyperstyles from 'hyperstyles'
+//import hyperstyles from 'hyperstyles'
 //const h = hyperstyles(vh, styles)
-
-console.log('styles',styles)
+console.log("styles",styles)
 
 function renderTopToolBar (state) {
   let _feedsSelector = feedsSelector({props$:just(state)}).DOM
   let _nodeEditor    = nodeEditor({props$:just(state)}).DOM
 
-  //return h('div.foo#bar','some text')
-  return h('section#topToolbar.foo',[
+  return h('section#'+styles.topToolbar,[
       h('button#addItems','Manage items'),
       h('button#feedsSelect','Select feeds'),
 
@@ -34,5 +32,5 @@ export default function view(state$, graphsGroupVTree$){
 
   return state$
     .tap(e=>console.log("state",e))
-    .map(state=> h('div.foo',[renderTopToolBar(state)]))
+    .map(state=> h('div.'+styles.mainWrap,[renderTopToolBar(state)]))
 }

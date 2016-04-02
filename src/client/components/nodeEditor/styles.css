@@ -1,0 +1,66 @@
+@import "../../styles/palette.css";
+@import "../../styles/common.css";
+
+
+$nodeEntryBackground:rgb(103, 103, 103);/*white;*/
+$nodeEntryDetailsBackground:mediumaquamarine;
+
+#adder{
+  position: absolute;
+  height: 80%;
+  width: 80%;
+  background: white;/*#615E5E;*/
+  z-index: 1;
+  border: 1px solid white;
+
+  button{
+    background: mediumaquamarine;
+  }
+  button:disabled{
+    background: #93B9AC;
+    color: #E4E4E4;
+    cursor: default;
+  }
+
+  h1{
+   margin: 5px;
+   color:black;
+  }
+
+  .addNode{
+    color:white;
+  }
+
+  ul{
+    -webkit-margin-before: 0;
+    -webkit-padding-start: 0px;
+  }
+
+  li.nodeEntry{
+    display:flex;
+    flex-wrap: wrap;
+    background: $nodeEntryBackground;
+    margin: 10px;
+  }
+
+  li.nodeEntry h1{
+    flex-grow: 1;
+    font-weight: bold;
+    color:white;
+  }
+
+  li.nodeEntry article{
+    width:100%;
+    display: flex;
+    padding: 20px 10px 20px 10px;
+  }
+
+  li.nodeEntry .details{
+    padding: 0px;
+    margin: 0px;
+    background:$nodeEntryDetailsBackground
+  }
+  li.nodeEntry .status{
+    flex-grow: 1;
+  }
+}

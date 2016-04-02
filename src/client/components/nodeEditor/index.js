@@ -1,10 +1,15 @@
-import {h} from 'cycle-snabbdom'
+import {h as h} from 'cycle-snabbdom'
 import Rx from 'rx'
 const {combineLatest} = Rx.Observable
 import {findIndex, find,propEq,flatten} from 'ramda'
 import {combineLatestObj, generateUUID} from '../../utils/utils'
 
-//import styles from './styles.scss'
+import styles from './styles.css'
+
+//import hyperstyles from 'hyperstyles'
+//const h = hyperstyles(vh, styles)
+
+console.log("nodeEditor styles", styles)
 
 function view(state$){
   return state$.map(view_inner)
@@ -24,7 +29,7 @@ function view_inner (state){
 
   const allNodes = nodesData
     .map( (node,index) => {
-      return h('li.nodeEntry',/*{
+      return h('li.'+styles.nodeEntry,/*{
           key: index,
           style: {opacity: '0', transform: 'translate(-200px)',
                   delayed: {transform: `translateY(${node.offset}px)`, opacity: '1'},
@@ -32,14 +37,14 @@ function view_inner (state){
           hook: {insert: (vnode) => { node.elmHeight = vnode.elm.offsetHeight }},
         },*/
         [
-        h('div',[
-          h('span.title',node.name||''),
+        h('article',[
+          h('h1',node.name||''),
           h('button.editNodes',{attrs:{'data-node': node.uid}},'Edit'),
           h('button.removeNodes',{attrs:{'data-node': node.uid}},'Delete'),
         ]),
-        h('div.details',[
-          h('span.status','Status: running'),
-          h('span.sensors','Sensors:'+node.sensors.length),
+        h('article.'+styles.details,[
+          h('span.'+styles.status,'Status: running'),
+          h('span.'+styles.sensors,'Sensors:'+node.sensors.length),
         ]),
       ])
     })
@@ -52,11 +57,11 @@ function view_inner (state){
 
 
   if(state.ui.addItemsToggled){
-    return h('section#adder',[
+    return h('section#'+styles.adder,[
       h('header',[
         h('h1','Manage nodes/sensors'),
       ]),
-      h('header',[
+      h('section',[
         nodeAdder,
       ])
     ])
