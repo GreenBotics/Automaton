@@ -1,28 +1,46 @@
-var path = require('path');
+var path = require('path')
 
-module.exports = {
+var production = process.argv.indexOf("--production") > -1
 
+//various loaders
+var babelLoader = {
+  test: /\.js?$/,
+  exclude: /(node_modules)/,
+  loader: 'babel', // 'babel-loader' is also a legal name to reference
+  query: {
+    presets: ['es2015']
+  }
+}
+//var cssLoader = { test: /\.css$/, loader: "style-loader!css-loader" }
+var postcssLoader = {
+  test: /\.css$/,
+  loader: "style-loader?singleton!css-loader?modules&importLoaders=1!postcss-loader"//!postcss-loader" 
+}
+var postcssSettings = {
+  postcss: function (webpack) {
+       return [
+         require('postcss-import')({addDependencyTo: webpack})
+         ,require('precss')
+         ,require('autoprefixer')
+         //,require('postcss-simple-vars')
+       ]
+   }
+}
+
+var config = {
   entry: [
     './src/client'
   ],
 
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: path.join(__dirname, 'dist','client'),
     filename: 'bundle.js'
   },
 
   module: {
-    loaders: [{
-      test: function (filename) {
-        if (filename.indexOf('node_modules') !== -1) {
-          return false;
-        } else {
-          return /\.js$/.test(filename) !== -1;
-        }
-      },
-      loaders: ['babel-loader']
-    },
-    { test: /\.css$/, loader: "style-loader!css-loader" }
+    loaders: [
+      babelLoader,
+      postcssLoader
     ]
   },
 
@@ -30,4 +48,10 @@ module.exports = {
     modulesDirectories: [path.join(__dirname, 'src'), 'node_modules']
   }
 
-};
+}
+
+//generate final config file, injecting specific settings
+config = Object.assign({}, config, postcssSettings)
+
+
+module.exports = config
