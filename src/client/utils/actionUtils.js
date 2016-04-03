@@ -1,6 +1,6 @@
 import Rx from 'rx'
-//const {merge} = Rx.Observable
-const merge = Object.assign.bind(null,{})
+const {merge} = Rx.Observable
+//const merge = Object.assign.bind(null,{})
 
 export function mergeActionsByName(actionSources, validActions=[]){
 
