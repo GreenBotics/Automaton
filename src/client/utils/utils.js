@@ -1,5 +1,9 @@
 import assign from 'fast.js/object/assign'//faster object.assign
 
+export function exists(input){
+  return input !== null && input !== undefined
+}
+
 /*converts input data to array if it is not already an array*/
 export function toArray(data){
   if(!data) return []
