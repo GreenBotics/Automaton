@@ -5,7 +5,7 @@
 $nodeEntryBackground:rgb(103, 103, 103);/*white;*/
 $nodeEntryDetailsBackground:mediumaquamarine;
 
-#adder{
+#nodeEditor{
   position: absolute;
   height: 80%;
   width: 80%;

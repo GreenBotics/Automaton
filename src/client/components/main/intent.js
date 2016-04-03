@@ -10,6 +10,5 @@ export default function intent(sources, other){
 
   const actions = mergeActionsByName([feedActions, nodeActions])
 
-  console.log("All actions",actions)
   return actions
 }

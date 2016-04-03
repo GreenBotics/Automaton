@@ -1,15 +1,18 @@
 import {h as h} from 'cycle-snabbdom'
 import Rx from 'rx'
-const {combineLatest} = Rx.Observable
-import {findIndex, find,propEq,flatten} from 'ramda'
-import {combineLatestObj, generateUUID} from '../../utils/utils'
+const {combineLatest, just} = Rx.Observable
+import {findIndex, find, propEq, flatten, prepend} from 'ramda'
+import {generateUUID, exists} from '../../utils/utils'
+import {combineLatestObj} from '../../utils/obsUtils'
+import {makeModel} from '../../utils/modelUtils'
+
 
 import styles from './styles.css'
 
 //import hyperstyles from 'hyperstyles'
 //const h = hyperstyles(vh, styles)
 
-console.log("nodeEditor styles", styles)
+//console.log("nodeEditor styles", styles)
 
 function view(state$){
   return state$.map(view_inner)
@@ -53,16 +56,16 @@ function view_inner (state){
     h('button.addNode','Add Node'),
     h('ul',allNodes)
   ])
-  const nodeAdder = state.ui.addNodeToggled?renderAddNodeScreen(state):nodeList
+  const nodeEditor = state.addNodeToggled?renderAddNodeScreen(state):nodeList
 
 
-  if(state.ui.addItemsToggled){
-    return h('section#'+styles.adder,[
+  if(state.addItemsToggled){
+    return h('section#'+styles.nodeEditor,[
       h('header',[
         h('h1','Manage nodes/sensors'),
       ]),
       h('section',[
-        nodeAdder,
+        nodeEditor,
       ])
     ])
   }else{
@@ -72,33 +75,36 @@ function view_inner (state){
 
 
 function renderAddNodeScreen(state){
-  const activeNode = find(propEq('uid', state.ui.editedNode))(state.nodes.data) || {
-    name:undefined,
-    uid:generateUUID(),
-    sensors:[]
-  }
+  const activeNode = state.activeNode
 
-  const validationButtonText = state.ui.editedNode? 'Update':'Add'
+  const microcontrollers = state.microcontrollers
+  const sensorModels = state.sensorModels
+  const sensorCaps   = state.sensorCaps
 
-  const microcontrollers = state.nodes.microcontrollers
-  const sensorModels = state.sensors.models.models
-  const sensorCaps   = state.sensors.models.caps
+  const validationButtonText = state.editedNode? 'Update':'Add'
 
-  const microcontrollersList = microcontrollers
+  const microcontrollersList = prepend(h('option.uc',{props:{value:undefined,disabled:true,selected:true}},'Choose:'),
+    microcontrollers
     .map(m=>h('option.mc',{props:{value:m,selected:false}, attrs:{'data-foo': ""}},m))
+  )
 
-  const sensorModelsList = Object.keys(sensorModels)
-    .map(m=>h('option.sens',{props:{value:m}, attrs:{'data-foo': ""}},m))
+  const sensorModelsList = prepend(h('option.sens',{props:{value:undefined,disabled:true,selected:true}},'Choose:'),
+      Object.keys(sensorModels)
+        .map(m=>h('option.sens',{props:{value:m}, attrs:{'data-foo': ""}},m))
+    )
+
+  const sensorsList = activeNode.sensors//['BME','FOO']
+    .map(s=>h('li.sens',{props:{value:s}},
+      [s,h('button.removeSensorFromNode','delete')]))
 
   return h('section.addNodeForm',{style: {transition: 'opacity 0.2s', delayed:{opacity:'1'}, remove: {opacity: '0'}}},[
     h('form#addNodeForm',[
       h('h1', 'Devices'),
         h('select.microcontroller',microcontrollersList),
-        h('button',{props:{type:'button'}},'select'),
 
       h('h1','device infos'),
         h('input.deviceName',{props:{type:'text',placeholder:'name',value:activeNode.name}}),
-        h('textarea.deviceDescription',{props:{value:activeNode.description}},[activeNode.description]),
+        h('textarea.deviceDescription',{props:{value:activeNode.description,placeholder:'description'}},[activeNode.description]),
         h('input.deviceUUID',{props:{type:'text',disabled:true, placeholder:'UUID',value:activeNode.uid}}),
 
       h('h1','wifi settings'),
@@ -109,6 +115,8 @@ function renderAddNodeScreen(state){
         h('select.sensorModel',sensorModelsList),
         h('button#AddSensorPackageToNode',{props:{type:'button'}},'add'),
 
+        h('ul.sensors',sensorsList),
+
       h('br'),
 
       h('button#confirmUpsertNode',{props:{type:'submit'}},validationButtonText),
@@ -118,14 +126,149 @@ function renderAddNodeScreen(state){
   ])
 }
 
+function intent(sources){
+  const {DOM} = sources
+
+  const setMicrocontroler$ = DOM.select('.microcontroller').events('change')
+    .map(e=>e.target.value)
+  const setDeviceName$ = DOM.select('.deviceName').events('change')
+    .map(e=>e.target.value)
+  const setDeviceDescription$ = DOM.select('.deviceDescription').events('change')
+    .map(e=>e.target.value)
+
+  const setWifiSSID$ = DOM.select('.wifiSSID').events('change')
+    .map(e=>e.target.value)
+  const setWifiPass$ = DOM.select('.wifiPass').events('change')
+    .map(e=>e.target.value)
+
+  const addSensorModel$ = DOM.select('#AddSensorPackageToNode').events('click')
+    .withLatestFrom(DOM.select('.sensorModel').events('change'),(_,d)=>d)
+    .map(e=>e.target.value)
+
+  const saveData$ = DOM.select('#confirmUpsertNode').events('click')
+
+  return {
+    setMicrocontroler$
+    ,setDeviceName$
+    ,setDeviceDescription$
+
+    ,setWifiSSID$
+    ,setWifiPass$
+
+    ,addSensorModel$
+    ,saveData$
+  }
+}
+
+function model({actions, props$}){
+
+  const editedNode$ = props$.pluck('ui','editedNode')
+  const nodesData$  = props$.pluck('nodes','data')
+
+  const setFromSelection$ = combineLatestObj({editedNode$, nodesData$})
+    .map(({editedNode,nodesData})=> find(propEq('uid', editedNode))(nodesData))
+    .filter(exists)
+
+  const reset$ = actions.saveData$.delay(500).map(e=>undefined)//FIXME: fugly
+
+  const activeNodeDefaults = {
+   name:undefined,
+   description:undefined,
+   microcontroller:undefined,
+   uid:generateUUID(),
+   wifiSSID:undefined,
+   wifiPass:undefined,
+   sensors:[]
+ }
+
+ function reset(state, input){
+   return {
+    name:undefined,
+    description:undefined,
+    microcontroller:undefined,
+    uid:generateUUID(),
+    wifiSSID:undefined,
+    wifiPass:undefined,
+    sensors:[]
+  }
+ }
+
+ function setDeviceName(state, input){
+   return Object.assign({},state,{name:input})
+ }
+ function setDeviceDescription(state,input){
+   return Object.assign({},state,{description:input})
+ }
+ function setWifiPass(state,input){
+   return Object.assign({},state,{wifiPass:input})
+ }
+ function setWifiSSID(state,input){
+   return Object.assign({},state,{wifiSSID:input})
+ }
+ function setMicrocontroler(state, input){
+   return Object.assign({},state,{microcontroller:input})
+ }
+  function addSensorModel(state, input){
+    const sensors = state.sensors.concat(input)
+    return Object.assign({},state,{sensors})
+  }
+  function setFromSelection(state, input){
+    return Object.assign({},input)
+  }
+  const activeNodeUpdateFns = {
+    setDeviceName
+    ,setDeviceDescription
+    ,setMicrocontroler
+    ,setWifiSSID
+    ,setWifiPass
+    ,addSensorModel
+    ,setFromSelection
+    ,reset
+  }
+  const activeNodeActions = Object.assign({},actions, {setFromSelection$, reset$})
+  const activeNode$ = makeModel(activeNodeDefaults, activeNodeUpdateFns, activeNodeActions)
+
+  return props$
+    .combineLatest(activeNode$,function(state,activeNode){
+
+    const nodes = state.nodes
+    const microcontrollers = state.nodes.microcontrollers
+    const sensorModels = state.sensors.models.models
+    const sensorCaps   = state.sensors.models.caps
+
+    const editedNode      = state.ui.editedNode
+    const addNodeToggled  = state.ui.addNodeToggled
+    const addItemsToggled = state.ui.addItemsToggled
+
+    //console.log("editNode",editedNode, "activeNode",activeNode)
+
+    return {
+      nodes,
+      microcontrollers,
+      sensorModels,
+      sensorCaps,
+
+      activeNode,
+      editedNode,
+      addNodeToggled,
+      addItemsToggled
+    }
+
+  })
+
+}
+
 export default function nodeEditor(sources) {
   const props$ = sources.props$
 
-  //const actions = intent(sources.DOM)
-  const state$ = props$//model(actions)
-  const vtree$ = view(state$)
+  const actions = intent(sources.sources)
+  const state$  = model({actions, props$})
+  const vtree$  = view(state$)
+
   return {
     DOM: vtree$
-    //remove: actions.remove$,
+    ,events:{
+      activeNode:state$.pluck('activeNode').sample(actions.saveData$)
+    }
   }
 }

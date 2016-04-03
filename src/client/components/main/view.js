@@ -7,30 +7,31 @@ const {combineLatest,just} = Rx.Observable
 import {findIndex, find,propEq,flatten} from 'ramda'
 import {combineLatestObj, generateUUID} from '../../utils/utils'
 
-import nodeEditor from '../nodeEditor'
 import feedsSelector from '../feedsSelector'
 
 import styles from './styles.css'
 //import hyperstyles from 'hyperstyles'
 //const h = hyperstyles(vh, styles)
-console.log("styles",styles)
+//console.log("styles",styles)
 
-function renderTopToolBar (state) {
+function renderTopToolBar (data) {
+  const {state,nodeEditor} = data
   let _feedsSelector = feedsSelector({props$:just(state)}).DOM
-  let _nodeEditor    = nodeEditor({props$:just(state)}).DOM
+  //let _nodeEditor    = nodeEditor({props$:just(state)}).DOM
 
   return h('section#'+styles.topToolbar,[
-      h('button#addItems','Manage items'),
+      h('button#addItems','Manage nodes'),
       h('button#feedsSelect','Select feeds'),
 
       _feedsSelector,
-      _nodeEditor
+      nodeEditor
     ])
 }
 
-export default function view(state$, graphsGroupVTree$){
+export default function view(state$, nodeEditorVtree$, graphsGroupVTree$){
 
   return state$
     .tap(e=>console.log("state",e))
-    .map(state=> h('div.'+styles.mainWrap,[renderTopToolBar(state)]))
+    .combineLatest(nodeEditorVtree$,(state,nodeEditor)=>({state,nodeEditor}))
+    .map((data)=> h('div.'+styles.mainWrap,[renderTopToolBar(data)]))
 }

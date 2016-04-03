@@ -6,9 +6,9 @@ import intent from './intent'
 import view   from './view'
 
 //import {GraphsGroupWrapper} from './wrappers'
+import nodeEditor from '../nodeEditor'
 
 import {equals} from 'ramda'
-
 
 import model from '../../model'
 import {makeModel} from '../../utils/modelUtils'
@@ -59,17 +59,20 @@ export default function main(sources) {
       //extractChangesBetweenArrays()
       return data
     })
-    .forEach(e=>console.log("nodeUpserts",e))
 
 
   //create visual elements
   //const GraphGroup = GraphsGroupWrapper(state$, DOM)
+  const _nodeEditor = nodeEditor({sources, props$:state$})
 
-  const vtree$  = view(state$)//, GraphGroup.DOM)
+  const events = just({nodeEditor:_nodeEditor.events})
+
+  const vtree$  = view(state$, _nodeEditor.DOM)//, GraphGroup.DOM)
   const sIO$    = socketIO(state$, actions)
 
   return {
     DOM: vtree$
     , socketIO: sIO$
+    , events
   }
 }

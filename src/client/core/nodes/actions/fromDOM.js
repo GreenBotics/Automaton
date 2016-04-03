@@ -51,7 +51,7 @@ function getFormResults(formElement) {
   }
   var formParams = elements.reduce(function(result, elem){
     const key = elem.id||elem.name||elem.className||'foo'
-    console.log("key",key, elem.type)
+    //console.log("key",key, elem.type)
     switch (elem.type) {
       case 'submit':
           break
@@ -115,7 +115,9 @@ export default function actions(DOM){
     .tap(e=>console.log("adding Node",e))
     .share()*/
 
-  const upsertNodes$ = DOM.select("#addNodeForm").events('submit')
+  const upsertNodes$ = Rx.Observable.never()
+
+    DOM.select("#addNodeForm").events('submit')
     .tap(function(e){
       e.preventDefault()
       return false
@@ -146,6 +148,7 @@ export default function actions(DOM){
       return {data, id:data.id}
     })
     //.forEach(e=>console.log("confirmUpsertNode",e))
+
 
 
     /*O.combineLatest(
@@ -187,7 +190,11 @@ export default function actions(DOM){
   const cancelUpsertNode$ = DOM.select('#cancelUpsertNode')
     .events('click')
 
-  const confirmUpsertNode$ = upsertNodes$
+  const confirmUpsertNode$ = DOM.select("#addNodeForm").events('submit')
+    .tap(function(e){
+      e.preventDefault()
+      return false
+    })
 
   return {
     selectNodes$
