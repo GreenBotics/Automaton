@@ -1,18 +1,15 @@
-import Rx from 'rx'
-const {merge} = Rx.Observable
-import {propEq, findIndex} from 'ramda'
-import {makeModel} from '../../utils/modelUtils'
-import {combineLatestObj} from '../../utils/obsUtils'
-import {mergeData, findIdenticals} from '../../utils/utils'
+import { propEq, findIndex } from 'ramda'
+import { makeModel } from '../../utils/modelUtils'
+import { combineLatestObj } from '../../utils/obsUtils'
+import { mergeData } from '../../utils/utils'
 
-
-function setNodes(state, input){
+function setNodes (state, input) {
   state = state.concat(input.data)
-  console.log("set nodes: state:",state,"input:", input)
+  console.log('set nodes: state:', state, 'input:', input)
   return state
 }
 
-/*workflow to add new nodes
+/* workflow to add new nodes
 
 - select microcontroller (UI)
   esp8266 only for now (UI)
@@ -28,13 +25,12 @@ function setNodes(state, input){
   -> encapsulate avrdude + extras
   -> see https://github.com/AdamMagaluk/leo or more generally https://www.npmjs.com/browse/keyword/gcc?offset=0
 */
-function upsertNodes(state, input){
-  console.log("upsert nodes",state, input)
+function upsertNodes (state, input) {
+  console.log('upsert nodes', state, input)
   const index = findIndex(propEq('uid', input.id))(state)
-  if(index === -1){
+  if (index === -1) {
     state = state.concat(input.data)
-  }
-  else{
+  } else {
     state = [
       ...state.slice(0, index),
       mergeData(state[index], input.data),
@@ -44,37 +40,37 @@ function upsertNodes(state, input){
   return state
 }
 
-function removeNodes(state, input){
-  console.log("remove nodes",state, input)
+function removeNodes (state, input) {
+  console.log('remove nodes', state, input)
   const index = findIndex(propEq('uid', input.id))(state)
-  state=[
+  state = [
     ...state.slice(0, index),
     ...state.slice(index + 1)
   ]
   return state
 }
 
-//node selections
-function selectNodes(state, input){
+// node selections
+function selectNodes (state, input) {
   state = input.ids
   return state
 }
 
-//sensor nodes model
-export function nodesData(state=[], actions){
-  const updateFns  = {setNodes, upsertNodes, removeNodes}
+// sensor nodes model
+export function nodesData (state = [], actions) {
+  const updateFns = {setNodes, upsertNodes, removeNodes}
   return makeModel(state, updateFns, actions)
 }
 
-//selections "model"
-export function nodesSelections(state=[], actions){
+// selections "model"
+export function nodesSelections (state = [], actions) {
   const updateFns = {selectNodes}
   return makeModel([], updateFns, actions)
 }
 
-//microcontrollers "model"
-export function microcontrollers(state=[], actions){
-  const list = [//TODO store this remotely
+// microcontrollers "model"
+export function microcontrollers (state = [], actions) {
+  const list = [ // TODO store this remotely
     'esp8266(Olimex MOD-WIFI-ESP8266-DEV)'
   ]
   const updateFns = {}
@@ -82,12 +78,11 @@ export function microcontrollers(state=[], actions){
   return makeModel(list, updateFns, actions)
 }
 
-
-//node wrappers
-export default function nodes(actions, sources){
+// node wrappers
+export default function nodes (actions, sources) {
   return combineLatestObj({
-    selections: nodesSelections([], actions)
-    ,data     : nodesData(      [], actions)
-    ,microcontrollers: microcontrollers([],actions)
+    selections: nodesSelections([], actions),
+    data: nodesData([], actions),
+    microcontrollers: microcontrollers([], actions)
   }).shareReplay(1)
 }
