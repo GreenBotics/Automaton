@@ -1,4 +1,5 @@
 import nodes from './core/nodes'
+import sensors from './core/sensors'
 import feeds from './core/feeds'
 import {makeModel} from './utils/modelUtils'
 import {combineLatestObj} from './utils/obsUtils'
@@ -22,7 +23,7 @@ function toggleAddItems(state, input){
 }
 
 function toggleUpsertNode(state, input){
-  console.log("toggleUpsertNode",input)
+  console.log("toggleUpsertNode in model",input)
   const addNodeToggled = !state.addNodeToggled
   const editedNode = addNodeToggled?input.id:undefined
 
@@ -42,7 +43,7 @@ function confirmUpsertNode(state, input){
   return state
 }
 
-//selections "model"
+//ui "model"
 export function ui(actions){
   const updateFns = {toggleFeedsSelection, toggleAddItems, toggleUpsertNode, cancelUpsertNode, confirmUpsertNode}
   return makeModel({addItemsToggled:false, feedsSelectionToggled:false, addNodeToggled:false, editedNode:undefined}, updateFns, actions)
@@ -53,6 +54,7 @@ export default function model({actions, sources}){
   return combineLatestObj({
     nodes   :nodes(actions)
     ,feeds  :feeds(actions)
+    ,sensors: sensors(actions)
     ,ui     :ui(actions)
   })
 }
