@@ -22,7 +22,7 @@
     "jsondiffpatch": "^0.1.41",
     "metrics-graphics": "mozilla/metrics-graphics",
     "mg-line-brushing": "dandehavilland/mg-line-brushing",
-    "most": "^0.18.0",
+    "most": "^0.18.8",
     "ramda": "^0.20.0",
     "rx": "^4.1.0",
     "rx-dom": "^7.0.3",
