@@ -14,7 +14,7 @@ var babelLoader = {
 //var cssLoader = { test: /\.css$/, loader: "style-loader!css-loader" }
 var postcssLoader = {
   test: /\.css$/,
-  loader: "style-loader?singleton!css-loader?modules&importLoaders=1!postcss-loader"//!postcss-loader" 
+  loader: "style-loader?singleton!css-loader?modules&importLoaders=1!postcss-loader"//!postcss-loader"
 }
 var postcssSettings = {
   postcss: function (webpack) {
@@ -28,6 +28,7 @@ var postcssSettings = {
 }
 
 var config = {
+  devtool: 'source-map',
   entry: [
     './src/client'
   ],
