@@ -10,7 +10,7 @@ var d3 = require('metrics-graphics/node_modules/d3')
 
 import fecha from 'fecha'
 
-import {combineLatestObj} from '../../../utils'
+import {combineLatestObj} from '../../../utils/obsUtils'
 
 import {mergeAll,flatten,nth} from 'ramda'
 
@@ -28,7 +28,7 @@ function view(state$){
   endOfDay.setHours(23)
   endOfDay.setMinutes(59)
   endOfDay.setSeconds(59)
-  //endOfDay = new Date( Date.now()+2000000 ) 
+  //endOfDay = new Date( Date.now()+2000000 )
 
   let startOfDay = new Date()
   startOfDay.setHours(9)
@@ -58,9 +58,9 @@ function view(state$){
     //,full_height:true
   }
 
-  //type can be temperature, pressure , speed etc 
+  //type can be temperature, pressure , speed etc
   function makeSettingsByType(type){
-   
+
     const mappings = {
       'temperature' : {
         title: "Temperature (C)"
@@ -131,7 +131,7 @@ function view(state$){
   }
 
 
-  
+
 
   function initGraph(dataType, id){
     console.log("initGraph",dataType,id)
@@ -147,14 +147,14 @@ function view(state$){
       if(elem){
         const timeString = fecha.format(d.time, 'YYYY-MM-DD hh:mm:ss A')
         elem.innerHTML = `${dataType}: ${d.value}    ${timeString}`
-      } 
+      }
     }
     /*,mouseover: function(d, i) {
       console.log("rollover",d,i)
         //custom format the rollover text, show days
         let elem =  document.querySelector('svg .mg-active-datapoint')
         console.log("elem",elem)
-        elem.innerHTML = "GNA GNA" + d.value +"  "+ d.time.toString() 
+        elem.innerHTML = "GNA GNA" + d.value +"  "+ d.time.toString()
     }*/
 
     const graph = new GraphWidget(undefined, graphSettings, graphId)
@@ -197,7 +197,7 @@ function view(state$){
       .asMutable()//needed , otherwise we loose prototypes, needed for graphWidget
 
     console.log("feed TEST",refinedFeedsData)
- 
+
     //multi graph version
     function makeComboGraph(refinedFeedsData){
       let combinedData = refinedFeedsData.reduce(function(acc, data, index){
@@ -210,7 +210,7 @@ function view(state$){
 
 
       console.log("foo",combinedData)
-      //comboGraph.updateData(combinedData.timeSeries)   
+      //comboGraph.updateData(combinedData.timeSeries)
 
       const typeSettings =  {
         title: "Combo"
@@ -236,7 +236,7 @@ function view(state$){
       {
         return null
       }
-      
+
     }
 
     function makeMultiGraphs(refinedFeedsData){
@@ -248,16 +248,16 @@ function view(state$){
       //update all graphs
       refinedFeedsData.forEach(function(data,index){
         graphList[index].updateData(data.timeSeries)
-      }) 
+      })
 
-      return graphList  
+      return graphList
     }
 
     //let graphList = makeComboGraph(refinedFeedsData)
     let graphList = makeMultiGraphs(refinedFeedsData)
 
     return <section id="graphs">
-        {graphList}   
+        {graphList}
       </section>
     })
 }
@@ -268,10 +268,10 @@ function GraphsGroup({DOM, props$}, name = '') {
   const state$ = model(props$)
 
   const vtree$ = view(state$)
-  
+
   return {
     DOM: vtree$
   }
 }
 
-export default GraphsGroup 
+export default GraphsGroup

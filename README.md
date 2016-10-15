@@ -12,7 +12,7 @@
 
 ## Usage
 
-          npm start 
+          npm start
 
 
   Then go to http://localhost:3001/index.html
@@ -27,11 +27,11 @@
 
   you can also manually rebuild things:
 
-    client 
+    client
 
           npm run build-client
 
-    server 
+    server
 
           npm run build-server
 
@@ -40,16 +40,17 @@
   file for more useful scripts
 
 
-## Tech 
+## Tech
 
   "Mostly" writen in a functional (functional reactive) way (I always was very OOP oriented so quality may vary)
 
   A few notable libs in use
 
   - [Cycle.js](http://cycle.js.org/) on both client and server as a sort of "app basis"
-  - [tingodb.js](http://www.tingodb.com/) for storage 
-  - browserify and various transforms to package things nicely for the client side 
-  - socket.io , etc etc 
+  - [tingodb.js](http://www.tingodb.com/) for storage
+  - browserify and various transforms to package things nicely for the client side
+  - socket.io
+  - mqtt
 
 
 

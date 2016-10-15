@@ -1,0 +1,81 @@
+@import "~styles/palette.scss";
+@import "~styles/common.scss";
+
+#sensorData{
+  position: absolute;
+  right:200px;
+  top:200px;
+  width: 300px;
+  height: 300px;
+}
+
+/*chart settings*/
+#graphs{
+  height: 90%;
+}
+
+.graph{
+  width: 50%;
+  position: relative;
+  float: left;
+  /*font-size: 0.55rem;*/
+}
+
+.mg-voronoi{
+  fill:rgba(255, 0, 0, 0);
+}
+
+.mg-chart-title{
+  color: #1bf8f1 !important;
+  font-weight: 500;
+}
+
+.mg-header{
+  color: #1bf8f1 !important;
+  font-weight: 500;
+  fill:#1bf8f1 !important;
+}
+
+.mg-line-legend{
+  color:white !important;
+  fill : #ffffff !important;
+}
+
+.mg-x-axis text {
+  color: #1bf8f1 !important;
+  fill : #1bf8f1 !important;
+}
+.mg-y-axis text {
+  color: #1bf8f1 !important;
+  fill : #1bf8f1 !important;
+}
+
+.mg-line-legend text {
+  color: #FFFFFF !important;
+  fill:#FFFFFF !important;
+}
+
+/*.mg-x-axis text, .mg-y-axis text, .mg-histogram .axis text {
+}
+shape-rendering: auto;
+*/
+.mg-x-axis line, .mg-y-axis line {
+    opacity: 1;
+
+    stroke: #b3b2b2;
+    stroke-width: 1px;
+}
+
+.mg-line1-color{
+  color: #1bf8f1  !important;
+  stroke: #1bf8f1  !important;
+}
+
+.mg-area1-color {
+    fill: rgba(255, 255, 255, 0);
+  }
+
+.mg-active-datapoint {
+  fill: #FFFFFF !important;
+  opacity: 0.6 !important;
+}

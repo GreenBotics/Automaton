@@ -1,21 +1,4 @@
-//import "babel-core/polyfill"//needed for object.assign
-
-
-/*converts input data to array if it is not already an array*/
-export function toArray(data){
-  if(!data) return []
-  if(data.constructor !== Array) return [data]
-  return data
-}
-
-//merge the current data with any number of input data
-export function mergeData(currentData,inputs){
-  if("merge" in currentData){
-    return currentData.merge(inputs)
-  }
-  return Object.assign(currentData,inputs)
-}
-
+import Rx from 'rx'
 
 //from staltz/combineLatestObj
 export function combineLatestObj(obj) {
@@ -36,7 +19,6 @@ export function combineLatestObj(obj) {
     return combination;
   })
 }
-
 
 export function slidingAccumulator(data$, maxItems=10){
 
